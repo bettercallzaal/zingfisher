@@ -18,6 +18,19 @@ not used in this fork's branding (trademark clause in LICENSE).
 
 ## Summary of Modifications
 
+### 2026-06-14 - Fix KFMEDIA partial-rebrand build breaks (loop iter 5)
+KFMEDIA's automated rebrand renamed several import sites to `KFMEDIA*` without
+ever exporting them, leaving dangling imports that break the build. Fixed:
+- `KFMEDIADiscordInvite` (4 import sites) - added export in `@packages/config/constants`,
+  pointed at the ZAO Discord (discord.thezao.com). `charmverseDiscordInvite` now aliases it.
+- `KFMEDIABankAddress` (3 import sites) - added alias to `charmVerseBankAddress` in
+  `@packages/subscriptions/constants` (value unchanged - upstream treasury, not ours).
+- `KFMEDIACredentialSchemas` - added alias to `charmverseCredentialSchemas` in
+  `@packages/credentials/schemas`.
+- `public/images/KFMEDIA_logo_icon.png` import (never committed) - repointed to an
+  existing icon asset (TODO: ZAO logo asset).
+- Dead `KFMEDIA_black.png` image paths -> existing `charmverse_black.png` (runtime).
+
 ### 2026-06-14 - Branding-string sweep (loop iter 4)
 - Replaced the bare brand word `KFMEDIA` with `ZAO` across 44 files of
   user-facing settings/account/billing copy (73 occurrences). Word-boundary +

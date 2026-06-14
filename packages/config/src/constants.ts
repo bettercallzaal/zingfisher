@@ -38,7 +38,12 @@ export const googleFirebaseAdminConfig = {
 };
 export const magicLinkEmailCookie = 'magic-link';
 
-export const charmverseDiscordInvite = 'https://discord.gg/ACYCzBGC2M';
+export const zaoDiscordInvite = 'https://discord.thezao.com';
+// Back-compat aliases. charmverseDiscordInvite is used by mailer templates;
+// KFMEDIADiscordInvite is imported by 4 settings/login files but was never
+// exported (KFMEDIA partial-rebrand fallout) - this alias fixes that build break.
+export const charmverseDiscordInvite = zaoDiscordInvite;
+export const KFMEDIADiscordInvite = zaoDiscordInvite;
 export const userManualUrl = 'https://tiny.charmverse.io/user-manual';
 // Google config with sensitive scopes (to eventually replace the primary config)
 export const googleOAuthClientIdSensitive =

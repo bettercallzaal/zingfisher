@@ -24,7 +24,7 @@ function SubscriptionTierChangeEventRow({ event }: { event: SubscriptionTierChan
       <Box display='flex' alignItems='center' gap={1}>
         <Avatar
           name={user?.username}
-          avatar={user ? user?.avatar : 'https://app.KFMEDIA.io/images/logos/KFMEDIA_black.png'}
+          avatar={user ? user?.avatar : '/images/logos/charmverse_black.png'}
           size='small'
           isNft={user ? hasNftAvatar(user) : false}
         />
@@ -52,7 +52,7 @@ function SubscriptionContributionEventRow({ event }: { event: SubscriptionContri
       <Box display='flex' alignItems='center' gap={1}>
         <Avatar
           name={user ? user.username : undefined}
-          avatar={user ? user?.avatar : 'https://app.KFMEDIA.io/images/logos/KFMEDIA_black.png'}
+          avatar={user ? user?.avatar : '/images/logos/charmverse_black.png'}
           size='small'
           isNft={user ? hasNftAvatar(user) : false}
         />
@@ -78,7 +78,7 @@ function SubscriptionPaymentEventRow({ event }: { event: SubscriptionPaymentEven
   return (
     <Stack flexDirection='row' justifyContent='space-between' alignItems='center' gap={1}>
       <Box display='flex' alignItems='center' gap={1}>
-        <Avatar avatar='https://app.KFMEDIA.io/images/logos/KFMEDIA_black.png' size='small' />
+        <Avatar avatar='/images/logos/charmverse_black.png' size='small' />
         <Typography variant='body1'>
           {month} {date.getFullYear()} - {capitalize(event.tier)} Plan
         </Typography>

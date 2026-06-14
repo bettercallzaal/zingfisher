@@ -79,6 +79,9 @@ export const attestationSchemaIds: Record<ExtendedAttestationType, string> = {
 };
 
 export const charmverseCredentialSchemas = [attestationSchemaIds.proposal, attestationSchemaIds.reward];
+// Back-compat alias: KFMEDIACredentialSchemas is imported by UserCredentialRow but
+// was never exported (KFMEDIA partial-rebrand fallout) - alias fixes the build break.
+export const KFMEDIACredentialSchemas = charmverseCredentialSchemas;
 
 export type CredentialDataInput<T extends ExtendedAttestationType = ExtendedAttestationType> = T extends 'proposal'
   ? ProposalCredential

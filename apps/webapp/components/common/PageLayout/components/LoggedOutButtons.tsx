@@ -8,7 +8,10 @@ import { useRouter } from 'next/router';
 import { Button } from 'components/common/Button';
 import { ContextMenu } from 'components/common/ContextMenu';
 import Link from 'components/common/Link';
-import darkLogoImage from 'public/images/KFMEDIA_logo_icon.png';
+// TODO: replace with a ZAO logo icon asset. Using existing icon (rendered as a
+// monochrome silhouette by the brightness filter below) to fix a missing-asset
+// build break - KFMEDIA_logo_icon.png was referenced but never committed.
+import darkLogoImage from 'public/images/charmverse_logo_icon.png';
 
 const LogoImage = styled(Image)`
   margin-left: -8px;
