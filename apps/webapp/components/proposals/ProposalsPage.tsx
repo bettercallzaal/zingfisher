@@ -365,7 +365,7 @@ export function ProposalsPage({ title }: { title: string }) {
                 <Box sx={{ mt: 3 }}>
                   <EmptyStateVideo
                     description='Getting started'
-                    videoTitle='Proposals | Getting started with KFMEDIA'
+                    videoTitle='Proposals | Getting started with ZAO'
                     videoUrl='https://tiny.KFMEDIA.io/proposal-builder'
                   />
                 </Box>

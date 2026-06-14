@@ -9,7 +9,7 @@ export type OpenGraphProps = {
 
 const defaults = {
   description: 'The Network for Onchain Communities. Manage grants. Connect with builders. Forge new ideas.',
-  title: 'KFMEDIA',
+  title: 'ZAO',
   image: 'https://app.KFMEDIA.io/images/logo_black_lightgrey_opengraph.png'
 };
 

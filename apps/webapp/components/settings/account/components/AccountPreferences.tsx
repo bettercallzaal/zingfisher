@@ -129,14 +129,14 @@ export function AccountPreferences() {
                   onChange={onChange}
                 />
               }
-              label='Receive email updates on mentions, comments, post and other things in KFMEDIA.'
+              label='Receive email updates on mentions, comments, post and other things in ZAO.'
             />
             <FormControlLabel
               disabled={!user?.email || isMutating}
               control={
                 <Checkbox {...register('emailNewsletter')} checked={!!user?.emailNewsletter} onChange={onChange} />
               }
-              label='Receive tips and examples how to use KFMEDIA.'
+              label='Receive tips and examples how to use ZAO.'
             />
           </FormGroup>
           <Button

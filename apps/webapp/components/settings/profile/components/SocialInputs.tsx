@@ -33,7 +33,7 @@ export function SocialInputs(props: SocialInputsProps) {
           disabled={readOnly}
           error={!!errors?.twitterURL?.message}
           helperText={errors?.twitterURL?.message}
-          placeholder='https://x.com/KFMEDIA'
+          placeholder='https://x.com/ZAO'
           onChange={(event) => {
             onChange({
               ...social,
@@ -49,7 +49,7 @@ export function SocialInputs(props: SocialInputsProps) {
           fullWidth
           error={!!errors?.githubURL?.message}
           helperText={errors?.githubURL?.message}
-          placeholder='https://github.com/KFMEDIA'
+          placeholder='https://github.com/ZAO'
           onChange={(event) => {
             onChange({
               ...social,

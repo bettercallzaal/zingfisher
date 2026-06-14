@@ -33,7 +33,7 @@ export const SpacesContext = createContext<Readonly<IContext>>({
 // Dev mode mock space
 const MOCK_SPACE: Space = {
  id: 'dev-mock-space-001',
- name: 'KFMEDIA Learning Center',
+ name: 'ZAO Learning Center',
  domain: 'kfmedia-learning',
  spaceImage: null,
  createdAt: new Date(),

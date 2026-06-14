@@ -56,7 +56,7 @@ type Props = {
   emailOnly?: boolean;
 };
 
-// KFMEDIA Learning Center — simplified login (no wallet/crypto)
+// ZAO Learning Center — simplified login (no wallet/crypto)
 
 export function LoginButton({ redirectUrl, signInLabel = 'Sign in', showSignup, emailOnly }: Props) {
   const loginDialog = usePopupState({ variant: 'popover', popupId: 'login-dialog' });
@@ -106,7 +106,7 @@ export function LoginButton({ redirectUrl, signInLabel = 'Sign in', showSignup, 
 
 function LoginHandler(props: DialogProps) {
  const { redirectUrl, onClose, isOpen } = props;
- // KFMEDIA Learning Center — email and Google only
+ // ZAO Learning Center — email and Google only
   const router = useRouter();
   const returnUrl = typeof router.query.returnUrl === 'string' ? router.query.returnUrl : undefined;
   const [loginMethod, setLoginMethod] = useState<'email' | null>(null);
@@ -147,7 +147,7 @@ function LoginHandler(props: DialogProps) {
     }
   }
 
-   // Web3 login removed for KFMEDIA Learning Center
+   // Web3 login removed for ZAO Learning Center
 
   function handleLoginError(err: any) {
     if ((err as SystemError)?.errorType === 'Disabled account') {
@@ -178,7 +178,7 @@ function LoginHandler(props: DialogProps) {
         <List sx={{ pt: 0, maxWidth: '400px' }}>
            {!loginMethod && (
           <DialogTitle textAlign='left'>
-          Sign in to KFMEDIA
+          Sign in to ZAO
          </DialogTitle>
         )}
 

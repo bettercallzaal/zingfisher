@@ -155,7 +155,7 @@ export function ApiSettings({ space }: { space: Space }) {
       <br />
       <Typography variant='h6'>Webhook (beta)</Typography>
       <Typography>
-        Subscribe to user events in KFMEDIA using webhooks. You must provide us with a http endpoint accepting POST
+        Subscribe to user events in ZAO using webhooks. You must provide us with a http endpoint accepting POST
         requests which returns a 200 response upon reception of the event.
       </Typography>
       {spaceWebhook && events && (

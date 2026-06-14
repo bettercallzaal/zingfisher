@@ -34,7 +34,7 @@ handler.get(getSubmissions);
  *          type: number
  *        source:
  *          type: string
- *          enum: [onchain, KFMEDIA]
+ *          enum: [onchain, ZAO]
  *        verificationUrl:
  *          type: string
  *          nullable: true
@@ -100,7 +100,7 @@ type PublicApiEASCredential = {
   schemaId: string;
   createdAt: string;
   chainId: number;
-  source: 'onchain' | 'KFMEDIA';
+  source: 'onchain' | 'ZAO';
   verificationUrl: string | null;
 };
 

@@ -26,7 +26,7 @@ async function connectTelegram(req: NextApiRequest, res: NextApiResponse<Telegra
   if (telegramUser) {
     if (telegramUser.userId !== userId) {
       throw new InvalidStateError(
-        'Connection to Telegram failed. Another KFMEDIA account is already associated with this Telegram account.'
+        'Connection to Telegram failed. Another ZAO account is already associated with this Telegram account.'
       );
     }
   } else {

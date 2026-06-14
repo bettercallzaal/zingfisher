@@ -247,7 +247,7 @@ const templates = {
     return emails.getPendingNotificationEmail({
       notification: createCardNotification({
         pageTitle: 'Product Road Map',
-        spaceName: 'KFMEDIA'
+        spaceName: 'ZAO'
       }),
       user,
       spaceFeatures: []
@@ -258,7 +258,7 @@ const templates = {
       notification: createDocumentNotification({
         mentionText: 'Hey there, please respond to this message.',
         pageTitle: 'Attention please',
-        spaceName: 'KFMEDIA'
+        spaceName: 'ZAO'
       }),
       user,
       spaceFeatures: []
@@ -268,7 +268,7 @@ const templates = {
     return emails.getPendingNotificationEmail({
       notification: createPostNotification({
         postTitle: 'New idea. Let us discuss!',
-        spaceName: 'KFMEDIA'
+        spaceName: 'ZAO'
       }),
       user,
       spaceFeatures: []
@@ -279,7 +279,7 @@ const templates = {
       notification: createVoteNotification({
         deadline: new Date(Date.now() + 12 * 60 * 60 * 1000),
         pageTitle: 'This is a really really long vote title',
-        spaceName: 'KFMEDIA',
+        spaceName: 'ZAO',
         voteTitle: 'Should we add this section? I think it can be a great addition but need all of your votes to decide'
       }),
       user,

@@ -28,7 +28,7 @@ export function EnterpriseBillingScreen() {
             }}
           >
             You are on our Grants plan. For any queries related to billing, please reach out to your billing contact at
-            KFMEDIA
+            ZAO
           </Typography>
         </Stack>
       </Stack>

@@ -71,7 +71,7 @@ export function SpaceCredentialSettings() {
 
       <Typography variant='h6'>Credentials Logo</Typography>
       <Box display='flex' flexDirection='column' alignItems='left' mb={2}>
-        <Typography variant='body1'>Select a custom logo which will appear on Credentials in KFMEDIA</Typography>
+        <Typography variant='body1'>Select a custom logo which will appear on Credentials in ZAO</Typography>
       </Box>
       <Box mb={1}>
         <Avatar

@@ -19,7 +19,7 @@ export function CodeDetails({ onSubmit, uri, code, btnText }: Props) {
   return (
     <Box>
       <Typography variant='h5' mb={2}>
-        Link the app to your KFMEDIA account
+        Link the app to your ZAO account
       </Typography>
       <Typography>
         Use your authentication app to scan this QR code. If you don't have an authentication app on your device, you'll

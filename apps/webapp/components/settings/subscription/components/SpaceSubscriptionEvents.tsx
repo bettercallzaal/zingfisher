@@ -33,7 +33,7 @@ function SubscriptionTierChangeEventRow({ event }: { event: SubscriptionTierChan
             ? _isDowngrade
               ? `${user.username} selected ${tierConfig[event.tier].name} tier for next month`
               : `${user.username} upgraded to ${capitalize(event.tier)} tier`
-            : `KFMEDIA ${_isDowngrade ? 'downgraded' : 'upgraded'} the tier to ${tierConfig[event.tier].name}`}
+            : `ZAO ${_isDowngrade ? 'downgraded' : 'upgraded'} the tier to ${tierConfig[event.tier].name}`}
         </Typography>
         <Typography variant='caption' color='text.secondary'>
           {formatDate(event.createdAt, { month: 'long', withYear: true })}
@@ -56,7 +56,7 @@ function SubscriptionContributionEventRow({ event }: { event: SubscriptionContri
           size='small'
           isNft={user ? hasNftAvatar(user) : false}
         />
-        <Typography variant='body1'>Contribution by {user ? user?.username : 'KFMEDIA'}</Typography>
+        <Typography variant='body1'>Contribution by {user ? user?.username : 'ZAO'}</Typography>
         <Typography variant='caption' color='text.secondary'>
           {formatDate(event.createdAt, { month: 'long', withYear: true })}
         </Typography>

@@ -123,7 +123,7 @@ async function connectDiscord(req: NextApiRequest, res: NextApiResponse<ConnectD
     log.warn('Error while creating Discord record', {
       error
     });
-    // If the discord user is already connected to a KFMEDIA account this code will be run
+    // If the discord user is already connected to a ZAO account this code will be run
     res.status(400).json({
       error: 'Connection to Discord failed.'
     });

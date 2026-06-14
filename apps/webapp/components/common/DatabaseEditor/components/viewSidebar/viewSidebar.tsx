@@ -163,7 +163,7 @@ function ViewSidebar(props: Props) {
               title='Data source'
               view={props.view}
               views={props.views}
-              // We don't want to allow going back if this board is locked to KFMEDIA databases
+              // We don't want to allow going back if this board is locked to ZAO databases
               closeSourceOptions={goToSidebarHome}
               closeSidebar={onClose}
               showView={props.showView}

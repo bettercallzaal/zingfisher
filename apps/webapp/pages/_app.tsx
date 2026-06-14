@@ -170,7 +170,7 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
                           <ErrorBoundary>
                             <Snackbar
                               isOpen={isOldBuild}
-                              message='New KFMEDIA Learning Center platform update available. Please refresh.'
+                              message='New ZAO Learning Center platform update available. Please refresh.'
                               actions={[
                                 <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
                                   <RefreshIcon fontSize='small' />
@@ -255,7 +255,7 @@ function DataProviders({ children }: { children: ReactNode }) {
 function PageHead({ openGraphData }: { openGraphData?: OpenGraphProps }) {
   const [title] = usePageTitle();
   const prefix = isDevEnv ? 'DEV |' : '';
-  const titleString = `${prefix} ${title || `KFMEDIA Learning Center - Education for Impact`}`;
+  const titleString = `${prefix} ${title || `ZAO Learning Center - Education for Impact`}`;
 
   return (
     <Head>

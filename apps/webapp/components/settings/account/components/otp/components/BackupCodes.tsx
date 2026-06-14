@@ -23,7 +23,7 @@ export function BackupCodes({ recoveryCode, errorMessage, loading, onSubmit }: P
       <Typography mb={2}>Save this single-use backup code in a safe place.</Typography>
       <LabelWithCopy label={recoveryCode} copyText='Copy backup code' variant='body1' iconPosition='right' />
       <Typography my={2}>
-        The backup code lets you log in to KFMEDIA if you don't have access to your authenticator app.
+        The backup code lets you log in to ZAO if you don't have access to your authenticator app.
       </Typography>
       <Button onClick={onSubmit} loading={loading} disabled={loading} data-test='two-factor-auth-next'>
         Confirm

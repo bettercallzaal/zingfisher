@@ -57,10 +57,10 @@ export function UserCredentialRow({
         await addFavorite({
           chainId: credential.chainId,
           attestationId:
-            (credential.type === 'onchain' || credential.type === 'KFMEDIA') && credential.id.startsWith('0x')
+            (credential.type === 'onchain' || credential.type === 'ZAO') && credential.id.startsWith('0x')
               ? credential.id
               : undefined,
-          issuedCredentialId: credential.type === 'KFMEDIA' ? credential.issuedCredentialId : undefined,
+          issuedCredentialId: credential.type === 'ZAO' ? credential.issuedCredentialId : undefined,
           gitcoinWalletAddress: credential.type === 'gitcoin' ? credential.recipient : undefined
         });
       }
@@ -77,7 +77,7 @@ export function UserCredentialRow({
     iconUrl: string | OverridableComponent<SvgIconTypeMap>;
     attestationContent: { name: string; value: string }[];
   } =
-    (credential.type === 'KFMEDIA' ||
+    (credential.type === 'ZAO' ||
       (credential.type === 'onchain' && KFMEDIACredentialSchemas.includes(credential.schemaId))) &&
     'Organization' in charmCredential
       ? {
@@ -86,7 +86,7 @@ export function UserCredentialRow({
           iconUrl: credential.iconUrl ?? '/images/logo_black_lightgrey.png',
           attestationContent: [{ name: 'Event', value: charmCredential.Event }]
         }
-      : credential.type === 'KFMEDIA' &&
+      : credential.type === 'ZAO' &&
           credential.schemaId === externalCredentialSchemaId &&
           'GrantRound' in charmCredential &&
           charmCredential.Source === 'Gitcoin'
@@ -96,7 +96,7 @@ export function UserCredentialRow({
             iconUrl: credential.iconUrl ?? '/images/logos/gitcoin-logo.png',
             attestationContent: [{ name: 'Event', value: charmCredential.Event }]
           }
-        : credential.type === 'KFMEDIA' &&
+        : credential.type === 'ZAO' &&
             credential.schemaId === externalCredentialSchemaId &&
             'GrantRound' in charmCredential &&
             charmCredential.Source === 'Questbook'
@@ -180,7 +180,7 @@ export function UserCredentialRow({
       {typeof credentialInfo.iconUrl === 'string' ? (
         <Image
           src={credentialInfo.iconUrl}
-          alt='KFMEDIA-logo'
+          alt='ZAO-logo'
           height={isSmallScreen ? 40 : 30}
           width={isSmallScreen ? 40 : 30}
         />

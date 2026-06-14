@@ -372,7 +372,7 @@ export function EvaluationsReview({
             pageId={pageId}
             lensPostLink={pageLensPostLink}
             onPublish={refreshProposal}
-            text={`${shareText}\nView on KFMEDIA:\n`}
+            text={`${shareText}\nView on ZAO:\n`}
             content={{
               type: 'doc',
               content: [
@@ -399,7 +399,7 @@ export function EvaluationsReview({
                   content: [
                     {
                       type: 'text',
-                      text: `View on KFMEDIA `
+                      text: `View on ZAO `
                     },
                     {
                       type: 'text',

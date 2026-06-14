@@ -102,7 +102,7 @@ export function EvaluationsReview({
   const [tempRewardUpdates, setTempRewardUpdates] = useState<UpdateableRewardFields | null>(null);
   const { showMessage } = useSnackbar();
   const shareLink = getAbsolutePath(`/${page.path}`, currentSpace?.domain);
-  const shareText = `Check out ${page.title} from ${currentSpace?.domain} on KFMEDIA: `;
+  const shareText = `Check out ${page.title} from ${currentSpace?.domain} on ZAO: `;
 
   useEffect(() => {
     if (currentEvaluation && (application || isNewApplication)) {
@@ -235,7 +235,7 @@ export function EvaluationsReview({
                     },
                     {
                       type: 'text',
-                      text: `Check out ${page.title} from ${currentSpace?.domain} on KFMEDIA: `
+                      text: `Check out ${page.title} from ${currentSpace?.domain} on ZAO: `
                     },
                     {
                       type: 'text',

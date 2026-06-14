@@ -337,7 +337,7 @@ export function UserIdentities() {
                             Are you sure you want to Disconnect your {wallet.ensname || wallet.address} wallet?
                           </Typography>
                           <Typography variant='body2'>
-                            This action will remove your wallet, NFTs, POAPs, Organizations from KFMEDIA. It will also
+                            This action will remove your wallet, NFTs, POAPs, Organizations from ZAO. It will also
                             remove roles and permissions if you joined the Space via a token gate.
                           </Typography>
                         </>

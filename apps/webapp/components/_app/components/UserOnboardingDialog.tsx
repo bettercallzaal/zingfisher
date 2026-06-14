@@ -182,7 +182,7 @@ function UserOnboardingDialog({
   let title = 'Edit your profile';
   if (initialStep) {
     if (currentStep === 'email_step') {
-      title = 'Welcome to KFMEDIA';
+      title = 'Welcome to ZAO';
     } else if (currentStep === 'profile_step') {
       // wrap hyphens with word joiner so that it doesn't wrap: https://en.wikipedia.org/wiki/Word_joiner
       title = `Welcome to ${space.name.replace(/-/g, '\ufeff-\ufeff')}! Set up your profile`;

@@ -440,7 +440,7 @@ export function RewardsPage({ title }: { title: string }) {
               <Box sx={{ mt: 3 }}>
                 <EmptyStateVideo
                   description='Getting started'
-                  videoTitle='Rewards | Getting started with KFMEDIA'
+                  videoTitle='Rewards | Getting started with ZAO'
                   videoUrl='https://tiny.KFMEDIA.io/bounties'
                 />
               </Box>

@@ -27,7 +27,7 @@ export function CredentialRow({ credential, isSmallScreen, verificationUrl }: Us
       <Box gap={1} display='flex' alignItems='center' justifyItems='flex-start' flexBasis='100%' sx={{ pr: 1 }}>
         <Image
           src={credentialInfo.iconUrl}
-          alt='KFMEDIA-logo'
+          alt='ZAO-logo'
           height={isSmallScreen ? 40 : 30}
           width={isSmallScreen ? 40 : 30}
         />

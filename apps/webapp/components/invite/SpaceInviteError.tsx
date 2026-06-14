@@ -19,7 +19,7 @@ export default function InviteLinkPageError() {
           </Typography>
         </Box>
         <PrimaryButton fullWidth size='large' href='/' external /* external=true avoids space domain being added */>
-          Continue to KFMEDIA
+          Continue to ZAO
         </PrimaryButton>
       </Card>
     </CenteredBox>

@@ -83,7 +83,7 @@ type ProposalReviewer = {
  *          example: EIP-4361 Sign in with Ethereum
  *        url:
  *          type: string
- *          example: https://app.KFMEDIA.io/KFMEDIA/proposals?id=3334afc4-5f0a-4d3c-8889-56fcc2b2ed8d
+ *          example: https://app.KFMEDIA.io/ZAO/proposals?id=3334afc4-5f0a-4d3c-8889-56fcc2b2ed8d
  *        voteOptions:
  *          type: array
  *          items:

@@ -28,7 +28,7 @@ export function TwoFactorAuthUser() {
       <Legend
         noBorder
         wrap
-        helperText='Use a mobile authentication app to get a verification code to enter KFMEDIA everytime you login.'
+        helperText='Use a mobile authentication app to get a verification code to enter ZAO everytime you login.'
       >
         Two-factor Authentication
       </Legend>

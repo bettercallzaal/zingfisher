@@ -60,7 +60,7 @@ export const embeds = {
     placeholder: 'https://www.figma.com/file/...',
     text: 'Insert a Figma embed',
     convertURLToEmbed(url: string) {
-      return `https://www.figma.com/embed?embed_host=KFMEDIA&url=${url}`;
+      return `https://www.figma.com/embed?embed_host=ZAO&url=${url}`;
     },
     urlTest(url: string) {
       return url.includes('www.figma.com');

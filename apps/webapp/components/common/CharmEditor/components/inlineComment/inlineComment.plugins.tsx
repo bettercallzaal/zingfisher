@@ -146,7 +146,7 @@ function getDecorations(state: EditorState) {
       const container = document.createElement('div');
       container.className = 'charm-row-decoration-comments charm-row-decoration';
       container.setAttribute('data-ids', newIds.join(','));
-      container.setAttribute('data-test', 'KFMEDIA-inline-comment-icon');
+      container.setAttribute('data-test', 'ZAO-inline-comment-icon');
       createRoot(container).render(<RowDecoration count={newIds.length} />);
 
       decorations.push(Decoration.widget(firstPos, () => container, { key: commentIds.join(',') }));

@@ -13,7 +13,7 @@ const subscriptionCancellationDetails = {
     'All users will have the default member role',
     'Custom domains will be removed',
     'You will no longer have access to the public API',
-    'You will still be able to use KFMEDIA for your community but you will be working in public'
+    'You will still be able to use ZAO for your community but you will be working in public'
   ],
   last: 'If you upgrade to a paid plan in the future, all current permissions will be restored.'
 };

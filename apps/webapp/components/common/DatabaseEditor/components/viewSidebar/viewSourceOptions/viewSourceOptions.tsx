@@ -173,7 +173,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
                 onClick={selectSourceType('board_page')}
               >
                 <TbDatabase style={{ fontSize: 24 }} />
-                KFMEDIA database
+                ZAO database
               </SourceType>
             )}
 
@@ -187,7 +187,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
                 onClick={isLoadingProposalSource ? undefined : proposalSourcePropertiesPopupState.open}
               >
                 <TaskOutlinedIcon fontSize='small' />
-                KFMEDIA Proposals
+                ZAO Proposals
               </SourceType>
             )}
 

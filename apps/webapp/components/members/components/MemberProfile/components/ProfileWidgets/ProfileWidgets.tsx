@@ -97,7 +97,7 @@ export function ProfileWidgets({
                 )
               );
 
-            case 'KFMEDIA':
+            case 'ZAO':
               return space ? (
                 <Grid size={{ xs: 12, md: 6 }} alignItems='stretch' key={id}>
                   <MemberPropertiesWidget

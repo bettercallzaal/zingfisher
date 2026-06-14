@@ -62,7 +62,7 @@ async function createProjectController(
   }
 
   const newProject = await createProject({
-    source: 'KFMEDIA',
+    source: 'ZAO',
     userId,
     input: req.body
   });

@@ -18,6 +18,21 @@ not used in this fork's branding (trademark clause in LICENSE).
 
 ## Summary of Modifications
 
+### 2026-06-14 - Branding-string sweep (loop iter 4)
+- Replaced the bare brand word `KFMEDIA` with `ZAO` across 44 files of
+  user-facing settings/account/billing copy (73 occurrences). Word-boundary +
+  `(?!.io)` lookahead protected code identifiers (`KFMEDIABankAddress`,
+  `KFMEDIADiscordInvite`), `KFMEDIA.io` URLs, and the logo asset path.
+- Deferred (documented, not yet changed): 35 dead `KFMEDIA.io` help/pricing
+  deep-links (CharmVerse pages with no ZAO equivalent, in billing/custom-domain
+  flows likely to be disabled) and the `KFMEDIA*` code identifiers in
+  `@packages/subscriptions/constants` + `@packages/config/constants`.
+
+### 2026-06-14 - ZAO landing copy + footer (loop iter 3)
+- Login title "The ZAO Learning Center", ZAO subtitle, dev redirect to /zao-learning.
+- Footer links/socials -> zaoos.com, discord.thezao.com, luma.com/zao, ORDAO,
+  Farcaster channel, zingfisher source. ZAO X/Telegram handles still TODO.
+
 ### 2026-06-14 - ZAO rebrand (loop iter 2)
 - **Brand colors**: Replaced KFMEDIA palette (#903235 red / #E6A23A gold) with the
   ZAO palette (#f5a623 amber / #ffd700 gold) in `packages/config/src/colors.ts`.

@@ -56,7 +56,7 @@ export function ConfirmRecoveryCode({ onSubmit, errorMessage, loading, changeTyp
           </Button>
         )}
         <Link href={KFMEDIADiscordInvite} variant='body2' external target='_blank'>
-          Contact KFMEDIA Support
+          Contact ZAO Support
         </Link>
       </Box>
       <Button

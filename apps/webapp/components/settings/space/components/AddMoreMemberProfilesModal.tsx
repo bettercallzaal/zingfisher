@@ -57,7 +57,7 @@ export function AddMoreMemberProfilesModal({
 
 export function getProfileWidgetLogo(name: MemberProfileName) {
   switch (name) {
-    case 'KFMEDIA':
+    case 'ZAO':
       return '/images/logos/KFMEDIA_black.png';
     case 'collection':
       return '/images/template_icons/nft_ape_icon.svg';

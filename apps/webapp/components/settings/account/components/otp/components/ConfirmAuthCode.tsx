@@ -36,7 +36,7 @@ export function ConfirmAuthCode({ onSubmit, errorMessage, loading, changeType }:
         Enter the confirmation code
       </Typography>
       <Typography mb={2}>
-        Follow the instructions on the authenticator app to link your KFMEDIA account. Once the authenticator app
+        Follow the instructions on the authenticator app to link your ZAO account. Once the authenticator app
         generates a confirmation code enter it here.
       </Typography>
       <Box maxWidth={300} mb={1}>
@@ -65,7 +65,7 @@ export function ConfirmAuthCode({ onSubmit, errorMessage, loading, changeType }:
           </Button>
         )}
         <Link href={KFMEDIADiscordInvite} variant='body2' external target='_blank'>
-          Contact KFMEDIA Support
+          Contact ZAO Support
         </Link>
       </Box>
       <Button
