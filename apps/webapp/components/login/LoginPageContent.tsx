@@ -32,7 +32,7 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Pr
   // STUB: Auto-redirect to app when in dev mode so we can audit without auth wall
   useEffect(() => {
     if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-      router.replace('/kfmedia-learning');
+      router.replace('/zao-learning');
     }
   }, [router]);
 
@@ -88,7 +88,7 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Pr
         maxWidth: { md: '520px' }
       }}
     >
-      Manage grants. Connect with builders. Forge new ideas.
+      Learn to build, ship, and govern across The ZAO ecosystem.
     </Typography>
   );
 
@@ -96,8 +96,8 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Pr
     `Login to ${spaceFromPath?.name}`
   ) : customDomain === null ? (
     <>
-      The Network for <br />
-      Onchain Communities
+      The ZAO <br />
+      Learning Center
     </>
   ) : null;
 
