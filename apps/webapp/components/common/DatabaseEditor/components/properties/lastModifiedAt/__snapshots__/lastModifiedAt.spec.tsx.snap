@@ -1,0 +1,15 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`components/properties/lastModifiedAt > should match snapshot 1`] = `
+<div>
+  <span
+    class="mocked mocked"
+  >
+    <div
+      class="octo-propertyvalue readonly MuiBox-root mui-yl62nh"
+    >
+      Invalid Date
+    </div>
+  </span>
+</div>
+`;

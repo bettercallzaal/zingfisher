@@ -1,0 +1,68 @@
+name: 'Build Connect Docker Image'
+
+inputs:
+  codebase_sha:
+    description: "Your code base sha, if it's different from the sha of the github action event"
+    value: ''
+    required: false
+  ecr_registry:
+    description: 'ECR registry url'
+    required: true
+
+outputs:
+  ecr-registry:
+    description: 'ECR registry url'
+    value: ${{ steps.login-ecr.outputs.registry }}
+  img_tag:
+    description: 'Image tag of the image'
+    value: '${{ steps.get_img_tag.outputs.version }}'
+  img_repo:
+    description: 'Image tag of the image'
+    value: '${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr_registry }}'
+  full_image_name:
+    description: 'Full image repo and tag'
+    value: '${{ steps.get_img_tag.outputs.tags }}'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Prune dev dependencies and calculate img tag
+      id: prune_dev_dep
+      shell: bash
+      run: |
+        npm prune --omit=dev
+        rm -rf apps/webapp/.next/cache
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-region: ${{ env.AWS_REGION }}
+        mask-aws-account-id: 'false'
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Docker get image tags
+      id: get_img_tag
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{steps.login-ecr.outputs.registry}}/${{ inputs.ecr_registry }}
+        tags: |
+          type=sha,prefix=${{github.run_id}}-,format=short
+        flavor: |
+          latest=${{ github.ref == 'refs/heads/main' }}
+      env:
+        DOCKER_METADATA_SHORT_SHA_LENGTH: 7 # this should match the short-length in the deploy_production action
+
+    - name: Build and push
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.get_img_tag.outputs.tags }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max

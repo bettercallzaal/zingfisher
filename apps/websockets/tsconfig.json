@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "paths": {
+      "lib/*": ["../../lib/*"],
+      "components/*": ["../../components/*"]
+    }
+  },
+  "exclude": ["esbuild.config.ts"]
+}

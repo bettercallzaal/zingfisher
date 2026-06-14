@@ -1,0 +1,21 @@
+{
+  "name": "websockets",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "build": "npx tsx esbuild.config.ts",
+    "start": "tsx watch src/initWebsockets.ts",
+    "start:prod": "node ./dist/initWebsockets.js",
+    "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
+  },
+  "dependencies": {
+    "@packages/bangleeditor": "^0.0.0",
+    "@packages/charmeditor": "^1.0.0",
+    "@packages/config": "^0.0.0",
+    "@packages/metrics": "^0.0.0",
+    "@packages/spaces": "^0.0.0",
+    "@packages/utils": "^1.0.0",
+    "@packages/websockets": "^0.0.0"
+  }
+}

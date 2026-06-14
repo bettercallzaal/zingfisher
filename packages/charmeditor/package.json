@@ -1,0 +1,26 @@
+{
+  "name": "@packages/charmeditor",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "npx tsc",
+    "test": ""
+  },
+  "dependencies": {
+    "@nytimes/react-prosemirror": "^0.6.2",
+    "@packages/utils": "^1.0.0",
+    "prosemirror-commands": "^1.6.0",
+    "prosemirror-inputrules": "^1.4.0",
+    "prosemirror-keymap": "^1.2.2",
+    "prosemirror-markdown": "^1.13.0",
+    "prosemirror-model": "^1.22.3",
+    "prosemirror-schema-list": "^1.4.1",
+    "prosemirror-state": "^1.4.3"
+  },
+  "exports": {
+    "./*": "./src/*.ts",
+    "./ui": "./src/ui/index.tsx",
+    "./utils": "./src/utils/index.ts",
+    "./extensions/listItem": "./src/extensions/listItem/index.ts"
+  }
+}

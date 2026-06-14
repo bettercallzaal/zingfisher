@@ -1,0 +1,16 @@
+{
+  "name": "@packages/farcaster",
+  "version": "0.0.0",
+  "description": "",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": ""
+  },
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "@packages/utils": "^1.0.0"
+  }
+}

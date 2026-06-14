@@ -1,0 +1,84 @@
+{
+  "compilerOptions": {
+    "importHelpers": true,
+    "baseUrl": ".",
+    "rootDir": "../../",
+    "strict": true,
+    "target": "es2019",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "jsx": "preserve",
+    "jsxImportSource": "@emotion/react",
+    "allowJs": true,
+    "incremental": true,
+    "isolatedModules": true,
+    "paths": {
+      "scripts/*": [
+        "./scripts/*"
+      ],
+      "lib/*": [
+        "./lib/*"
+      ],
+      "components/*": [
+        "./components/*"
+      ],
+      "hooks/*": [
+        "./hooks/*"
+      ],
+      "pages/*": [
+        "./pages/*"
+      ],
+      "public/*": [
+        "./public/*"
+      ],
+      "theme/*": [
+        "./theme/*"
+      ],
+      "__e2e__/*": [
+        "./__e2e__/*"
+      ],
+      // not sure why we need this, required for playwright in CI to fix "module not found" error 
+      "@packages/testing/*": [
+        "../../packages/testing/src/*"
+      ],
+      // "@charmverse/core/prisma": ["../../node_modules/@charmverse/core/dist/cjs/prisma"],
+      // "@charmverse/core/prisma-client": ["../../node_modules/@charmverse/core/dist/cjs/prisma-client"],
+      // "@charmverse/core/shared": ["../../node_modules/@charmverse/core/dist/cjs/shared"],
+      // "@packages/core/log": [
+      //   "../../../node_modules/@charmverse/core/dist/cjs/lib/log"
+      // ]
+      // "@packages/core/http": ["../../node_modules/@charmverse/core/dist/cjs/http"],
+      // "@charmverse/core/test": ["../../node_modules/@charmverse/core/dist/cjs/test"],
+      // "@packages/core/permissions": ["../../node_modules/@charmverse/core/dist/cjs/permissions"],
+      // "@packages/core/permissions/flags": ["../../node_modules/@charmverse/core/dist/cjs/permissions-flags"],
+      // "@packages/core/pages": ["../../node_modules/@charmverse/core/dist/cjs/pages"],
+      // "@packages/core/pages/utilities": ["../../node_modules/@charmverse/core/dist/cjs/pages-utilities"],
+      // "@packages/core/proposals": ["../../node_modules/@charmverse/core/dist/cjs/proposals"],
+      // "@charmverse/core/bounties": ["../../node_modules/@charmverse/core/dist/cjs/bounties"],
+      // "@packages/core/utilities": ["../../node_modules/@charmverse/core/dist/cjs/utilities"],
+      // "@charmverse/core/protocol": ["../../node_modules/@charmverse/core/dist/cjs/protocol"],
+      // "@packages/core/errors": ["../../node_modules/@charmverse/core/dist/cjs/errors"]
+    },
+    "types": [
+      "vitest/globals"
+    ]
+  },
+  "exclude": [
+    "node_modules",
+    "scripts"
+  ],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx"]
+}

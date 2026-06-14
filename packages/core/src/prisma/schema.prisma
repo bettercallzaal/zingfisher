@@ -1,0 +1,4225 @@
+generator client {
+  provider        = "prisma-client-js"
+  binaryTargets   = ["debian-openssl-3.0.x", "linux-musl", "darwin-arm64", "native", "rhel-openssl-1.0.x"]
+  previewFeatures = ["fullTextSearchPostgres"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PermissionLevel {
+  full_access
+  editor
+  view_comment
+  view
+}
+
+enum SpacePermissionConfigurationMode {
+  custom
+  readOnly
+  collaborative
+  open
+}
+
+enum IdentityType {
+  Wallet
+  Discord
+  Telegram
+  RandomName
+  UnstoppableDomain
+  Google
+  VerifiedEmail
+  Lens
+  Farcaster
+}
+
+enum VoteStatus {
+  InProgress
+  Passed
+  Rejected
+  Cancelled
+}
+
+enum VoteType {
+  Approval
+  SingleChoice
+  MultiChoice
+}
+
+enum NotificationChannel {
+  email
+  webapp
+}
+
+enum NotificationType {
+  multisig
+  mention
+  vote
+  proposal
+  bounty
+  post_comment
+  page_comment
+  forum
+}
+
+enum BountyStatus {
+  suggestion
+  draft
+  open
+  complete
+  paid
+}
+
+enum BountyOperation {
+  work
+  review
+  lock
+  approve_applications
+  grant_permissions
+  mark_paid
+}
+
+enum BountyPermissionLevel {
+  reviewer
+  creator
+  submitter
+}
+
+enum ApplicationStatus {
+  applied
+  submission_rejected
+  inProgress
+  review
+  rejected
+  processing
+  complete
+  paid
+  cancelled
+}
+
+enum WalletType {
+  metamask
+  gnosis
+}
+
+enum RoleSource {
+  guild_xyz
+  collabland
+  summon
+}
+
+enum PagePermissionLevel {
+  full_access
+  editor
+  view_comment
+  view
+  custom
+}
+
+enum PageOperations {
+  read
+  delete
+  edit_position
+  edit_content
+  edit_path
+  grant_permissions
+  comment
+  create_poll
+  delete_attached_bounty
+  edit_lock
+}
+
+enum UserSpaceActionType {
+  view_page
+  app_loaded
+}
+
+enum SpaceOperation {
+  createPage
+  createBounty
+  createForumCategory
+  moderateForums
+  reviewProposals
+  deleteAnyPage
+  deleteAnyBounty
+  deleteAnyProposal
+  createProposals
+}
+
+enum ProfileItemType {
+  community
+  nft
+  poap
+  vc
+}
+
+enum ProposalStatus {
+  draft
+  published
+}
+
+enum WorkspaceEventType {
+  proposal_status_change
+}
+
+enum FontFamily {
+  default
+  serif
+  mono
+}
+
+enum PageType {
+  board
+  board_template
+  bounty
+  bounty_template
+  page
+  page_template
+  card
+  card_synced
+  card_template
+  proposal
+  proposal_notes
+  proposal_template
+  inline_board
+  inline_linked_board
+  linked_board
+}
+
+enum VoteContext {
+  inline
+  proposal
+}
+
+enum MemberPropertyType {
+  text
+  text_multiline
+  number
+  email
+  phone
+  url
+  select
+  multiselect
+  role
+  profile_pic
+  timezone
+  discord
+  twitter
+  bio
+  join_date
+  linked_in
+  farcaster
+  github
+  google
+  telegram
+  wallet
+}
+
+enum MemberPropertyPermissionLevel {
+  view
+}
+
+enum VisibilityView {
+  gallery
+  table
+  profile
+}
+
+enum CategorySubscriptionMode {
+  whitelist
+  blacklist
+}
+
+enum Feature {
+  member_directory
+  proposals
+  forum
+  bounties
+  rewards
+}
+
+enum ApiPageKeyType {
+  typeform
+}
+
+enum SubscriptionTier {
+  free
+  community
+  enterprise
+  cancelled
+}
+
+enum SpaceSubscriptionTier {
+  readonly
+  free
+  bronze
+  silver
+  gold
+  grant
+}
+
+enum SubscriptionPeriod {
+  monthly
+  annual
+}
+
+enum TokenGateType {
+  lit
+  unlock
+  hypersub
+}
+
+enum CredentialEventType {
+  proposal_created
+  proposal_approved
+  reward_submission_approved
+}
+
+enum VoteStrategy {
+  regular
+  token
+  snapshot
+}
+
+enum KycOption {
+  persona
+  synaps
+}
+
+enum ProjectSource {
+  charmverse
+  connect
+  sunny_awards
+  farcaster
+}
+
+model Space {
+  id                           String                             @id @default(uuid()) @db.Uuid
+  deletedAt                    DateTime?
+  createdAt                    DateTime                           @default(now())
+  createdBy                    String                             @db.Uuid
+  updatedAt                    DateTime                           @updatedAt
+  updatedBy                    String                             @db.Uuid
+  name                         String
+  domain                       String                             @unique
+  customDomain                 String?                            @unique
+  isCustomDomainVerified       Boolean?
+  paidTier                     SubscriptionTier                   @default(community)
+  subscriptionTier             SpaceSubscriptionTier?             @default(readonly)
+  subscriptionMonthlyPrice     Int?
+  subscriptionCancelledAt      DateTime?
+  subscriptionCancelledBy      String?                            @db.Uuid
+  discordServerId              String?
+  defaultVotingDuration        Int?
+  enableTestnets               Boolean?                           @default(false)
+  snapshotDomain               String?
+  spaceImage                   String?
+  spaceArtwork                 String?
+  emailBrandColor              String?
+  emailBrandArtwork            String?
+  credentialLogo               String?
+  defaultPostCategoryId        String?                            @unique @db.Uuid
+  defaultPostCategory          PostCategory?                      @relation(fields: [defaultPostCategoryId], references: [id], name: "defaultPostCategory", onDelete: SetNull)
+  defaultPagePermissionGroup   PagePermissionLevel?               @default(full_access)
+  defaultPublicPages           Boolean?                           @default(false)
+  homePageId                   String?                            @unique @db.Uuid
+  homePage                     Page?                              @relation(fields: [homePageId], references: [id], name: "spaceHomePage", onDelete: SetNull)
+  notificationToggles          Json                               @default("{}")
+  requireProposalTemplate      Boolean?                           @default(false)
+  publicProposalTemplates      Boolean?                           @default(false)
+  permissionConfigurationMode  SpacePermissionConfigurationMode?  @default(custom)
+  publicBountyBoard            Boolean?                           @default(false)
+  publicProposals              Boolean?                           @default(false)
+  xpsEngineId                  String?                            @unique
+  useOnchainCredentials        Boolean?                           @default(false)
+  credentialsChainId           Int?
+  credentialsWallet            String?
+  subscriptionBalance          String?
+  kycOption                    KycOption?
+  primaryMemberIdentity        IdentityType?
+  author                       User                               @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  blocks                       Block[]
+  bounties                     Bounty[]
+  bountyPermissions            BountyPermission[]
+  comments                     Comment[]
+  inviteLinks                  InviteLink[]
+  pages                        Page[]
+  permissions                  PagePermission[]
+  paymentMethods               PaymentMethod[]
+  roles                        Role[]
+  apiToken                     SpaceApiToken?
+  superApiTokenId              String?                            @db.Uuid
+  superApiToken                SuperApiToken?                     @relation(fields: [superApiTokenId], references: [id], onDelete: SetNull)
+  permittedGroups              SpacePermission[]                  @relation("permittedGroups")
+  spacePermissions             SpacePermission[]                  @relation("spacePermissions")
+  spaceRoles                   SpaceRole[]
+  threads                      Thread[]
+  tokenGates                   TokenGate[]
+  votes                        Vote[]
+  proposals                    Proposal[]
+  workspaceEvents              WorkspaceEvent[]
+  memberProperties             MemberProperty[]
+  memberPropertyValues         MemberPropertyValue[]
+  userTokenGates               UserTokenGate[]
+  postCategories               PostCategory[]
+  posts                        Post[]
+  postCategoryPermissions      PostCategoryPermission[]
+  spaceNotificationSettings    UserSpaceNotificationSettings[]
+  webhookSubscriptionUrl       String?
+  webhookSubscriptions         WebhookSubscription[]
+  webhookSigningSecret         String?
+  origin                       String?
+  hiddenFeatures               Feature[]
+  features                     Json[]
+  memberProfiles               Json[]
+  stripeSubscription           StripeSubscription[]
+  userActions                  UserSpaceAction[]
+  postTags                     PostTag[]
+  blockCounts                  BlockCount[]
+  blockQuota                   Int                                @default(0)
+  requireMembersTwoFactorAuth  Boolean                            @default(false)
+  tokenGateMessage             Json?
+  proposalBlocks               ProposalBlock[]
+  rewardBlocks                 RewardBlock[]
+  userNotifications            UserNotificationMetadata[]
+  blacklistedSpaceUsers        BlacklistedSpaceUser[]
+  additionalBlockQuotas        AdditionalBlockQuota[]
+  proposalWorkflows            ProposalWorkflow[]
+  credentialTemplates          CredentialTemplate[]
+  charmWallet                  CharmWallet?
+  pendingSafeTransactions      PendingSafeTransaction[]
+  githubConnections            SpaceGithubConnection[]
+  Form                         Form[]
+  synapsCredential             SynapsCredential?
+  synapsUserKyc                SynapsUserKyc[]
+  personaCredential            PersonaCredential?
+  personaUserKyc               PersonaUserKyc[]
+  docusignCredentials          DocusignCredential[]
+  documentsToSign              DocumentToSign[]
+  docusignAllowedRoleOrUsers   DocusignAllowedRoleOrUser[]
+  proposalMyTaskColumns        ProposalMyWorkColumn[]
+  subscriptionPayments         SpaceSubscriptionPayment[]
+  subscriptionContributions    SpaceSubscriptionContribution[]
+  subscriptionTierChangeEvents SpaceSubscriptionTierChangeEvent[]
+  spaceExportJobs              SpaceExportJob[]
+
+  @@index([createdBy])
+  @@index([homePageId])
+  @@index([defaultPostCategoryId])
+  @@index([domain])
+  @@index([customDomain])
+  @@index([name])
+}
+
+enum SpaceExportJobStatus {
+  pending
+  completed
+  failed
+}
+
+model SpaceExportJob {
+  id            String               @id @default(uuid()) @db.Uuid
+  createdAt     DateTime             @default(now())
+  createdBy     String               @db.Uuid
+  author        User                 @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  emailToNotify String?
+  spaceId       String               @db.Uuid
+  space         Space                @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  status        SpaceExportJobStatus
+  metrics       Json                 @default("{}")
+  updatedAt     DateTime             @updatedAt
+  downloadLink  String?
+  error         Json?
+
+  @@index([spaceId, status])
+  @@index([createdBy])
+}
+
+model StripeSubscription {
+  id             String    @id @default(uuid()) @db.Uuid
+  createdAt      DateTime  @default(now())
+  spaceId        String    @db.Uuid
+  space          Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  customerId     String
+  subscriptionId String    @unique
+  deletedAt      DateTime?
+
+  @@index([spaceId])
+}
+
+model SpaceSubscriptionPayment {
+  id                      String                @id @default(uuid()) @db.Uuid
+  paidTokenAmount         String
+  subscriptionTier        SpaceSubscriptionTier
+  subscriptionPrice       String
+  subscriptionPeriodStart DateTime
+  spaceId                 String?               @db.Uuid
+  space                   Space?                @relation(fields: [spaceId], references: [id], onDelete: SetNull)
+  createdAt               DateTime              @default(now())
+}
+
+model SpaceSubscriptionContribution {
+  id             String          @id @default(uuid()) @db.Uuid
+  spaceId        String?         @db.Uuid
+  space          Space?          @relation(fields: [spaceId], references: [id], onDelete: SetNull)
+  userId         String?         @db.Uuid
+  user           User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  walletAddress  String?
+  devTokenAmount String
+  decentStatus   DecentTxStatus?
+  decentError    Json?
+  decentTxHash   String?
+  decentChainId  Int?
+  decentPayload  Json
+  txHash         String?         @unique
+  chainId        Int?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@index([spaceId])
+  @@index([userId])
+  @@index([spaceId, createdAt])
+}
+
+model SpaceSubscriptionTierChangeEvent {
+  id           String                @id @default(uuid()) @db.Uuid
+  createdAt    DateTime              @default(now())
+  spaceId      String?               @db.Uuid
+  space        Space?                @relation(fields: [spaceId], references: [id], onDelete: SetNull)
+  userId       String?               @db.Uuid
+  user         User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
+  previousTier SpaceSubscriptionTier
+  newTier      SpaceSubscriptionTier
+
+  @@index([spaceId])
+  @@index([spaceId, createdAt])
+}
+
+model SpaceApiToken {
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  spaceId   String   @unique @db.Uuid
+  token     String
+  space     Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  @@unique([token, spaceId])
+  @@index([spaceId])
+}
+
+model SuperApiToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  token     String   @unique
+  name      String
+  spaces    Space[]
+
+  @@unique(name)
+  @@index([token])
+}
+
+model Page {
+  id                  String                 @id @default(uuid()) @db.Uuid
+  deletedAt           DateTime?
+  createdAt           DateTime               @default(now())
+  createdBy           String                 @db.Uuid
+  updatedAt           DateTime               @default(now())
+  updatedBy           String                 @db.Uuid
+  deletedBy           String?                @db.Uuid
+  title               String
+  content             Json?
+  contentText         String
+  galleryImage        String?
+  hasContent          Boolean                @default(false)
+  headerImage         String?
+  icon                String?
+  path                String
+  isTemplate          Boolean?               @default(false)
+  parentId            String?                @db.Uuid
+  spaceId             String                 @db.Uuid
+  additionalPaths     String[]               @default([])
+  type                PageType
+  boardId             String?                @db.Uuid
+  autoGenerated       Boolean?               @default(false)
+  index               Int                    @default(-1)
+  cardId              String?                @unique @db.Uuid
+  proposalId          String?                @unique @db.Uuid
+  fullWidth           Boolean?               @default(false)
+  fontFamily          FontFamily?            @default(default)
+  fontSizeSmall       Boolean?               @default(false)
+  version             Int                    @default(1)
+  card                Block?                 @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  author              User                   @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  parent              Page?                  @relation(fields: [parentId], references: [id], onDelete: SetNull, name: "parent")
+  space               Space                  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  inlineComments      Comment[]
+  favorites           FavoritePage[]
+  permissions         PagePermission[]
+  bountyId            String?                @unique @db.Uuid
+  bounty              Bounty?                @relation(fields: [bountyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  proposal            Proposal?              @relation(fields: [proposalId], references: [id], onDelete: SetNull, onUpdate: Cascade, name: "proposal")
+  threads             Thread[]
+  votes               Vote[]
+  workspaceEvents     WorkspaceEvent[]
+  diffs               PageDiff[]
+  syncWithPageId      String?                @db.Uuid
+  convertedProposalId String?                @unique @db.Uuid
+  convertedProposal   Proposal?              @relation(fields: [convertedProposalId], references: [id], onDelete: SetNull, onUpdate: Cascade, name: "convertedProposal")
+  comments            PageComment[]
+  apiPageKeys         ApiPageKey[]
+  userSpaceActions    UserSpaceAction[]
+  sourceTemplateId    String?                @db.Uuid
+  notifications       DocumentNotification[]
+  homePageSpace       Space?                 @relation("spaceHomePage")
+  children            Page[]                 @relation("parent")
+  rewardsGithubRepos  RewardsGithubRepo[]
+  isLocked            Boolean?               @default(false)
+  lockedBy            String?                @db.Uuid
+  lensPostLink        String?
+
+  // Ensure synced proposal databases cannot have duplicate cards for a proposal
+  @@unique([parentId, syncWithPageId])
+  @@index([bountyId])
+  @@index([boardId])
+  @@index([cardId])
+  @@index([createdBy])
+  @@index([deletedAt])
+  @@index([parentId])
+  @@index([proposalId])
+  @@index([spaceId])
+  @@index([title])
+  @@index([path])
+  @@index([spaceId, type])
+  // https://www.prisma.io/docs/concepts/components/prisma-schema/indexes#configuring-the-access-type-of-indexes-with-type-postgresql
+  // https://www.postgresql.org/docs/current/indexes-types.html#INDEXES-TYPES-GIN
+  @@index([additionalPaths], type: Gin)
+}
+
+model UserSpaceAction {
+  id             String              @id @default(uuid()) @db.Uuid
+  createdAt      DateTime            @default(now())
+  createdBy      String?             @db.Uuid
+  distinctUserId String?             @db.Uuid
+  pageId         String?             @db.Uuid
+  page           Page?               @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  postId         String?             @db.Uuid
+  post           Post?               @relation(fields: [postId], references: [id], onDelete: Cascade)
+  action         UserSpaceActionType
+  meta           Json?
+  pageType       String?
+  user           User?               @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  spaceId        String?             @db.Uuid
+  space          Space?              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  @@index([createdBy, action])
+  @@index([spaceId, action])
+  @@index([pageId])
+  @@index([postId])
+}
+
+model PageComment {
+  id                   String                 @id @default(uuid()) @db.Uuid
+  createdAt            DateTime               @default(now())
+  createdBy            String                 @db.Uuid
+  content              Json
+  contentText          String
+  updatedAt            DateTime               @updatedAt
+  deletedAt            DateTime?
+  deletedBy            String?
+  parentId             String?
+  pageId               String                 @db.Uuid
+  page                 Page                   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  user                 User                   @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  votes                PageCommentVote[]
+  lensCommentLink      String?
+  DocumentNotification DocumentNotification[]
+
+  @@index([pageId])
+}
+
+model PageCommentVote {
+  createdAt DateTime @default(now())
+  createdBy String   @db.Uuid
+  upvoted   Boolean
+
+  commentId String      @db.Uuid
+  comment   PageComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([createdBy, commentId])
+  @@index([commentId])
+}
+
+model PageDiff {
+  data      Json
+  createdAt DateTime @default(now())
+  createdBy String   @db.Uuid
+  pageId    String   @db.Uuid
+  page      Page?    @relation(fields: [pageId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  version   Int
+
+  @@unique([pageId, version])
+  @@index([pageId])
+}
+
+model Block {
+  id                String             @id @db.Uuid
+  deletedAt         DateTime?
+  createdAt         DateTime           @default(now())
+  createdBy         String             @db.Uuid
+  updatedAt         DateTime           @default(now())
+  updatedBy         String             @db.Uuid
+  spaceId           String             @db.Uuid
+  parentId          String
+  rootId            String             @db.Uuid
+  schema            Int
+  type              String
+  title             String
+  fields            Json
+  user              User               @relation(fields: [createdBy], references: [id])
+  space             Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  page              Page?
+  cardNotifications CardNotification[] @relation("card")
+
+  @@index([rootId])
+  @@index([spaceId])
+  @@index([createdBy])
+  @@index([type])
+}
+
+model UserVote {
+  voteId      String   @db.Uuid
+  userId      String   @db.Uuid
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  choices     String[] @default([])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vote        Vote     @relation(fields: [voteId], references: [id], onDelete: Cascade)
+  tokenAmount String?
+
+  @@unique([voteId, userId])
+  @@index([voteId])
+  @@index([userId])
+}
+
+model VoteOptions {
+  name   String
+  voteId String @db.Uuid
+  vote   Vote   @relation(fields: [voteId], references: [id], onDelete: Cascade)
+
+  @@unique([voteId, name])
+  @@index([voteId])
+}
+
+model Vote {
+  id            String              @id @default(uuid()) @db.Uuid
+  pageId        String?             @db.Uuid
+  postId        String?             @db.Uuid
+  title         String
+  description   String?
+  content       Json?
+  contentText   String?
+  deadline      DateTime
+  status        VoteStatus
+  createdAt     DateTime            @default(now())
+  createdBy     String              @db.Uuid
+  spaceId       String              @db.Uuid
+  threshold     Int
+  maxChoices    Int?                @default(1)
+  type          VoteType            @default(SingleChoice)
+  strategy      VoteStrategy        @default(regular)
+  context       VoteContext         @default(inline)
+  author        User                @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  page          Page?               @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  post          Post?               @relation(fields: [postId], references: [id], onDelete: Cascade)
+  space         Space               @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  userVotes     UserVote[]
+  voteOptions   VoteOptions[]
+  notifications VoteNotification[]
+  evaluation    ProposalEvaluation?
+  chainId       Int?
+  tokenAddress  String?
+  blockNumber   String?
+
+  @@index([createdBy])
+  @@index([pageId])
+  @@index([spaceId])
+}
+
+model User {
+  id                                String                             @id @default(uuid()) @db.Uuid
+  createdAt                         DateTime                           @default(now())
+  updatedAt                         DateTime                           @default(now())
+  deletedAt                         DateTime?
+  avatar                            String?
+  avatarContract                    String?
+  avatarTokenId                     String?
+  avatarChain                       Int?
+  username                          String
+  isBot                             Boolean?                           @default(false)
+  path                              String                             @unique
+  identityType                      IdentityType?
+  email                             String?
+  emailNotifications                Boolean?                           @default(true)
+  emailNewsletter                   Boolean?                           @default(false)
+  xpsEngineId                       String?                            @unique
+  publishToLensDefault              Boolean?                           @default(false)
+  connectOnboarded                  Boolean?                           @default(false)
+  primaryWalletId                   String?                            @db.Uuid
+  primaryWallet                     UserWallet?                        @relation(fields: [primaryWalletId], references: [id], onDelete: SetNull, name: "primaryUserWallet")
+  applications                      Application[]
+  blocks                            Block[]
+  bounties                          Bounty[]
+  bountyPermissions                 BountyPermission[]
+  comments                          Comment[]
+  discordUser                       DiscordUser?
+  favorites                         FavoritePage[]
+  inviteLinks                       InviteLink[]
+  posts                             Post[]
+  pages                             Page[]
+  permissions                       PagePermission[]
+  poaps                             Poap[]
+  spacesCreated                     Space[]
+  spacePermissions                  SpacePermission[]
+  spaceRoles                        SpaceRole[]
+  spacesOrder                       String[]
+  telegramUser                      TelegramUser?
+  threads                           Thread[]
+  profile                           UserDetails?
+  gnosisSafes                       UserGnosisSafe[]
+  userNotifications                 UserNotification[]
+  notificationState                 UserNotificationState?
+  userVotes                         UserVote[]
+  initiatedVotes                    Vote[]
+  profileItems                      ProfileItem[]
+  proposalsAuthored                 ProposalAuthor[]
+  proposalsReviewed                 ProposalReviewer[]
+  reviewedProposals                 Proposal[]
+  workspaceEvents                   WorkspaceEvent[]
+  wallets                           UserWallet[]                       @relation("userWallet")
+  memberPropertyValues              MemberPropertyValue[]
+  spaceNotificationSettings         UserSpaceNotificationSettings[]
+  userTokenGates                    UserTokenGate[]
+  unstoppableDomains                UnstoppableDomain[]
+  postComments                      PostComment[]
+  googleAccounts                    GoogleAccount[]
+  GoogleCredential                  GoogleCredential[]
+  PageComment                       PageComment[]
+  verifiedEmails                    VerifiedEmail[]
+  apiPageKeys                       ApiPageKey[]
+  spaceActions                      UserSpaceAction[]
+  proposalBlocks                    ProposalBlock[]
+  rewardBlocks                      RewardBlock[]
+  authorNotifications               UserNotificationMetadata[]         @relation("author")
+  targetNotifications               UserNotificationMetadata[]         @relation("target")
+  ApplicationComment                ApplicationComment[]
+  blacklistedSpaceUsers             BlacklistedSpaceUser[]
+  blacklistedUser                   BlacklistedUser[]
+  proposalEvaluationPermissions     ProposalEvaluationPermission[]
+  decidedProposalEvaluations        ProposalEvaluation[]               @relation("decidedBy")
+  appealedByProposalEvaluations     ProposalEvaluation[]               @relation("appealedBy")
+  receivedCredentials               IssuedCredential[]
+  otp                               Otp?
+  charmWallet                       CharmWallet?
+  favoriteCredentials               FavoriteCredential[]
+  referralCodes                     ReferralCode[]
+  referredUserEvents                ReferralCodeUseEvent[]             @relation("referrer")
+  referredByUserEvents              ReferralCodeUseEvent[]             @relation("referee")
+  projectMembers                    ProjectMember[]
+  projects                          Project[]
+  claimed                           Boolean?
+  spaceGithubConnections            SpaceGithubConnection[]
+  rewardsGithubRepo                 RewardsGithubRepo[]
+  synapsUserKyc                     SynapsUserKyc?
+  personaUserKyc                    PersonaUserKyc?
+  docusignCredentials               DocusignCredential[]
+  documentSignatures                DocumentSigner[]
+  reviews                           ProposalEvaluationReview[]
+  proposalAppealReviewers           ProposalAppealReviewer[]
+  appealReviews                     ProposalEvaluationAppealReview[]
+  farcasterUser                     FarcasterUser?
+  proposalRubricCriteriaAnswers     ProposalRubricCriteriaAnswer[]
+  docusignAllowedRoleOrUsers        DocusignAllowedRoleOrUser[]
+  charmCredentials                  CharmUserCredential[]
+  charmQualifyingEventCredentials   CharmQualifyingEventCredential[]
+  charmProjectCredentials           CharmProjectCredential[]
+  pushNotificationSubscription      PushNotificationSubscription[]
+  proposalEvaluationApprovers       ProposalEvaluationApprover[]
+  productUpdatesFarcasterFrames     ProductUpdatesFarcasterFrame[]
+  spaceSubscriptionContributions    SpaceSubscriptionContribution[]
+  spaceSubscriptionTierChangeEvents SpaceSubscriptionTierChangeEvent[]
+  spaceExportJob                    SpaceExportJob[]
+
+  @@index([createdAt(sort: Asc)])
+}
+
+model FarcasterUser {
+  fid       Int      @id @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  account   Json
+  userId    String   @unique @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerifiedEmail {
+  id        String @id @default(uuid()) @db.Uuid
+  email     String @unique
+  name      String
+  avatarUrl String
+  userId    String @db.Uuid
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([email])
+  @@index([userId])
+}
+
+model UserWallet {
+  id                 String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  address            String        @unique
+  userId             String        @db.Uuid
+  ensname            String?       @unique
+  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade, name: "userWallet")
+  primaryWalletUsers User[]        @relation("primaryUserWallet")
+  profileItems       ProfileItem[]
+
+  @@index([userId])
+}
+
+model UserSpaceNotificationSettings {
+  userId              String                   @db.Uuid
+  user                User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spaceId             String                   @db.Uuid
+  space               Space                    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  // just keep a list of ids instead of another table, since we dont really care if they exist or not in the db
+  forumCategories     String[]
+  forumCategoriesMode CategorySubscriptionMode @default(blacklist)
+
+  @@unique([userId, spaceId])
+  @@index([userId, spaceId])
+}
+
+model UserNotificationState {
+  snoozedUntil  DateTime?
+  snoozeMessage String?
+  userId        String    @unique @db.Uuid
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model UserNotification {
+  taskId    String
+  createdAt DateTime             @default(now())
+  userId    String               @db.Uuid
+  type      NotificationType
+  channel   NotificationChannel?
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, userId])
+  @@index([userId])
+}
+
+model UserDetails {
+  id          String  @id @db.Uuid
+  description String?
+  social      Json?
+  user        User    @relation(fields: [id], references: [id], onDelete: Cascade)
+  timezone    String?
+  locale      String?
+}
+
+model TelegramUser {
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+  userId     String   @unique @db.Uuid
+  telegramId BigInt   @id
+  account    Json
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model DiscordUser {
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  userId    String   @unique @db.Uuid
+  discordId String   @id
+  account   Json
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Poap {
+  id            String   @id @default(uuid()) @db.Uuid
+  tokenId       String   @unique
+  userId        String   @db.Uuid
+  walletAddress String
+  isHidden      Boolean?
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model FavoritePage {
+  pageId String @db.Uuid
+  userId String @db.Uuid
+  index  Int    @default(-1)
+  page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([pageId, userId])
+  @@index([userId])
+  @@index([pageId])
+}
+
+model UserTokenGate {
+  id                     String     @id @default(uuid()) @db.Uuid
+  spaceId                String     @db.Uuid
+  userId                 String     @db.Uuid
+  tokenGateConnectedDate DateTime?
+  jwt                    String?
+  tokenGateId            String?    @db.Uuid
+  tokenGate              TokenGate? @relation(fields: [tokenGateId], references: [id], onDelete: SetNull)
+  space                  Space      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  user                   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grantedRoles           String[]   @default([])
+
+  @@unique([tokenGateId, userId, spaceId], name: "tokenGateUserSpace")
+  @@index([spaceId])
+  @@index([userId])
+  @@index([tokenGateId])
+}
+
+model SpaceRole {
+  spaceId         String            @db.Uuid
+  userId          String            @db.Uuid
+  id              String            @id @default(uuid()) @db.Uuid
+  isAdmin         Boolean           @default(false)
+  isGuest         Boolean           @default(false)
+  createdAt       DateTime          @default(now())
+  xpsUserId       String?           @unique
+  space           Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spaceRoleToRole SpaceRoleToRole[]
+  tokenGate       TokenGate?        @relation(fields: [tokenGateId], references: [id])
+  tokenGateId     String?           @db.Uuid
+  joinedViaLink   Boolean?
+  onboarded       Boolean           @default(false)
+
+  @@unique([spaceId, userId], name: "spaceUser")
+  @@index([spaceId])
+  @@index([userId])
+}
+
+enum PublicInviteLinkContext {
+  proposals
+}
+
+model InviteLink {
+  id                String                   @id @default(uuid()) @db.Uuid
+  code              String                   @unique
+  createdAt         DateTime                 @default(now())
+  createdBy         String                   @db.Uuid
+  spaceId           String                   @db.Uuid
+  maxAgeMinutes     Int                      @default(60)
+  maxUses           Int                      @default(-1)
+  useCount          Int                      @default(0)
+  visibleOn         PublicInviteLinkContext?
+  author            User                     @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  space             Space                    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  inviteLinkToRoles InviteLinkToRole[]
+
+  // One link per public context type for a space
+  @@unique([spaceId, visibleOn])
+  @@index([createdBy])
+  @@index([spaceId])
+}
+
+enum RewardType {
+  token
+  none
+  custom
+}
+
+model Bounty {
+  createdBy                   String               @db.Uuid
+  spaceId                     String               @db.Uuid
+  createdAt                   DateTime             @default(now())
+  updatedAt                   DateTime             @default(now())
+  dueDate                     DateTime?
+  rewardAmount                Float?
+  rewardToken                 String?
+  rewardType                  RewardType           @default(none)
+  status                      BountyStatus         @default(open)
+  id                          String               @id @default(uuid()) @db.Uuid
+  chainId                     Int?
+  suggestedBy                 String?              @db.Uuid
+  allowMultipleApplications   Boolean?             @default(false)
+  approveSubmitters           Boolean              @default(false)
+  submissionsLocked           Boolean              @default(false)
+  maxSubmissions              Int?
+  author                      User                 @relation(fields: [createdBy], references: [id])
+  space                       Space                @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  applications                Application[]
+  permissions                 BountyPermission[]
+  page                        Page?
+  customReward                String?
+  selectedCredentialTemplates String[]
+  fields                      Json?
+  githubIssueUrl              String?
+  notifications               BountyNotification[]
+  proposalId                  String?              @db.Uuid
+  proposal                    Proposal?            @relation(fields: [proposalId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@index([createdBy])
+  @@index([spaceId])
+  @@index([proposalId])
+}
+
+model BountyPermission {
+  id              String                @id @default(uuid()) @db.Uuid
+  userId          String?               @db.Uuid
+  spaceId         String?               @db.Uuid
+  roleId          String?               @db.Uuid
+  public          Boolean?
+  bountyId        String                @db.Uuid
+  permissionLevel BountyPermissionLevel
+  operations      BountyOperation[]
+  bounty          Bounty                @relation(fields: [bountyId], references: [id], onDelete: Cascade)
+  role            Role?                 @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  space           Space?                @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  user            User?                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bountyId, permissionLevel], name: "userId_bountyId_permissionLevel")
+  @@unique([roleId, bountyId, permissionLevel], name: "roleId_bountyId_permissionLevel")
+  @@unique([spaceId, bountyId, permissionLevel], name: "spaceId_bountyId_permissionLevel")
+  @@unique([public, bountyId, permissionLevel], name: "public_bountyId_permissionLevel")
+  @@index([bountyId])
+  @@index([spaceId])
+  @@index([roleId])
+  @@index([userId])
+}
+
+model Application {
+  id                 String               @id @default(uuid()) @db.Uuid
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @default(now())
+  bountyId           String               @db.Uuid
+  createdBy          String               @db.Uuid
+  walletAddress      String?
+  rewardInfo         String?
+  message            String?
+  messageNodes       Json?
+  spaceId            String
+  status             ApplicationStatus    @default(applied)
+  submission         String?
+  submissionNodes    String?
+  acceptedBy         String?              @db.Uuid
+  reviewedBy         String?              @db.Uuid
+  bounty             Bounty               @relation(fields: [bountyId], references: [id], onDelete: Cascade)
+  applicant          User                 @relation(fields: [createdBy], references: [id])
+  transactions       Transaction[]
+  ApplicationComment ApplicationComment[]
+  notifications      BountyNotification[]
+  issuedCredentials  IssuedCredential[]
+
+  @@index([createdBy])
+  @@index([bountyId])
+  @@index([spaceId])
+}
+
+model Transaction {
+  id            String      @id @default(uuid()) @db.Uuid
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @default(now())
+  transactionId String
+  safeTxHash    String?
+  chainId       String
+  applicationId String      @db.Uuid
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+}
+
+model TokenGate {
+  id               String            @id @default(uuid()) @db.Uuid
+  createdAt        DateTime          @default(now())
+  createdBy        String            @db.Uuid
+  spaceId          String            @db.Uuid
+  conditions       Json
+  resourceId       Json
+  userRole         String?
+  accessTypes      String[]          @default([])
+  type             TokenGateType     @default(lit)
+  space            Space             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  archived         Boolean           @default(false)
+  tokenGateToRoles TokenGateToRole[]
+  userTokenGates   UserTokenGate[]
+  spaceRoles       SpaceRole[]
+
+  @@index([spaceId])
+}
+
+model PaymentMethod {
+  id                String     @id @default(uuid()) @db.Uuid
+  createdAt         DateTime   @default(now())
+  createdBy         String     @db.Uuid
+  spaceId           String     @db.Uuid
+  chainId           Int
+  contractAddress   String?
+  tokenName         String
+  tokenSymbol       String
+  tokenDecimals     Int
+  tokenLogo         String?
+  gnosisSafeAddress String?
+  walletType        WalletType @default(metamask)
+  space             Space      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  @@unique([spaceId, chainId, contractAddress])
+  @@unique([spaceId, chainId, gnosisSafeAddress])
+  @@index([spaceId])
+}
+
+model UserGnosisSafe {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  chainId   Int
+  address   String
+  name      String?
+  isHidden  Boolean  @default(false)
+  threshold Int
+  owners    String[]
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Role {
+  id                            String                         @id @default(uuid()) @db.Uuid
+  createdAt                     DateTime                       @default(now())
+  createdBy                     String                         @db.Uuid
+  externalId                    String?
+  name                          String
+  spaceId                       String                         @db.Uuid
+  source                        RoleSource?
+  sourceId                      String?
+  space                         Space                          @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  archived                      Boolean                        @default(false)
+  bountyPermissions             BountyPermission[]
+  permissions                   PagePermission[]
+  spacePermissions              SpacePermission[]
+  spaceRolesToRole              SpaceRoleToRole[]
+  tokenGateToRoles              TokenGateToRole[]
+  proposalReviewer              ProposalReviewer[]
+  inviteLinkToRoles             InviteLinkToRole[]
+  memberPropertyPermissions     MemberPropertyPermission[]
+  postCategoryPermissions       PostCategoryPermission[]
+  proposalEvaluationPermissions ProposalEvaluationPermission[]
+  proposalAppealReviewers       ProposalAppealReviewer[]
+  docusignAllowedRoleOrUsers    DocusignAllowedRoleOrUser[]
+  proposalEvaluationApprovers   ProposalEvaluationApprover[]
+
+  @@unique([spaceId, name])
+  @@index([spaceId])
+}
+
+model TokenGateToRole {
+  id          String    @id @default(uuid()) @db.Uuid
+  createdAt   DateTime  @default(now())
+  tokenGateId String    @db.Uuid
+  roleId      String    @db.Uuid
+  role        Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  tokenGate   TokenGate @relation(fields: [tokenGateId], references: [id], onDelete: Cascade)
+
+  @@unique([tokenGateId, roleId])
+  @@index([tokenGateId])
+  @@index([roleId])
+}
+
+model InviteLinkToRole {
+  id           String     @id @default(uuid()) @db.Uuid
+  createdAt    DateTime   @default(now())
+  inviteLinkId String     @db.Uuid
+  roleId       String     @db.Uuid
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  inviteLink   InviteLink @relation(fields: [inviteLinkId], references: [id], onDelete: Cascade)
+
+  @@unique([inviteLinkId, roleId])
+  @@index([roleId])
+  @@index([inviteLinkId])
+}
+
+model SpaceRoleToRole {
+  id          String    @id @default(uuid()) @db.Uuid
+  createdAt   DateTime  @default(now())
+  spaceRoleId String    @db.Uuid
+  roleId      String    @db.Uuid
+  role        Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  spaceRole   SpaceRole @relation(fields: [spaceRoleId], references: [id], onDelete: Cascade)
+
+  @@unique([spaceRoleId, roleId])
+  @@index([spaceRoleId])
+  @@index([roleId])
+}
+
+model PagePermission {
+  pageId                  String              @db.Uuid
+  userId                  String?             @db.Uuid
+  id                      String              @id @default(uuid()) @db.Uuid
+  permissionLevel         PagePermissionLevel
+  permissions             PageOperations[]
+  roleId                  String?             @db.Uuid
+  spaceId                 String?             @db.Uuid
+  inheritedFromPermission String?             @db.Uuid
+  public                  Boolean?
+  // Specifies if a public page is returned in list operations or is only accessible if you already have the link.
+  allowDiscovery          Boolean?            @default(false)
+  sourcePermission        PagePermission?     @relation("InheritedPermissions", fields: [inheritedFromPermission], references: [id], onDelete: Cascade)
+  page                    Page                @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  role                    Role?               @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  space                   Space?              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  user                    User?               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  inheritingChildren      PagePermission[]    @relation("InheritedPermissions")
+
+  @@unique([userId, pageId], name: "userId_PageId")
+  @@unique([roleId, pageId], name: "roleId_pageId")
+  @@unique([spaceId, pageId], name: "spaceId_pageId")
+  @@unique([public, pageId], name: "public_pageId")
+  @@index([id])
+  @@index([inheritedFromPermission])
+  @@index([pageId])
+  @@index([roleId])
+  @@index([userId])
+  @@index([spaceId])
+}
+
+model SpacePermission {
+  id         String           @id @default(uuid()) @db.Uuid
+  createdAt  DateTime         @default(now())
+  operations SpaceOperation[]
+  forSpaceId String           @db.Uuid
+  roleId     String?          @db.Uuid
+  spaceId    String?          @db.Uuid
+  userId     String?          @db.Uuid
+  forSpace   Space            @relation("permittedGroups", fields: [forSpaceId], references: [id], onDelete: Cascade)
+  role       Role?            @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  space      Space?           @relation("spacePermissions", fields: [spaceId], references: [id], onDelete: Cascade)
+  user       User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, forSpaceId], name: "userId_forSpaceId")
+  @@unique([roleId, forSpaceId], name: "roleId_forSpaceId")
+  @@unique([spaceId, forSpaceId], name: "spaceId_forSpaceId")
+  @@index([roleId])
+  @@index([userId])
+  @@index([forSpaceId])
+  @@index([spaceId])
+}
+
+model Thread {
+  id            String           @id @default(uuid()) @db.Uuid
+  createdAt     DateTime         @default(now())
+  pageId        String           @db.Uuid
+  context       String
+  userId        String           @db.Uuid
+  resolved      Boolean
+  spaceId       String           @db.Uuid
+  updatedAt     DateTime?
+  page          Page             @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  space         Space            @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  user          User             @relation(fields: [userId], references: [id])
+  comments      Comment[]
+  accessGroups  Json[]           @default([])
+  fieldAnswerId String?          @db.Uuid
+  fieldAnswer   FormFieldAnswer? @relation(fields: [fieldAnswerId], references: [id], onDelete: SetNull)
+
+  @@index([pageId])
+  @@index([spaceId])
+  @@index([userId])
+}
+
+model Comment {
+  id                String                 @id @default(uuid()) @db.Uuid
+  createdAt         DateTime               @default(now())
+  threadId          String                 @db.Uuid
+  content           Json?
+  userId            String                 @db.Uuid
+  pageId            String                 @db.Uuid
+  spaceId           String                 @db.Uuid
+  updatedAt         DateTime?
+  page              Page                   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  space             Space                  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  thread            Thread                 @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  user              User                   @relation(fields: [userId], references: [id])
+  pageNotifications DocumentNotification[]
+
+  @@index([pageId])
+  @@index([spaceId])
+  @@index([threadId])
+  @@index([userId])
+}
+
+enum ProposalEvaluationType {
+  feedback
+  vote
+  rubric
+  pass_fail
+  sign_documents
+}
+
+model Proposal {
+  id                              String                              @id @default(uuid()) @db.Uuid
+  createdBy                       String                              @db.Uuid
+  spaceId                         String                              @db.Uuid
+  status                          ProposalStatus
+  archived                        Boolean?                            @default(false)
+  archivedByAdmin                 Boolean?                            @default(false)
+  authors                         ProposalAuthor[]
+  reviewers                       ProposalReviewer[]
+  space                           Space                               @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  page                            Page?                               @relation("proposal")
+  sourcePage                      Page?                               @relation("convertedProposal")
+  reviewedBy                      String?                             @db.Uuid
+  reviewer                        User?                               @relation(fields: [reviewedBy], references: [id], onDelete: Cascade)
+  reviewedAt                      DateTime?
+  publishedAt                     DateTime?
+  publishToLens                   Boolean?
+  post                            Post[]
+  rubricCriteria                  ProposalRubricCriteria[]
+  rubricAnswers                   ProposalRubricCriteriaAnswer[]
+  fields                          Json                                @default("{}")
+  selectedCredentialTemplates     String[]
+  draftRubricAnswers              DraftProposalRubricCriteriaAnswer[]
+  notifications                   ProposalNotification[]
+  evaluations                     ProposalEvaluation[]
+  // we only reference workflows for proposal templates
+  workflowId                      String?                             @db.Uuid
+  workflow                        ProposalWorkflow?                   @relation(fields: [workflowId], references: [id], onDelete: SetNull)
+  rewards                         Bounty[]
+  formId                          String?                             @db.Uuid
+  form                            Form?                               @relation(fields: [formId], references: [id], onDelete: Cascade)
+  formAnswers                     FormFieldAnswer[]
+  issuedCredentials               IssuedCredential[]
+  projectId                       String?                             @db.Uuid
+  project                         Project?                            @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  documentToSign                  DocumentToSign[]
+  ProposalAppealReviewer          ProposalAppealReviewer[]
+  charmQualifyingEventCredentials CharmQualifyingEventCredential[]
+  proposalEvaluationApprovers     ProposalEvaluationApprover[]
+
+  @@index([spaceId])
+  @@index([reviewedBy])
+  @@index([workflowId])
+  @@index([projectId])
+  @@index([formId])
+  @@index([archived])
+  @@index([status])
+}
+
+model ProposalWorkflow {
+  id                 String     @id @default(uuid()) @db.Uuid
+  createdAt          DateTime   @default(now())
+  spaceId            String     @db.Uuid
+  space              Space      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  index              Int
+  title              String
+  archived           Boolean    @default(false)
+  draftReminder      Boolean?   @default(false)
+  privateEvaluations Boolean?   @default(false)
+  evaluations        Json[] // mirrors the ProposalEvaluation schema
+  proposals          Proposal[]
+
+  @@index([spaceId])
+}
+
+enum ProposalEvaluationResult {
+  pass
+  fail
+}
+
+enum ProposalSystemRole {
+  author
+  space_member
+  current_reviewer
+  all_reviewers
+  public
+}
+
+model ProposalEvaluationPermission {
+  id           String              @id @default(uuid()) @db.Uuid
+  operation    ProposalOperation
+  evaluationId String              @db.Uuid
+  evaluation   ProposalEvaluation  @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  roleId       String?             @db.Uuid
+  userId       String?             @db.Uuid
+  role         Role?               @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  reviewer     User?               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  systemRole   ProposalSystemRole?
+
+  @@index([evaluationId])
+}
+
+model ProposalEvaluation {
+  id                            String                              @id @default(uuid()) @db.Uuid
+  index                         Int // tells us what order
+  title                         String
+  type                          ProposalEvaluationType
+  completedAt                   DateTime?
+  declinedAt                    DateTime? // Required to keep track of when the evaluation was declined for an appealable step
+  snapshotId                    String?
+  snapshotExpiry                DateTime?
+  decidedBy                     String?                             @db.Uuid
+  decider                       User?                               @relation(fields: [decidedBy], references: [id], onDelete: SetNull, name: "decidedBy")
+  proposalId                    String                              @db.Uuid
+  proposal                      Proposal                            @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  voteSettings                  Json?
+  voteId                        String?                             @unique @db.Uuid
+  vote                          Vote?                               @relation(fields: [voteId], references: [id], onDelete: SetNull)
+  actionLabels                  Json?
+  notificationLabels            Json?
+  requiredReviews               Int                                 @default(1)
+  finalStep                     Boolean?
+  appealRequiredReviews         Int?
+  appealable                    Boolean?                            @default(false)
+  appealedAt                    DateTime?
+  appealedBy                    String?                             @db.Uuid
+  appealReason                  String?
+  appealer                      User?                               @relation(fields: [appealedBy], references: [id], onDelete: SetNull, name: "appealedBy")
+  shareReviews                  Boolean?                            @default(false)
+  dueDate                       DateTime?
+  showAuthorResultsOnRubricFail Boolean?
+  rubricCriteria                ProposalRubricCriteria[]
+  rubricAnswers                 ProposalRubricCriteriaAnswer[]
+  draftRubricAnswers            DraftProposalRubricCriteriaAnswer[]
+  result                        ProposalEvaluationResult?
+  reviewers                     ProposalReviewer[]
+  appealReviewers               ProposalAppealReviewer[]
+  permissions                   ProposalEvaluationPermission[]
+  proposalNotification          ProposalNotification[]
+  reviews                       ProposalEvaluationReview[]
+  appealReviews                 ProposalEvaluationAppealReview[]
+  documentsToSign               DocumentToSign[]
+  evaluationApprovers           ProposalEvaluationApprover[]
+
+  @@index([proposalId])
+  @@index([index])
+}
+
+model ProposalBlock {
+  createdBy String    @db.Uuid
+  updatedBy String    @db.Uuid
+  spaceId   String    @db.Uuid
+  rootId    String    @db.Uuid
+  id        String
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
+  parentId  String
+  schema    Int
+  type      String    @default("board")
+  title     String
+  fields    Json
+  user      User      @relation(fields: [createdBy], references: [id])
+  space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  @@id([id, spaceId])
+  @@index([rootId])
+  @@index([spaceId])
+  @@index([createdBy])
+}
+
+model RewardBlock {
+  id        String
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  createdBy String    @db.Uuid
+  updatedAt DateTime  @default(now())
+  updatedBy String    @db.Uuid
+  spaceId   String    @db.Uuid
+  parentId  String
+  rootId    String    @db.Uuid
+  schema    Int
+  type      String    @default("board")
+  title     String
+  fields    Json
+  user      User      @relation(fields: [createdBy], references: [id])
+  space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  @@id([id, spaceId])
+  @@index([rootId])
+  @@index([spaceId])
+  @@index([createdBy])
+}
+
+model ProposalAuthor {
+  proposalId String   @db.Uuid
+  proposal   Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  userId     String   @db.Uuid
+  author     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([proposalId, userId])
+  @@index([proposalId])
+  @@index([userId])
+}
+
+model ProposalReviewer {
+  id           String              @id @default(uuid()) @db.Uuid
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @default(now())
+  proposalId   String              @db.Uuid
+  proposal     Proposal            @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  roleId       String?             @db.Uuid
+  userId       String?             @db.Uuid
+  // This should only use the all_members value of system role
+  systemRole   ProposalSystemRole?
+  role         Role?               @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  reviewer     User?               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  evaluationId String              @db.Uuid
+  evaluation   ProposalEvaluation  @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+
+  @@index([evaluationId])
+  @@index([proposalId])
+  @@index([roleId])
+  @@index([userId])
+}
+
+model ProposalEvaluationApprover {
+  id           String             @id @default(uuid()) @db.Uuid
+  proposalId   String             @db.Uuid
+  proposal     Proposal           @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  roleId       String?            @db.Uuid
+  userId       String?            @db.Uuid
+  role         Role?              @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  reviewer     User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  evaluationId String             @db.Uuid
+  evaluation   ProposalEvaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+
+  @@index([evaluationId])
+  @@index([proposalId])
+  @@index([roleId])
+  @@index([userId])
+}
+
+model ProposalAppealReviewer {
+  id           String             @id @default(uuid()) @db.Uuid
+  proposalId   String             @db.Uuid
+  proposal     Proposal           @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  roleId       String?            @db.Uuid
+  userId       String?            @db.Uuid
+  role         Role?              @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  reviewer     User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  evaluationId String             @db.Uuid
+  evaluation   ProposalEvaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+
+  @@index([evaluationId])
+  @@index([proposalId])
+  @@index([roleId])
+  @@index([userId])
+}
+
+enum ProposalRubricCriteriaType {
+  range
+}
+
+model ProposalRubricCriteria {
+  id           String                              @id @default(uuid()) @db.Uuid
+  index        Int                                 @default(-1)
+  title        String
+  description  String?
+  proposalId   String                              @db.Uuid
+  proposal     Proposal                            @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  type         ProposalRubricCriteriaType
+  parameters   Json
+  answers      ProposalRubricCriteriaAnswer[]
+  draftAnswers DraftProposalRubricCriteriaAnswer[]
+  evaluation   ProposalEvaluation                  @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  evaluationId String                              @db.Uuid
+
+  @@index([proposalId])
+  @@index([evaluationId])
+  @@index([index])
+}
+
+model ProposalRubricCriteriaAnswer {
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @default(now())
+  rubricCriteriaId String                 @db.Uuid
+  rubricCriteria   ProposalRubricCriteria @relation(fields: [rubricCriteriaId], references: [id], onDelete: Cascade)
+  proposalId       String                 @db.Uuid
+  proposal         Proposal               @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  userId           String                 @db.Uuid
+  user             User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  response         Json
+  comment          String?
+  evaluation       ProposalEvaluation     @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  evaluationId     String                 @db.Uuid
+
+  @@unique([userId, rubricCriteriaId])
+  @@index([proposalId])
+  @@index([evaluationId])
+  @@index([rubricCriteriaId])
+}
+
+model DraftProposalRubricCriteriaAnswer {
+  rubricCriteriaId String                 @db.Uuid
+  rubricCriteria   ProposalRubricCriteria @relation(fields: [rubricCriteriaId], references: [id], onDelete: Cascade)
+  proposalId       String                 @db.Uuid
+  proposal         Proposal               @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  userId           String
+  response         Json
+  comment          String?
+  evaluation       ProposalEvaluation     @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  evaluationId     String                 @db.Uuid
+
+  @@unique([userId, rubricCriteriaId])
+  @@index([proposalId])
+  @@index([evaluationId])
+  @@index([rubricCriteriaId])
+}
+
+model ProfileItem {
+  id         String          @id
+  userId     String          @db.Uuid
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isHidden   Boolean?
+  metadata   Json?
+  type       ProfileItemType
+  isPinned   Boolean?
+  walletId   String?         @db.Uuid
+  userWallet UserWallet?     @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([walletId])
+}
+
+model WorkspaceEvent {
+  id        String             @id @default(uuid()) @db.Uuid
+  actorId   String?            @db.Uuid
+  actor     User?              @relation(fields: [actorId], references: [id], onDelete: Cascade)
+  type      WorkspaceEventType
+  meta      Json?
+  spaceId   String             @db.Uuid
+  space     Space              @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  pageId    String             @db.Uuid
+  page      Page               @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  createdAt DateTime           @default(now())
+
+  @@index([actorId])
+  @@index([spaceId])
+  @@index([pageId])
+  @@index([createdAt])
+}
+
+// Note: eventually this will just be view, edit, comment, and move once we migrate to the new permissions flow
+enum ProposalOperation {
+  edit
+  edit_rewards
+  view
+  view_notes
+  view_private_fields
+  delete
+  create_vote
+  comment
+  evaluate
+  make_public
+  archive
+  unarchive
+  move
+  evaluate_appeal
+  complete_evaluation
+}
+
+model MemberProperty {
+  id                   String                     @id @default(uuid()) @db.Uuid
+  createdAt            DateTime                   @default(now())
+  createdBy            String                     @db.Uuid
+  updatedAt            DateTime                   @updatedAt
+  updatedBy            String                     @db.Uuid
+  spaceId              String                     @db.Uuid
+  space                Space                      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  name                 String
+  type                 MemberPropertyType
+  options              Json?
+  index                Int                        @default(-1)
+  memberPropertyValues MemberPropertyValue[]
+  permissions          MemberPropertyPermission[]
+  enabledViews         VisibilityView[]           @default([gallery, table, profile])
+  required             Boolean                    @default(false)
+
+  @@index([spaceId])
+}
+
+model MemberPropertyValue {
+  id               String         @id @default(uuid()) @db.Uuid
+  updatedAt        DateTime       @updatedAt
+  updatedBy        String         @db.Uuid
+  memberPropertyId String         @db.Uuid
+  memberProperty   MemberProperty @relation(fields: [memberPropertyId], references: [id], onDelete: Cascade)
+  spaceId          String         @db.Uuid
+  space            Space          @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  userId           String         @db.Uuid
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  value            Json?
+
+  @@unique([memberPropertyId, spaceId, userId])
+  @@index([memberPropertyId])
+  @@index([spaceId])
+  @@index([userId])
+}
+
+model MemberPropertyPermission {
+  id                            String                        @id @default(uuid()) @db.Uuid
+  roleId                        String?                       @db.Uuid
+  memberPropertyPermissionLevel MemberPropertyPermissionLevel
+  memberPropertyId              String                        @db.Uuid
+  memberProperty                MemberProperty                @relation(fields: [memberPropertyId], references: [id], onDelete: Cascade)
+  role                          Role?                         @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, memberPropertyId])
+  @@index([memberPropertyId])
+  @@index([roleId])
+}
+
+// Begin Forum models
+model PostCategory {
+  id                      String                   @id @default(uuid()) @db.Uuid
+  name                    String
+  description             String?
+  path                    String?
+  defaultForSpace         Space?                   @relation(name: "defaultPostCategory")
+  spaceId                 String                   @db.Uuid
+  space                   Space                    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  Post                    Post[]
+  postCategoryPermissions PostCategoryPermission[]
+
+  @@unique([spaceId, name])
+  @@unique([spaceId, path])
+}
+
+model Post {
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
+  deletedAt            DateTime?
+  id                   String                  @id @default(uuid()) @db.Uuid
+  title                String
+  content              Json
+  contentText          String
+  path                 String                  @unique
+  categoryId           String                  @db.Uuid
+  createdBy            String                  @db.Uuid
+  author               User                    @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  spaceId              String                  @db.Uuid
+  space                Space                   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  pinned               Boolean?                @default(false)
+  locked               Boolean?                @default(false)
+  category             PostCategory            @relation(fields: [categoryId], references: [id])
+  comments             PostComment[]
+  upDownVotes          PostUpDownVote[]
+  commentUpDownVotes   PostCommentUpDownVote[]
+  proposalId           String?                 @db.Uuid
+  proposal             Proposal?               @relation(fields: [proposalId], references: [id], onDelete: SetNull)
+  votes                Vote[]
+  isDraft              Boolean?                @default(false)
+  userSpaceActions     UserSpaceAction[]
+  postToPostTags       PostToPostTag[]
+  notifications        PostNotification[]
+  DocumentNotification DocumentNotification[]
+
+  @@index([categoryId])
+  @@index([path])
+  @@index([spaceId, deletedAt]) // space feed
+  @@index([spaceId, deletedAt, categoryId]) // category feed
+  @@index([createdBy])
+  @@index([proposalId])
+}
+
+model PostToPostTag {
+  postId    String  @db.Uuid
+  postTagId String  @db.Uuid
+  post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postTag   PostTag @relation(fields: [postTagId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, postTagId])
+  @@index([postId])
+  @@index([postTagId])
+}
+
+model PostUpDownVote {
+  createdAt DateTime @default(now())
+  createdBy String   @db.Uuid
+  upvoted   Boolean
+  postId    String   @db.Uuid
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([createdBy, postId])
+  @@index([postId])
+}
+
+model PostComment {
+  id          String    @id @default(uuid()) @db.Uuid
+  createdAt   DateTime  @default(now())
+  createdBy   String    @db.Uuid
+  content     Json
+  contentText String
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  deletedBy   String?
+  parentId    String?
+
+  postId               String                  @db.Uuid
+  post                 Post                    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user                 User                    @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  votes                PostCommentUpDownVote[]
+  DocumentNotification DocumentNotification[]
+
+  @@index([postId])
+}
+
+model ApplicationComment {
+  id          String    @id @default(uuid()) @db.Uuid
+  createdAt   DateTime  @default(now())
+  createdBy   String    @db.Uuid
+  content     Json
+  contentText String
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  deletedBy   String?
+  parentId    String?   @db.Uuid
+
+  applicationId String                 @db.Uuid
+  application   Application            @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  user          User                   @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  notifications DocumentNotification[]
+
+  @@index([applicationId])
+}
+
+model PostCommentUpDownVote {
+  createdAt DateTime @default(now())
+  createdBy String   @db.Uuid
+  upvoted   Boolean
+
+  commentId String      @db.Uuid
+  comment   PostComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  postId    String      @db.Uuid
+  post      Post        @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([createdBy, commentId])
+  @@index([commentId])
+  @@index([postId])
+}
+
+model PostTag {
+  id             String          @id @default(uuid()) @db.Uuid
+  name           String
+  spaceId        String          @db.Uuid
+  space          Space           @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  postToPostTags PostToPostTag[]
+
+  @@unique([spaceId, name])
+  @@index([spaceId])
+}
+
+model UnstoppableDomain {
+  id     String @id @default(uuid()) @db.Uuid
+  domain String @unique
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([domain])
+  @@index([userId])
+}
+
+model WebhookSubscription {
+  id        String    @id @default(uuid()) @db.Uuid
+  createdBy String    @db.Uuid
+  scope     String
+  spaceId   String    @db.Uuid
+  space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@unique([scope, spaceId])
+}
+
+model GoogleAccount {
+  id        String @id @default(uuid()) @db.Uuid
+  email     String @unique
+  name      String
+  avatarUrl String
+  userId    String @db.Uuid
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([email])
+  @@index([userId])
+}
+
+model GoogleCredential {
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  id           String    @id @default(uuid()) @db.Uuid
+  expiredAt    DateTime?
+  error        Json?
+  name         String
+  refreshToken String
+  scope        String
+  userId       String    @db.Uuid
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+enum PostCategoryOperation {
+  manage_permissions
+  delete_category
+  edit_category
+  create_post
+  view_posts
+  comment_posts
+}
+
+enum PostOperation {
+  view_post
+  edit_post
+  delete_post
+  pin_post
+  lock_post
+  add_comment
+  delete_comments
+  upvote
+  downvote
+}
+
+enum PostCategoryPermissionLevel {
+  category_admin
+  moderator
+  full_access
+  comment_vote
+  view
+  custom
+}
+
+model PostCategoryPermission {
+  id                 String                      @id @default(uuid()) @db.Uuid
+  permissionLevel    PostCategoryPermissionLevel
+  postCategoryId     String                      @db.Uuid
+  postCategory       PostCategory                @relation(fields: [postCategoryId], references: [id], onDelete: Cascade)
+  // These fields will only be used when the custom permission level is used
+  categoryOperations PostCategoryOperation[]
+  postOperations     PostOperation[]
+
+  // Permission assignees
+  roleId  String?  @db.Uuid
+  role    Role?    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  spaceId String?  @db.Uuid
+  space   Space?   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  public  Boolean?
+
+  @@unique([roleId, postCategoryId])
+  @@unique([spaceId, postCategoryId])
+  @@unique([public, postCategoryId])
+  @@index([postCategoryId])
+  @@index([postCategoryId, roleId])
+  @@index([postCategoryId, spaceId])
+  @@index([postCategoryId, public])
+}
+
+model ApiPageKey {
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  createdBy String         @db.Uuid
+  pageId    String         @db.Uuid
+  apiKey    String
+  type      ApiPageKeyType
+  page      Page           @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  user      User           @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@unique([pageId, type])
+  @@unique([apiKey])
+  @@index([pageId])
+  @@index([apiKey])
+}
+
+model BlockCount {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+  count     Int
+  spaceId   String   @db.Uuid
+  space     Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  details   Json
+
+  @@index([spaceId])
+  @@index([createdAt(sort: Desc)])
+}
+
+model UserNotificationMetadata {
+  id                    String                 @id @default(uuid()) @db.Uuid
+  createdAt             DateTime               @default(now())
+  createdBy             String                 @db.Uuid
+  author                User                   @relation(fields: [createdBy], references: [id], onDelete: Cascade, name: "author")
+  deletedAt             DateTime?
+  seenAt                DateTime?
+  archivedAt            DateTime?
+  channel               NotificationChannel?
+  spaceId               String                 @db.Uuid
+  space                 Space                  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  userId                String                 @db.Uuid
+  user                  User                   @relation(fields: [userId], references: [id], onDelete: Cascade, name: "target")
+  messageId             String?
+  bountyNotifications   BountyNotification[]
+  documentNotifications DocumentNotification[]
+  cardNotifications     CardNotification[]
+  postNotifications     PostNotification[]
+  proposalNotifications ProposalNotification[]
+  voteNotifications     VoteNotification[]
+  customNotifications   CustomNotification[]
+
+  @@index([spaceId])
+  @@index([createdBy])
+  @@index([userId])
+}
+
+model BountyNotification {
+  id                     String                   @id @default(uuid()) @db.Uuid
+  notificationMetadataId String                   @db.Uuid
+  notificationMetadata   UserNotificationMetadata @relation(fields: [notificationMetadataId], references: [id], onDelete: Cascade)
+  // bounty task columns
+  bountyId               String                   @db.Uuid
+  bounty                 Bounty                   @relation(fields: [bountyId], references: [id], onDelete: Cascade)
+  applicationId          String?                  @db.Uuid
+  application            Application?             @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  type                   String
+}
+
+model DocumentNotification {
+  id                     String                   @id @default(uuid()) @db.Uuid
+  notificationMetadataId String                   @db.Uuid
+  notificationMetadata   UserNotificationMetadata @relation(fields: [notificationMetadataId], references: [id], onDelete: Cascade)
+  // page task columns
+  pageId                 String?                  @db.Uuid
+  page                   Page?                    @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  mentionId              String?
+  inlineComment          Comment?                 @relation(fields: [inlineCommentId], references: [id], onDelete: Cascade)
+  inlineCommentId        String?                  @db.Uuid
+  type                   String
+  postCommentId          String?                  @db.Uuid
+  postComment            PostComment?             @relation(fields: [postCommentId], references: [id], onDelete: Cascade)
+  pageCommentId          String?                  @db.Uuid
+  pageComment            PageComment?             @relation(fields: [pageCommentId], references: [id], onDelete: Cascade)
+  postId                 String?                  @db.Uuid
+  post                   Post?                    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  content                Json?
+  applicationCommentId   String?                  @db.Uuid
+  applicationComment     ApplicationComment?      @relation(fields: [applicationCommentId], references: [id], onDelete: Cascade)
+
+  @@index([pageId])
+  @@index([postId])
+  @@index([inlineCommentId])
+  @@index([postCommentId])
+  @@index([pageCommentId])
+  @@index([applicationCommentId])
+  @@index([notificationMetadataId])
+}
+
+model CardNotification {
+  id                     String                   @id @default(uuid()) @db.Uuid
+  notificationMetadataId String                   @db.Uuid
+  notificationMetadata   UserNotificationMetadata @relation(fields: [notificationMetadataId], references: [id], onDelete: Cascade)
+  // card task columns
+  cardId                 String                   @db.Uuid
+  card                   Block                    @relation(fields: [cardId], references: [id], onDelete: Cascade, name: "card")
+  personPropertyId       String?
+  type                   String
+
+  @@index([notificationMetadataId])
+  @@index([cardId])
+}
+
+model PostNotification {
+  id                     String                   @id @default(uuid()) @db.Uuid
+  notificationMetadataId String                   @db.Uuid
+  notificationMetadata   UserNotificationMetadata @relation(fields: [notificationMetadataId], references: [id], onDelete: Cascade)
+  // forum task column
+  postId                 String                   @db.Uuid
+  post                   Post                     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  type                   String
+
+  @@index([notificationMetadataId])
+  @@index([postId])
+}
+
+model ProposalNotification {
+  id                     String                   @id @default(uuid()) @db.Uuid
+  notificationMetadataId String                   @db.Uuid
+  notificationMetadata   UserNotificationMetadata @relation(fields: [notificationMetadataId], references: [id], onDelete: Cascade)
+  // proposal task columns
+  proposalId             String                   @db.Uuid
+  proposal               Proposal                 @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  type                   String
+  evaluationId           String?                  @db.Uuid
+  evaluation             ProposalEvaluation?      @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+
+  @@index([notificationMetadataId])
+  @@index([proposalId])
+}
+
+model VoteNotification {
+  id                     String                   @id @default(uuid()) @db.Uuid
+  notificationMetadataId String                   @db.Uuid
+  notificationMetadata   UserNotificationMetadata @relation(fields: [notificationMetadataId], references: [id], onDelete: Cascade)
+  // vote task columns
+  voteId                 String                   @db.Uuid
+  vote                   Vote                     @relation(fields: [voteId], references: [id], onDelete: Cascade)
+  type                   String
+
+  @@index([notificationMetadataId])
+  @@index([voteId])
+}
+
+model CustomNotification {
+  id                     String                   @id @default(uuid()) @db.Uuid
+  notificationMetadataId String                   @db.Uuid
+  notificationMetadata   UserNotificationMetadata @relation(fields: [notificationMetadataId], references: [id], onDelete: Cascade)
+  type                   String
+  content                Json?
+
+  @@index([notificationMetadataId])
+}
+
+model SQSMessage {
+  id        String   @id
+  createdAt DateTime @default(now())
+  payload   Json?
+}
+
+model BlacklistedSpaceUser {
+  userId          String   @db.Uuid
+  spaceId         String   @db.Uuid
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  space           Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  discordId       String?
+  walletAddresses String[]
+  emails          String[]
+  createdAt       DateTime @default(now())
+
+  @@unique([userId, spaceId])
+}
+
+model BlacklistedUser {
+  userId          String   @id @db.Uuid
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  discordId       String?
+  walletAddresses String[]
+  emails          String[]
+  createdAt       DateTime @default(now())
+
+  @@index([userId])
+}
+
+model AdditionalBlockQuota {
+  id         String    @id @default(uuid()) @db.Uuid
+  spaceId    String    @db.Uuid
+  space      Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  expiresAt  DateTime?
+  blockCount Int
+  createdAt  DateTime  @default(now())
+
+  @@index([spaceId])
+}
+
+model Form {
+  id         String      @id @default(uuid()) @db.Uuid
+  formFields FormField[]
+  proposal   Proposal[]
+  spaceId    String?     @db.Uuid
+  space      Space?      @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  @@index([spaceId])
+}
+
+enum FormFieldType {
+  project_profile
+  short_text
+  long_text
+  number
+  email
+  phone
+  url
+  select
+  multiselect
+  wallet
+  date
+  person
+  label
+  image
+  file
+  milestone
+  optimism_project_profile
+}
+
+model FormField {
+  id                    String                 @id @default(uuid()) @db.Uuid
+  type                  FormFieldType
+  index                 Int                    @default(-1)
+  name                  String
+  description           Json?
+  required              Boolean                @default(false)
+  private               Boolean                @default(false)
+  options               Json?
+  formId                String                 @db.Uuid
+  form                  Form                   @relation(fields: [formId], references: [id], onDelete: Cascade)
+  fieldConfig           Json?
+  answers               FormFieldAnswer[]
+  proposalMyTaskColumns ProposalMyWorkColumn[]
+  dependsOnStepIndex    Int?
+
+  @@index([formId])
+}
+
+model FormFieldAnswer {
+  id         String        @id @default(uuid()) @db.Uuid
+  fieldId    String        @db.Uuid
+  field      FormField     @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  type       FormFieldType
+  value      Json
+  proposalId String        @db.Uuid
+  proposal   Proposal      @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  threads    Thread[]
+  createdAt  DateTime      @default(now())
+
+  @@unique([proposalId, fieldId])
+  @@index([fieldId])
+  @@index([proposalId])
+}
+
+enum AttestationType {
+  proposal
+  reward
+  external
+}
+
+model CredentialTemplate {
+  id                String                @id @default(uuid()) @db.Uuid
+  spaceId           String                @db.Uuid
+  name              String
+  organization      String
+  description       String                @default("")
+  schemaType        AttestationType
+  schemaAddress     String
+  createdAt         DateTime              @default(now())
+  space             Space                 @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  credentialEvents  CredentialEventType[] @default([])
+  issuedCredentials IssuedCredential[]
+
+  @@index([spaceId])
+}
+
+model IssuedCredential {
+  id                   String               @id @default(uuid()) @db.Uuid
+  credentialTemplateId String?              @db.Uuid
+  credentialTemplate   CredentialTemplate?  @relation(fields: [credentialTemplateId], references: [id], onDelete: SetNull)
+  proposalId           String?              @db.Uuid
+  proposal             Proposal?            @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  rewardApplicationId  String?              @db.Uuid
+  rewardApplication    Application?         @relation(fields: [rewardApplicationId], references: [id], onDelete: Cascade)
+  schemaId             String?
+  // Fields specific to ceramic (deprecated)
+  ceramicId            String?              @unique
+  ceramicRecord        Json?
+  // Fields specific to on chain credentials
+  onchainAttestationId String?              @unique
+  onchainChainId       Int?
+  hidden               Boolean?             @default(false)
+  userId               String               @db.Uuid
+  user                 User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  credentialEvent      CredentialEventType
+  createdAt            DateTime             @default(now())
+  favoriteCredentials  FavoriteCredential[]
+
+  @@index([credentialTemplateId])
+  @@index([proposalId])
+  @@index([rewardApplicationId])
+  @@index([userId])
+}
+
+model Otp {
+  id             String       @id @default(uuid()) @db.Uuid
+  createdAt      DateTime     @default(now())
+  deletedAt      DateTime?
+  activatedAt    DateTime?
+  secret         String
+  userId         String       @unique @db.Uuid
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recoveryCodeId String       @unique @db.Uuid
+  recoveryCode   RecoveryCode @relation(fields: [recoveryCodeId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model RecoveryCode {
+  id        String    @id @default(uuid()) @db.Uuid
+  createdAt DateTime  @default(now())
+  usedAt    DateTime?
+  deletedAt DateTime?
+  code      String
+  otp       Otp?
+}
+
+model CharmWallet {
+  id               String             @id @default(uuid()) @db.Uuid
+  balance          Int                @default(0)
+  totalBalance     Int                @default(0)
+  userId           String?            @unique @db.Uuid
+  spaceId          String?            @unique @db.Uuid
+  user             User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  space            Space?             @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  transactionsFrom CharmTransaction[] @relation("fromWallet")
+  transactionsTo   CharmTransaction[] @relation("toWallet")
+
+  @@index([id])
+  @@index([totalBalance(sort: Desc)])
+  @@index([userId])
+  @@index([spaceId])
+}
+
+model CharmTransaction {
+  id         String       @id @default(uuid()) @db.Uuid
+  createdAt  DateTime     @default(now())
+  amount     Int
+  from       String?      @db.Uuid
+  to         String?      @db.Uuid
+  fromWallet CharmWallet? @relation("fromWallet", fields: [from], references: [id], onDelete: SetNull)
+  toWallet   CharmWallet? @relation("toWallet", fields: [to], references: [id], onDelete: SetNull)
+  metadata   Json?        @default("{}")
+}
+
+model FavoriteCredential {
+  id                   String            @id @default(uuid()) @db.Uuid
+  index                Int               @default(-1)
+  chainId              Int?
+  userId               String            @db.Uuid
+  user                 User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  attestationId        String?           @unique
+  issuedCredentialId   String?           @unique @db.Uuid
+  issuedCredential     IssuedCredential? @relation(fields: [issuedCredentialId], references: [id], onDelete: SetNull)
+  gitcoinWalletAddress String?           @unique
+
+  @@index([userId])
+  @@index([issuedCredentialId])
+}
+
+model ReferralCode {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      String   @unique
+  createdAt DateTime @default(now())
+  userId    String   @unique @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([code])
+}
+
+model ReferralCodeUseEvent {
+  id         String   @id @default(uuid()) @db.Uuid
+  createdAt  DateTime @default(now())
+  referrerId String   @db.Uuid
+  refereeId  String   @db.Uuid
+  referrer   User     @relation("referrer", fields: [referrerId], references: [id], onDelete: Cascade)
+  referee    User     @relation("referee", fields: [refereeId], references: [id], onDelete: Cascade)
+
+  @@unique([referrerId, refereeId])
+  @@index([referrerId])
+  @@index([refereeId])
+}
+
+model PendingSafeTransaction {
+  safeAddress       String
+  safeTxHash        String          @unique
+  chainId           Int
+  processed         Boolean         @default(false)
+  credentialType    AttestationType
+  spaceId           String          @db.Uuid
+  space             Space           @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  schemaId          String
+  proposalIds       String[]
+  rewardIds         String[]
+  credentialContent Json?
+
+  @@index([spaceId])
+  @@index([proposalIds], type: Gin)
+  @@index([rewardIds], type: Gin)
+}
+
+model ProjectMember {
+  id            String   @id @default(uuid()) @db.Uuid
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  updatedBy     String   @db.Uuid
+  teamLead      Boolean  @default(false)
+  name          String
+  walletAddress String?
+  email         String?
+  farcasterId   Int?
+  socialUrls    String[]
+  userId        String?  @db.Uuid
+  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  projectId     String   @db.Uuid
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([projectId])
+}
+
+enum SunnyAwardsProjectType {
+  creator
+  app
+  other
+}
+
+model Project {
+  id                               String                           @id @default(uuid()) @db.Uuid
+  createdAt                        DateTime                         @default(now())
+  createdBy                        String                           @db.Uuid
+  updatedAt                        DateTime                         @default(now()) @updatedAt
+  updatedBy                        String                           @db.Uuid
+  deletedAt                        DateTime?
+  name                             String
+  path                             String?
+  description                      String?
+  twitter                          String?
+  websites                         String[]                         @default([])
+  farcasterValues                  String[]                         @default([])
+  category                         String? // deprecated - replaced by optimismCategory
+  optimismCategory                 String?
+  avatar                           String?
+  coverImage                       String?
+  farcasterFrameImage              String?
+  github                           String?
+  walletAddress                    String?
+  primaryContractAddress           String?
+  primaryContractDeployer          String?
+  primaryContractDeployTxHash      String?
+  primaryContractChainId           Int?
+  mintingWalletAddress             String?
+  sunnyAwardsNumber                Int?
+  sunnyAwardsProjectType           SunnyAwardsProjectType?
+  sunnyAwardsCategory              String?
+  sunnyAwardsCategoryDetails       String?
+  source                           ProjectSource                    @default(charmverse)
+  user                             User                             @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  projectMembers                   ProjectMember[]
+  proposals                        Proposal[]
+  gitcoinProjectAttestations       GitcoinProjectAttestation[]
+  pptimismProjectAttestations      OptimismProjectAttestation[]
+  charmProjectCredentials          CharmProjectCredential[]
+  charmQualifyingEventCredentialss CharmQualifyingEventCredential[]
+  productUpdatesFarcasterFrames    ProductUpdatesFarcasterFrame[]
+
+  @@index([createdBy])
+}
+
+enum ExternalProjectSource {
+  gitcoin
+  questbook
+}
+
+model ExternalProject {
+  id        String                @id @default(uuid()) @db.Uuid
+  metadata  Json
+  recipient String
+  source    ExternalProjectSource
+}
+
+model SpaceGithubConnection {
+  id             String              @id @default(uuid()) @db.Uuid
+  createdAt      DateTime            @default(now())
+  createdBy      String              @db.Uuid
+  installationId String
+  name           String
+  spaceId        String              @db.Uuid
+  author         User                @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  space          Space               @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  rewardsRepos   RewardsGithubRepo[]
+
+  @@index([spaceId])
+}
+
+model RewardsGithubRepo {
+  id               String                @id @default(uuid()) @db.Uuid
+  connectionId     String                @db.Uuid
+  connection       SpaceGithubConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  repositoryId     String
+  repositoryLabels String[]              @default([])
+  repositoryName   String
+  rewardAuthorId   String                @db.Uuid
+  rewardAuthor     User                  @relation(fields: [rewardAuthorId], references: [id], onDelete: Cascade)
+  rewardTemplateId String?               @db.Uuid
+  rewardTemplate   Page?                 @relation(fields: [rewardTemplateId], references: [id], onDelete: Cascade)
+
+  @@unique([connectionId, repositoryId])
+  @@index([connectionId])
+}
+
+model SynapsCredential {
+  id      String  @id @default(uuid()) @db.Uuid
+  apiKey  String
+  secret  String?
+  spaceId String  @unique @db.Uuid
+  space   Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  @@index([spaceId])
+}
+
+enum SynapsUserKycStatus {
+  APPROVED
+  REJECTED
+  RESUBMISSION_REQUIRED
+  SUBMISSION_REQUIRED
+  PENDING_VERIFICATION
+}
+
+model SynapsUserKyc {
+  id        String              @id @default(uuid()) @db.Uuid
+  createdAt DateTime            @default(now())
+  deletedAt DateTime?
+  sessionId String // Unique identifier for the user KYC session in Synaps
+  status    SynapsUserKycStatus
+  userId    String              @unique @db.Uuid
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spaceId   String              @db.Uuid
+  space     Space               @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, spaceId])
+  @@index([userId, spaceId])
+}
+
+model PersonaCredential {
+  id         String  @id @default(uuid()) @db.Uuid
+  apiKey     String
+  templateId String
+  secret     String?
+  spaceId    String  @unique @db.Uuid
+  space      Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  @@index([spaceId])
+}
+
+enum PersonaUserKycStatus {
+  created
+  pending
+  completed
+  failed
+  expired
+  needs_review
+  approved
+  declined
+}
+
+model PersonaUserKyc {
+  id        String               @id @default(uuid()) @db.Uuid
+  createdAt DateTime             @default(now())
+  deletedAt DateTime?
+  inquiryId String // Unique identifier for the user KYC inquiry in Persona
+  status    PersonaUserKycStatus
+  userId    String               @unique @db.Uuid // This will be stored also in Persona as reference-id so we can debug each user kyc case
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spaceId   String               @db.Uuid
+  space     Space                @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, spaceId])
+  @@index([userId, spaceId])
+}
+
+model ProposalEvaluationReview {
+  id             String                   @id @default(uuid()) @db.Uuid
+  completedAt    DateTime                 @default(now())
+  result         ProposalEvaluationResult
+  reviewerId     String                   @db.Uuid
+  reviewer       User                     @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+  evaluationId   String                   @db.Uuid
+  evaluation     ProposalEvaluation       @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  declineReasons String[]                 @default([])
+  declineMessage String?
+
+  @@unique([reviewerId, evaluationId])
+  @@index([evaluationId])
+}
+
+model DocusignCredential {
+  id                  String  @id @default(uuid()) @db.Uuid
+  docusignAccountId   String
+  docusignAccountName String
+  docusignApiBaseUrl  String
+  docusignWebhookId   String?
+  refreshToken        String
+  accessToken         String
+  userId              String  @db.Uuid
+  user                User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spaceId             String  @unique @db.Uuid
+  space               Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  // Generated by CharmVerse for Docusign to post back to our webhook
+  webhookApiKey       String? @unique
+
+  @@index([userId])
+  @@index([spaceId])
+}
+
+enum DocumentSignatureStatus {
+  pending
+  completed
+}
+
+model DocumentToSign {
+  id                 String                  @id @default(uuid()) @db.Uuid
+  createdAt          DateTime                @default(now())
+  completedAt        DateTime?
+  docusignEnvelopeId String
+  status             DocumentSignatureStatus
+  title              String
+  evaluationId       String                  @db.Uuid
+  evaluation         ProposalEvaluation      @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  proposalId         String                  @db.Uuid
+  proposal           Proposal                @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  spaceId            String                  @db.Uuid
+  space              Space                   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  signers            DocumentSigner[]
+
+  @@index([spaceId])
+  @@index([proposalId])
+  @@index([evaluationId])
+}
+
+model DocumentSigner {
+  id               String         @id @default(uuid()) @db.Uuid
+  createdAt        DateTime       @default(now())
+  documentToSignId String         @db.Uuid
+  documentToSign   DocumentToSign @relation(fields: [documentToSignId], references: [id], onDelete: Cascade)
+  completedAt      DateTime?
+  completedBy      String?        @db.Uuid
+  completedByUser  User?          @relation(fields: [completedBy], references: [id], onDelete: Cascade)
+  email            String
+  name             String
+
+  @@index([documentToSignId])
+  @@index([completedBy])
+}
+
+model ProposalEvaluationAppealReview {
+  id             String                   @id @default(uuid()) @db.Uuid
+  completedAt    DateTime                 @default(now())
+  result         ProposalEvaluationResult
+  reviewerId     String                   @db.Uuid
+  reviewer       User                     @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+  evaluationId   String                   @db.Uuid
+  evaluation     ProposalEvaluation       @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  declineReasons String[]                 @default([])
+  declineMessage String?
+
+  @@unique([reviewerId, evaluationId])
+  @@index([evaluationId])
+}
+
+enum PullRequestStatus {
+  open
+  closed
+  merged
+}
+
+model PullRequestSummary {
+  id            String            @id @default(uuid()) @db.Uuid
+  createdAt     DateTime          @default(now())
+  repoName      String
+  repoOwner     String
+  prTitle       String
+  prNumber      Int
+  createdBy     String
+  status        PullRequestStatus
+  patches       Json
+  additions     Int
+  deletions     Int
+  changedFiles  Int
+  model         String
+  prompt        String
+  promptTokens  Int
+  summary       String
+  summaryTokens Int
+
+  // Ensure we don't run duplicate simulations
+  @@unique([repoName, repoOwner, prNumber, model, prompt])
+}
+
+model DocusignAllowedRoleOrUser {
+  id      String  @id @default(uuid()) @db.Uuid
+  spaceId String  @db.Uuid
+  space   Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  roleId  String? @db.Uuid
+  role    Role?   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  userId  String? @db.Uuid
+  user    User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([spaceId])
+  @@index([roleId])
+  @@index([userId])
+}
+
+model OptimismProjectAttestation {
+  projectRefUID             String   @id
+  farcasterIds              Int[]
+  chainId                   Int
+  name                      String
+  metadataAttestationUID    String
+  metadataUrl               String
+  metadata                  Json
+  timeCreated               DateTime
+  projectId                 String?  @db.Uuid
+  project                   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  projectAttestationRevoked Boolean  @default(false)
+
+  @@index([projectId])
+}
+
+enum GitcoinProjectAttestationType {
+  application
+  profile
+}
+
+model GitcoinProjectAttestation {
+  id                        String                        @id @default(uuid()) @db.Uuid
+  createdAt                 DateTime                      @default(now())
+  projectId                 String                        @db.Uuid
+  project                   Project                       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  chainId                   Int
+  type                      GitcoinProjectAttestationType
+  schemaId                  String
+  attestationUID            String
+  projectAttestationRevoked Boolean                       @default(false)
+
+  @@index([projectId])
+}
+
+enum QualifyingEventType {
+  proposal_published
+  pull_request_merged
+}
+
+model CharmUserCredential {
+  id             String   @id @default(uuid()) @db.Uuid
+  createdAt      DateTime @default(now())
+  chainId        Int
+  schemaId       String
+  attestationUID String
+  userId         String   @db.Uuid
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model CharmProjectCredential {
+  projectRefUID             String   @id
+  farcasterIds              Int[]
+  chainId                   Int
+  name                      String
+  metadataAttestationUID    String
+  metadataUrl               String
+  metadata                  Json
+  createdAt                 DateTime @default(now())
+  projectId                 String?  @db.Uuid
+  project                   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  userId                    String   @db.Uuid
+  user                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectAttestationRevoked Boolean  @default(false)
+
+  @@index([userId])
+  @@index([projectId])
+}
+
+model CharmQualifyingEventCredential {
+  id                  String              @id @default(uuid()) @db.Uuid
+  createdAt           DateTime            @default(now())
+  qualifyingEventType QualifyingEventType
+  chainId             Int
+  schemaId            String
+  attestationUID      String
+  userId              String              @db.Uuid
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Relations to data that triggered the attestation
+  resourceUrl         String?
+  proposalId          String?             @db.Uuid
+  proposal            Proposal?           @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  projectId           String?             @db.Uuid
+  project             Project?            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([proposalId])
+  @@index([projectId])
+}
+
+enum PushNotificationSource {
+  sunnyawards
+  connect
+  charmverse
+}
+
+model PushNotificationSubscription {
+  id           String                 @id @default(uuid()) @db.Uuid
+  createdAt    DateTime               @default(now())
+  subscription Json
+  source       PushNotificationSource
+  userId       String?                @db.Uuid
+  user         User?                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model ProductUpdatesFarcasterFrame {
+  id          String  @id @default(uuid()) @db.Uuid
+  text        String
+  textContent Json?
+  image       String
+  createdBy   String  @db.Uuid
+  author      User    @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  projectId   String  @db.Uuid
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt      DateTime @default(now())
+  createdAtLocal String
+
+  @@index([projectId])
+}
+
+model ConnectWaitlistSlot {
+  id                 String                @id @default(uuid()) @db.Uuid
+  createdAt          DateTime              @default(now())
+  initialPosition    Int                   @default(autoincrement())
+  fid                Int                   @unique
+  username           String? // TBD if we need this
+  referredByFid      Int?
+  referrer           ConnectWaitlistSlot?  @relation("ReferralRelation", fields: [referredByFid], references: [fid], onDelete: SetNull)
+  referralsGenerated ConnectWaitlistSlot[] @relation("ReferralRelation")
+  score              Int                   @default(0)
+  percentile         Int?
+  githubLogin        String?
+  isPartnerAccount   Boolean               @default(false)
+
+  @@index([githubLogin])
+  @@index([score])
+  @@index([referredByFid])
+}
+
+model CryptoEcosystem {
+  subEcosystems String[]
+  title         String                       @unique
+  repoUrls      String[]
+  organizations String[]
+  repos         CryptoEcosystemRepo[]
+  pullRequests  CryptoEcosystemPullRequest[]
+  children      CryptoEcosystemChild[]       @relation("parent")
+  parents       CryptoEcosystemChild[]       @relation("child")
+
+  @@index([title])
+}
+
+model CryptoEcosystemChild {
+  parentTitle String
+  parent      CryptoEcosystem @relation("parent", fields: [parentTitle], references: [title], onDelete: Cascade)
+  childTitle  String
+  child       CryptoEcosystem @relation("child", fields: [childTitle], references: [title], onDelete: Cascade)
+
+  @@unique([parentTitle, childTitle])
+  @@index([parentTitle])
+  @@index([childTitle])
+}
+
+model CryptoEcosystemRepo {
+  ecosystemTitle          String
+  ecosystem               CryptoEcosystem              @relation(fields: [ecosystemTitle], references: [title], onDelete: Cascade)
+  githubId                String                       @unique
+  url                     String
+  assignableUsers         Int
+  pullRequestAuthorsCount Int
+  stargazerCount          Int
+  watcherCount            Int
+  forkCount               Int
+  xtra                    Json?
+  pullRequests            CryptoEcosystemPullRequest[]
+
+  @@index([ecosystemTitle])
+}
+
+model CryptoEcosystemAuthor {
+  login        String                       @unique
+  name         String?
+  email        String?
+  twitter      String?
+  xtra         Json?
+  pullRequests CryptoEcosystemPullRequest[]
+
+  @@index([login])
+}
+
+model CryptoEcosystemPullRequest {
+  date            DateTime
+  githubId        String                @unique
+  repoGithubId    String
+  title           String
+  userGithubLogin String
+  xtra            Json?
+  ecosystemTitle  String
+  author          CryptoEcosystemAuthor @relation(fields: [userGithubLogin], references: [login], onDelete: Cascade)
+  repo            CryptoEcosystemRepo   @relation(fields: [repoGithubId], references: [githubId], onDelete: Cascade)
+  ecosystem       CryptoEcosystem       @relation(fields: [ecosystemTitle], references: [title], onDelete: Cascade)
+}
+
+enum BuilderStatus {
+  applied
+  rejected
+  approved
+  banned
+}
+
+model Scout {
+  createdAt                        DateTime                     @default(now())
+  deletedAt                        DateTime?
+  id                               String                       @id @default(uuid()) @db.Uuid
+  email                            String?
+  path                             String                       @unique
+  displayName                      String
+  farcasterId                      Int?                         @unique
+  farcasterName                    String? // every user only has one farcaster account
+  telegramId                       BigInt?                      @unique
+  telegramName                     String?
+  walletENS                        String?
+  avatar                           String?
+  bio                              String?
+  builderStatus                    BuilderStatus?
+  reappliedAt                      DateTime?
+  sendMarketing                    Boolean                      @default(false)
+  sendTransactionEmails            Boolean                      @default(true)
+  agreedToTermsAt                  DateTime?
+  onboardedAt                      DateTime?
+  currentBalance                   Int?                         @default(0)
+  currentBalanceDevToken           String?                      @default("0")
+  hasMoxieProfile                  Boolean                      @default(false)
+  utmCampaign                      String?
+  framesNotificationToken          String?
+  sendFarcasterNotification        Boolean                      @default(true)
+  wallets                          ScoutWallet[]
+  strikes                          BuilderStrike[]
+  events                           BuilderEvent[]
+  githubUsers                      GithubUser[]
+  gemsPayoutEvents                 GemsPayoutEvent[]
+  pointsReceived                   PointsReceipt[]              @relation("pointsReceiptRecipient")
+  pointsSent                       PointsReceipt[]              @relation("pointsReceiptSender")
+  userWeeklyStats                  UserWeeklyStats[]
+  userSeasonStats                  UserSeasonStats[]
+  userAllTimeStats                 UserAllTimeStats[]
+  builderNfts                      BuilderNft[]
+  activities                       ScoutGameActivity[]
+  pendingNftTransactions           PendingNftTransaction[]
+  builderCardActivities            BuilderCardActivity[]
+  onchainProfileAttestationUid     String?
+  onchainProfileAttestationChainId Int?
+  socialQuests                     ScoutSocialQuest[]
+  dailyClaimEvents                 ScoutDailyClaimEvent[]
+  dailyClaimStreakEvents           ScoutDailyClaimStreakEvent[]
+  referralCode                     String                       @unique
+  referralCodeEvents               ReferralCodeEvent[]
+  talentProfile                    TalentProfile?
+  mergedFromEvents                 ScoutMergeEvent[]            @relation("mergedFromScout")
+  mergedToEvents                   ScoutMergeEvent[]            @relation("mergedToScout")
+  partnerRewardEvents              PartnerRewardEvent[]
+  emailVerifications               ScoutEmailVerification[]
+  builderStatusEvents              BuilderStatusEvent[]
+  scoutProjectMembers              ScoutProjectMember[]
+  scoutFarcasterNotifications      ScoutFarcasterNotification[]
+  scoutEmailNotifications          ScoutEmailNotification[]
+  matchups                         ScoutMatchup[]
+  scoutAppNotifications            ScoutAppNotification[]
+  draftSeasonOffersReceived        DraftSeasonOffer[]
+
+  @@index([path])
+  @@index([farcasterId])
+  @@index([telegramId])
+  @@index([deletedAt])
+  @@index([builderStatus])
+}
+
+model ScoutEmailVerification {
+  code        String    @id
+  sentAt      DateTime  @default(now())
+  completedAt DateTime?
+  email       String
+  scoutId     String    @db.Uuid
+  scout       Scout     @relation(fields: [scoutId], references: [id], onDelete: Cascade)
+
+  @@index([completedAt, scoutId])
+}
+
+model ScoutMergeEvent {
+  createdAt       DateTime @default(now())
+  mergedFromId    String   @db.Uuid
+  mergedFromScout Scout    @relation(fields: [mergedFromId], references: [id], onDelete: Cascade, name: "mergedFromScout")
+  mergedToId      String   @db.Uuid
+  mergedToScout   Scout    @relation(fields: [mergedToId], references: [id], onDelete: Cascade, name: "mergedToScout")
+  mergedRecords   Json
+
+  @@unique([mergedFromId, mergedToId])
+  @@index([mergedFromId])
+  @@index([mergedToId])
+}
+
+model BuilderStrike {
+  id                          String              @id @default(uuid()) @db.Uuid
+  builderId                   String              @db.Uuid
+  builder                     Scout               @relation(fields: [builderId], references: [id], onDelete: Cascade)
+  createdAt                   DateTime            @default(now())
+  deletedAt                   DateTime?
+  githubEventId               String?             @unique @db.Uuid
+  githubEvent                 GithubEvent?        @relation(fields: [githubEventId], references: [id], onDelete: SetNull)
+  activities                  ScoutGameActivity[]
+  onchainStrikeChainId        Int?
+  onchainStrikeAttestationUid String?
+
+  @@index([builderId, deletedAt])
+}
+
+enum BuilderEventType {
+  daily_commit
+  merged_pull_request
+  waitlist_airdrop
+  misc_event // for offline events that don't fit any other category
+  nft_purchase
+  proposal_passed
+  gems_payout
+  daily_claim
+  daily_claim_streak
+  social_quest
+  referral
+  referral_bonus
+  onchain_achievement
+  matchup_winner
+}
+
+model BuilderEvent {
+  id                      String                          @id @default(uuid()) @db.Uuid
+  builderId               String                          @db.Uuid
+  builder                 Scout                           @relation(fields: [builderId], references: [id], onDelete: Cascade)
+  type                    BuilderEventType
+  week                    String
+  season                  String
+  createdAt               DateTime                        @default(now())
+  description             String? // for misc_event type
+  bonusPartner            String?
+  scoutPartnerId          String?
+  scoutPartner            ScoutPartner?                   @relation(fields: [scoutPartnerId], references: [id], onDelete: SetNull)
+  githubEventId           String?                         @unique @db.Uuid
+  githubEvent             GithubEvent?                    @relation(fields: [githubEventId], references: [id], onDelete: SetNull)
+  gemsPayoutEventId       String?                         @unique @db.Uuid
+  gemsPayoutEvent         GemsPayoutEvent?                @relation(fields: [gemsPayoutEventId], references: [id], onDelete: SetNull)
+  nftPurchaseEventId      String?                         @unique @db.Uuid
+  nftPurchaseEvent        NFTPurchaseEvent?               @relation(fields: [nftPurchaseEventId], references: [id], onDelete: SetNull)
+  pointsReceipts          PointsReceipt[]
+  gemsReceipt             GemsReceipt?
+  // If deleting a weekly claim, we want to delete the builder event
+  weeklyClaimId           String?                         @db.Uuid
+  weeklyClaim             WeeklyClaims?                   @relation(fields: [weeklyClaimId], references: [id], onDelete: Cascade)
+  tokensReceipts          TokensReceipt[]
+  scoutSocialQuestId      String?                         @unique @db.Uuid
+  scoutSocialQuest        ScoutSocialQuest?               @relation(fields: [scoutSocialQuestId], references: [id], onDelete: SetNull)
+  dailyClaimEventId       String?                         @unique @db.Uuid
+  dailyClaimEvent         ScoutDailyClaimEvent?           @relation(fields: [dailyClaimEventId], references: [id], onDelete: SetNull)
+  dailyClaimStreakEventId String?                         @unique @db.Uuid
+  dailyClaimStreakEvent   ScoutDailyClaimStreakEvent?     @relation(fields: [dailyClaimStreakEventId], references: [id], onDelete: SetNull)
+  referralCodeEvent       ReferralCodeEvent?              @relation("builderEvent")
+  referralBonusEvent      ReferralCodeEvent?              @relation("bonusBuilderEvent")
+  onchainAchievementId    String?                         @db.Uuid
+  onchainAchievement      ScoutProjectOnchainAchievement? @relation(fields: [onchainAchievementId], references: [id], onDelete: SetNull)
+
+  @@index([builderId])
+  @@index([type])
+  @@index([githubEventId])
+  @@index([gemsPayoutEventId])
+  @@index([nftPurchaseEventId])
+  @@index([dailyClaimEventId])
+  @@index([dailyClaimStreakEventId])
+  @@index([weeklyClaimId])
+  @@index([week, season])
+  @@index([createdAt])
+  @@index([scoutPartnerId])
+}
+
+model GithubUser {
+  id          Int           @id
+  builderId   String?       @db.Uuid
+  builder     Scout?        @relation(fields: [builderId], references: [id], onDelete: SetNull)
+  email       String?
+  displayName String?
+  login       String        @unique
+  events      GithubEvent[]
+  createdAt   DateTime      @default(now())
+
+  @@index([builderId])
+}
+
+enum GithubRepoOwnerType {
+  user
+  org
+}
+
+model GithubRepo {
+  id             Int                 @id
+  owner          String
+  ownerType      GithubRepoOwnerType
+  handPicked     Boolean             @default(false)
+  fork           Boolean             @default(false)
+  name           String
+  avatar         String?
+  defaultBranch  String
+  events         GithubEvent[]
+  createdAt      DateTime            @default(now())
+  deletedAt      DateTime?
+  bonusPartner   String?
+  scoutPartnerId String?
+  scoutPartner   ScoutPartner?       @relation(fields: [scoutPartnerId], references: [id], onDelete: SetNull)
+  issues         GithubIssue[]
+
+  @@unique([owner, name])
+  @@index([id])
+  @@index([bonusPartner])
+  @@index([scoutPartnerId])
+}
+
+enum GithubEventType {
+  merged_pull_request
+  closed_pull_request
+  commit
+}
+
+model GithubEvent {
+  id                 String          @id @default(uuid()) @db.Uuid
+  repoId             Int
+  repo               GithubRepo      @relation(fields: [repoId], references: [id], onDelete: Cascade)
+  pullRequestNumber  Int?
+  commitHash         String?
+  type               GithubEventType
+  isFirstPullRequest Boolean         @default(false)
+  title              String
+  url                String
+  createdAt          DateTime        @default(now())
+  createdBy          Int
+  completedAt        DateTime?
+  githubUser         GithubUser      @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  strike             BuilderStrike?
+  builderEvent       BuilderEvent?
+  issues             GithubIssue[]
+
+  @@unique([pullRequestNumber, repoId, createdBy, type], name: "unique_github_event")
+  @@index([repoId])
+  @@index([createdBy])
+}
+
+model NFTPurchaseEvent {
+  id                  String              @id @default(uuid()) @db.Uuid
+  createdAt           DateTime            @default(now())
+  paidInPoints        Boolean?
+  tokensPurchased     Int
+  pointsValue         Int
+  builderNftId        String              @db.Uuid
+  builderNft          BuilderNft          @relation(fields: [builderNftId], references: [id], onDelete: Cascade)
+  txHash              String
+  txLogIndex          Int
+  builderEvent        BuilderEvent?
+  activities          ScoutGameActivity[]
+  walletAddress       String?
+  scoutWallet         ScoutWallet?        @relation(fields: [walletAddress], references: [address], onDelete: Cascade, name: "nftRecipientWallet")
+  senderWalletAddress String?
+  senderWallet        ScoutWallet?        @relation(fields: [senderWalletAddress], references: [address], onDelete: Cascade, name: "nftSenderWallet")
+
+  @@unique([txHash, txLogIndex, builderNftId, tokensPurchased, senderWalletAddress, walletAddress], name: "unique_nft_purchase_event")
+  @@index([senderWalletAddress])
+  @@index([walletAddress])
+  @@index([builderNftId])
+}
+
+model GemsPayoutEvent {
+  id           String        @id @default(uuid()) @db.Uuid
+  createdAt    DateTime      @default(now())
+  builderId    String        @db.Uuid
+  builder      Scout         @relation(fields: [builderId], references: [id], onDelete: Cascade)
+  gems         Int
+  points       Int
+  week         String
+  season       String
+  builderEvent BuilderEvent?
+
+  @@unique([builderId, week])
+  @@index([builderId])
+}
+
+model PointsReceipt {
+  id          String              @id @default(uuid()) @db.Uuid
+  createdAt   DateTime            @default(now())
+  value       Int
+  claimedAt   DateTime?
+  eventId     String              @db.Uuid
+  event       BuilderEvent        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  recipientId String?             @db.Uuid
+  recipient   Scout?              @relation(fields: [recipientId], references: [id], onDelete: Cascade, name: "pointsReceiptRecipient")
+  senderId    String?             @db.Uuid
+  sender      Scout?              @relation(fields: [senderId], references: [id], onDelete: Cascade, name: "pointsReceiptSender")
+  season      String
+  activities  ScoutGameActivity[]
+
+  @@index([recipientId])
+  @@index([senderId])
+  @@index([eventId])
+}
+
+enum GemsReceiptType {
+  first_pr
+  third_pr_in_streak
+  regular_pr
+  regular_pr_unreviewed
+  daily_commit
+  onchain_achievement
+}
+
+model GemsReceipt {
+  id                        String              @id @default(uuid()) @db.Uuid
+  eventId                   String              @unique @db.Uuid
+  event                     BuilderEvent        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdAt                 DateTime            @default(now())
+  value                     Int
+  type                      GemsReceiptType
+  activities                ScoutGameActivity[]
+  onchainAttestationUid     String?
+  onchainChainId            Int?
+  onchainAttestationRevoked Boolean?            @default(false)
+
+  @@index([eventId])
+}
+
+model UserWeeklyStats {
+  id            Int      @id @default(autoincrement())
+  lastUpdated   DateTime @default(now())
+  userId        String   @db.Uuid
+  user          Scout    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gemsCollected Int
+  week          String
+  season        String
+  rank          Int?
+
+  @@unique([userId, week])
+  @@unique([id, gemsCollected]) // for sorting by gems
+  @@index([userId])
+}
+
+model UserSeasonStats {
+  id                    Int      @id @default(autoincrement())
+  lastUpdated           DateTime @default(now())
+  userId                String   @db.Uuid
+  user                  Scout    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pointsEarnedAsBuilder Int      @default(0)
+  pointsEarnedAsScout   Int      @default(0)
+  season                String
+  // Optional int as not all users have a builder nft to sell
+  nftOwners             Int?     @default(0)
+  nftsSold              Int?     @default(0)
+  nftsPurchased         Int      @default(0)
+  level                 Int      @default(0)
+
+  @@unique([userId, season])
+  @@unique([id, level]) // for sorting by level
+  @@unique([pointsEarnedAsScout, nftsPurchased, id]) // for sorting by pointsEarnedAsScout
+  @@index([userId])
+}
+
+model UserAllTimeStats {
+  lastUpdated           DateTime @default(now())
+  userId                String   @unique @db.Uuid
+  user                  Scout    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pointsEarnedAsBuilder Int      @default(0)
+  pointsEarnedAsScout   Int      @default(0)
+
+  @@index([userId])
+}
+
+enum BuilderNftType {
+  default
+  starter_pack
+}
+
+model BuilderNft {
+  id                      String                  @id @default(uuid()) @db.Uuid
+  createdAt               DateTime                @default(now())
+  builderId               String                  @db.Uuid
+  builder                 Scout                   @relation(fields: [builderId], references: [id], onDelete: Cascade)
+  chainId                 Int
+  season                  String
+  nftType                 BuilderNftType          @default(default)
+  currentPrice            BigInt?
+  currentPriceDevToken    String?
+  currentListingPrice     BigInt?
+  contractAddress         String
+  tokenId                 Int
+  imageUrl                String
+  congratsImageUrl        String?
+  estimatedPayout         Int?                    @default(0)
+  estimatedPayoutDevToken String?
+  nftSoldEvents           NFTPurchaseEvent[]
+  nftOwners               ScoutNft[]
+  listings                DeveloperNftListing[]
+  matchupSelections       ScoutMatchupSelection[]
+
+  // Don't allow registering the same token id twice
+  @@unique([contractAddress, tokenId, chainId])
+  // Only 1 builder token per season
+  @@unique([builderId, season, nftType])
+  @@unique([currentPrice, createdAt]) // for sorting by price
+  @@unique([estimatedPayout, createdAt]) // for sorting by est payout
+  @@index([builderId])
+  @@index([season, nftType])
+}
+
+enum ScoutGameActivityType {
+  gems_first_pr
+  gems_third_pr_in_streak
+  gems_regular_pr
+  daily_commit
+  nft_purchase
+  builder_strike
+  builder_suspended
+  points
+}
+
+enum ActivityRecipientType {
+  builder
+  scout
+}
+
+model ScoutGameActivity {
+  id            String                @id @default(uuid()) @db.Uuid
+  createdAt     DateTime              @default(now())
+  type          ScoutGameActivityType
+  userId        String                @db.Uuid
+  user          Scout                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipientType ActivityRecipientType
+  gemsReceiptId String?               @db.Uuid
+  gemsReceipt   GemsReceipt?          @relation(fields: [gemsReceiptId], references: [id], onDelete: Cascade)
+
+  pointsReceiptId String?        @db.Uuid
+  pointsReceipt   PointsReceipt? @relation(fields: [pointsReceiptId], references: [id], onDelete: Cascade)
+
+  nftPurchaseEventId String?           @db.Uuid
+  nftPurchaseEvent   NFTPurchaseEvent? @relation(fields: [nftPurchaseEventId], references: [id], onDelete: Cascade)
+
+  builderStrikeId String?        @db.Uuid
+  builderStrike   BuilderStrike? @relation(fields: [builderStrikeId], references: [id], onDelete: Cascade)
+  tokensReceipt   TokensReceipt? @relation(fields: [tokensReceiptId], references: [id])
+  tokensReceiptId String?        @db.Uuid
+
+  @@unique([userId, recipientType, pointsReceiptId])
+  @@unique([userId, recipientType, nftPurchaseEventId])
+  @@unique([userId, recipientType, builderStrikeId])
+  @@unique([userId, recipientType, gemsReceiptId])
+  @@index([userId])
+  @@index([type])
+  @@index([userId, type])
+  @@index([pointsReceiptId])
+  @@index([nftPurchaseEventId])
+  @@index([builderStrikeId])
+}
+
+enum TransactionStatus {
+  pending
+  processing
+  completed
+  failed
+}
+
+model PendingNftTransaction {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+  userId    String   @db.Uuid
+  user      Scout    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Amount supposed to be received
+  sourceChainTxHash String
+  sourceChainId     Int
+
+  targetAmountReceived          BigInt
+  targetCurrencyContractAddress String
+
+  destinationChainId     Int
+  destinationChainTxHash String?
+
+  // Token info
+  contractAddress String
+  tokenId         BigInt
+  tokenAmount     Int
+
+  // Wallet to mint to
+  senderAddress String
+
+  status TransactionStatus @default(pending)
+
+  @@unique([sourceChainTxHash, sourceChainId])
+  @@unique([destinationChainTxHash, destinationChainId])
+  @@index([userId])
+  @@index([status])
+}
+
+model ProposalMyWorkColumn {
+  spaceId     String    @db.Uuid
+  space       Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  formFieldId String    @db.Uuid
+  formField   FormField @relation(fields: [formFieldId], references: [id], onDelete: Cascade)
+
+  @@unique([spaceId, formFieldId])
+}
+
+model BuilderCardActivity {
+  builderId  String @id @db.Uuid
+  builder    Scout  @relation(fields: [builderId], references: [id], onDelete: Cascade)
+  last7Days  Json?
+  last14Days Json   @default("[]")
+
+  @@unique([builderId])
+}
+
+model ScoutWallet {
+  createdAt             DateTime              @default(now())
+  address               String                @unique
+  scoutId               String                @db.Uuid
+  primary               Boolean               @default(false)
+  isSanctioned          Boolean               @default(false)
+  lastSanctionCheckedAt DateTime?
+  scout                 Scout                 @relation(fields: [scoutId], references: [id], onDelete: Cascade)
+  purchaseEvents        NFTPurchaseEvent[]    @relation("nftRecipientWallet")
+  saleEvents            NFTPurchaseEvent[]    @relation("nftSenderWallet")
+  scoutedNfts           ScoutNft[]
+  tokensReceived        TokensReceipt[]       @relation("tokenReceiptRecipient")
+  tokensSent            TokensReceipt[]       @relation("tokenReceiptSender")
+  partnerRewardPayouts  PartnerRewardPayout[]
+  buyerNftListings      DeveloperNftListing[] @relation("buyerWallet")
+  sellerNftListings     DeveloperNftListing[] @relation("sellerWallet")
+  draftSeasonOffers     DraftSeasonOffer[]
+  airdropClaimPayouts   AirdropClaimPayout[]
+
+  @@index([address])
+  @@index([scoutId])
+  @@index([primary, scoutId])
+}
+
+model WeeklyClaims {
+  id                     String         @id @default(uuid()) @db.Uuid
+  createdAt              DateTime       @default(now())
+  season                 String
+  week                   String         @unique
+  merkleTreeRoot         String
+  totalClaimable         Int?
+  totalClaimableDevToken String?
+  claims                 Json
+  proofsMap              Json
+  builderEvents          BuilderEvent[]
+}
+
+model TokensReceipt {
+  id                     String              @id @default(uuid()) @db.Uuid
+  createdAt              DateTime            @default(now())
+  value                  String // Amount in wei (18 decimals)
+  claimedAt              DateTime?
+  claimTxHash            String?
+  eventId                String              @db.Uuid
+  event                  BuilderEvent        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  recipientWalletAddress String?
+  recipientWallet        ScoutWallet?        @relation(fields: [recipientWalletAddress], references: [address], onDelete: Cascade, name: "tokenReceiptRecipient")
+  senderWalletAddress    String?
+  senderWallet           ScoutWallet?        @relation(fields: [senderWalletAddress], references: [address], onDelete: Cascade, name: "tokenReceiptSender")
+  activities             ScoutGameActivity[]
+
+  @@index([recipientWalletAddress])
+  @@index([senderWalletAddress])
+  @@index([eventId])
+}
+
+model ScoutNft {
+  id            String      @id @default(uuid()) @db.Uuid
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  builderNftId  String      @db.Uuid
+  builderNft    BuilderNft  @relation(fields: [builderNftId], references: [id], onDelete: Cascade)
+  walletAddress String
+  scoutWallet   ScoutWallet @relation(fields: [walletAddress], references: [address], onDelete: Cascade)
+  balance       Int
+
+  @@unique([builderNftId, walletAddress])
+  @@index([builderNftId])
+  @@index([walletAddress])
+}
+
+model ScoutSocialQuest {
+  id          String        @id @default(uuid()) @db.Uuid
+  type        String
+  userId      String        @db.Uuid
+  user        Scout         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  completedAt DateTime      @default(now())
+  season      String
+  event       BuilderEvent?
+
+  @@unique([type, userId, season])
+  @@index([userId])
+}
+
+model ScoutDailyClaimEvent {
+  id        String        @id @default(uuid()) @db.Uuid
+  userId    String        @db.Uuid
+  user      Scout         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  week      String // '2024-W40'
+  dayOfWeek Int
+  event     BuilderEvent?
+
+  @@unique([userId, week, dayOfWeek])
+  @@index([userId, week])
+}
+
+model ScoutDailyClaimStreakEvent {
+  id     String        @id @default(uuid()) @db.Uuid
+  userId String        @db.Uuid
+  user   Scout         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  week   String // '2024-W40'
+  event  BuilderEvent?
+
+  @@unique([userId, week])
+  @@index([userId, week])
+}
+
+enum ReferralPlatform {
+  telegram
+  farcaster
+  webapp
+  onchain_webapp
+  onchain_cron
+  unknown
+}
+
+model ReferralCodeEvent {
+  id                  String           @id @default(uuid()) @db.Uuid
+  createdAt           DateTime         @default(now())
+  completedAt         DateTime?
+  builderEventId      String           @unique @db.Uuid
+  builderEvent        BuilderEvent     @relation(fields: [builderEventId], references: [id], onDelete: Cascade, name: "builderEvent") // builderId from BuilderEvent table is the referrer
+  refereeId           String           @db.Uuid
+  referee             Scout            @relation(fields: [refereeId], references: [id], onDelete: Cascade) // scoutId that used the referral code
+  platform            ReferralPlatform @default(unknown)
+  bonusBuilderEventId String?          @unique @db.Uuid
+  bonusBuilderEvent   BuilderEvent?    @relation(fields: [bonusBuilderEventId], references: [id], name: "bonusBuilderEvent")
+
+  @@unique([builderEventId, refereeId])
+  @@unique([bonusBuilderEventId, refereeId])
+  @@index([builderEventId])
+  @@index([refereeId])
+}
+
+model TalentProfile {
+  id        Int      @id // passport_id
+  score     Int
+  builderId String   @unique @db.Uuid
+  builder   Scout    @relation(fields: [builderId], references: [id], onDelete: Cascade)
+  address   String   @unique
+  updatedAt DateTime @default(now())
+
+  @@index([builderId])
+}
+
+model PartnerRewardEvent {
+  createdAt      DateTime      @default(now())
+  week           String
+  season         String
+  userId         String        @db.Uuid
+  user           Scout         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  partner        String
+  reward         Json
+  scoutPartnerId String?
+  scoutPartner   ScoutPartner? @relation(fields: [scoutPartnerId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, partner, week, season])
+  @@index([userId])
+  @@index([scoutPartnerId])
+}
+
+enum MessageSender {
+  user
+  agent
+}
+
+model AgentTelegramMessage {
+  id                     String        @id @default(uuid()) @db.Uuid
+  sentAt                 DateTime      @default(now())
+  sender                 MessageSender
+  message                String
+  toolCalls              Json?
+  conversationTelegramId BigInt
+  messageTelegramId      BigInt
+
+  @@index([conversationTelegramId])
+}
+
+model ScoutProject {
+  id                  String                           @id @default(uuid()) @db.Uuid
+  createdAt           DateTime                         @default(now())
+  updatedAt           DateTime                         @updatedAt
+  name                String
+  avatar              String                           @default("")
+  path                String                           @default("")
+  description         String                           @default("")
+  website             String                           @default("")
+  github              String                           @default("")
+  deletedAt           DateTime?
+  members             ScoutProjectMember[]
+  contracts           ScoutProjectContract[]
+  deployers           ScoutProjectDeployer[]
+  wallets             ScoutProjectWallet[]
+  onchainAchievements ScoutProjectOnchainAchievement[]
+
+  @@unique([path])
+  @@index([deletedAt])
+  @@index([path])
+}
+
+enum ScoutProjectMemberRole {
+  owner
+  member
+}
+
+model ScoutProjectMember {
+  projectId String                 @db.Uuid
+  project   ScoutProject           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String                 @db.Uuid
+  user      Scout                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      ScoutProjectMemberRole
+  createdAt DateTime               @default(now())
+  updatedAt DateTime               @updatedAt
+  createdBy String                 @db.Uuid
+  deletedAt DateTime?
+
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
+  @@index([deletedAt])
+}
+
+model ScoutProjectContract {
+  id                     String                            @id @default(uuid()) @db.Uuid
+  createdAt              DateTime                          @default(now())
+  createdBy              String                            @db.Uuid
+  deployedAt             DateTime
+  projectId              String                            @db.Uuid
+  project                ScoutProject                      @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  address                String
+  chainId                Int
+  deployerId             String                            @db.Uuid
+  deployer               ScoutProjectDeployer              @relation(fields: [deployerId], references: [id], onDelete: Restrict)
+  deployTxHash           String
+  blockNumber            BigInt
+  deletedAt              DateTime?
+  transactions           ScoutProjectContractTransaction[]
+  transactionsPollEvents ScoutProjectContractPollEvent[]
+  dailyStats             ScoutProjectContractDailyStats[]
+
+  @@unique([address, chainId])
+  @@index([projectId])
+  @@index([address])
+  @@index([deletedAt])
+}
+
+model ScoutProjectDeployer {
+  id         String                 @id @default(uuid()) @db.Uuid
+  projectId  String                 @db.Uuid
+  project    ScoutProject           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  address    String
+  createdAt  DateTime               @default(now())
+  verifiedAt DateTime?
+  verifiedBy String?                @db.Uuid
+  contracts  ScoutProjectContract[]
+
+  @@unique([projectId, address])
+  @@index([projectId])
+  @@index([address])
+}
+
+enum ChainType {
+  evm
+  solana
+}
+
+model ScoutProjectWallet {
+  id           String                          @id @default(uuid()) @db.Uuid
+  createdAt    DateTime                        @default(now())
+  createdBy    String                          @db.Uuid
+  projectId    String                          @db.Uuid
+  project      ScoutProject                    @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  address      String
+  chainId      Int? // for evm chains
+  chainType    ChainType
+  deletedAt    DateTime?
+  verifiedAt   DateTime?
+  verifiedBy   String?                         @db.Uuid
+  transactions ScoutProjectWalletTransaction[]
+  pollEvents   ScoutProjectWalletPollEvent[]
+  dailyStats   ScoutProjectWalletDailyStats[]
+
+  @@unique([address, chainId])
+  @@index([projectId])
+  @@index([address])
+  @@index([deletedAt])
+}
+
+model ScoutProjectContractDailyStats {
+  createdAt    DateTime             @default(now())
+  contractId   String               @db.Uuid
+  contract     ScoutProjectContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  day          DateTime
+  accounts     Int
+  transactions Int
+  gasFees      String
+  week         String
+
+  @@unique([contractId, day])
+  @@index([contractId])
+  @@index([day])
+  @@index([week])
+}
+
+model ScoutProjectWalletDailyStats {
+  createdAt    DateTime           @default(now())
+  walletId     String             @db.Uuid
+  wallet       ScoutProjectWallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  day          DateTime
+  accounts     Int
+  transactions Int
+  gasFees      String
+  week         String
+
+  @@unique([walletId, day])
+  @@index([walletId])
+  @@index([day])
+  @@index([week])
+}
+
+enum OnchainAchievementTier {
+  bronze
+  silver
+  gold
+}
+
+model ScoutProjectOnchainAchievement {
+  id            String                 @id @default(uuid()) @db.Uuid
+  projectId     String                 @db.Uuid
+  project       ScoutProject           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt     DateTime               @default(now())
+  tier          OnchainAchievementTier
+  week          String
+  builderEvents BuilderEvent[]
+
+  @@unique([projectId, week, tier])
+  @@index([projectId])
+  @@index([week])
+}
+
+enum BuilderStatusEventType {
+  registered
+  banned
+  unbanned
+}
+
+model BuilderStatusEvent {
+  createdAt      DateTime               @default(now())
+  attestationUid String                 @id
+  chainId        Int
+  status         BuilderStatusEventType
+
+  builderId String @db.Uuid
+  builder   Scout  @relation(fields: [builderId], references: [id], onDelete: Cascade)
+
+  @@index([builderId])
+  @@index([createdAt])
+}
+
+model PartnerRewardPayout {
+  id               String                      @id @default(uuid()) @db.Uuid
+  walletAddress    String
+  wallet           ScoutWallet                 @relation(fields: [walletAddress], references: [address], onDelete: Cascade)
+  amount           String
+  claimedAt        DateTime?
+  txHash           String?
+  payoutContractId String                      @db.Uuid
+  payoutContract   PartnerRewardPayoutContract @relation(fields: [payoutContractId], references: [id], onDelete: Cascade)
+  meta             Json?
+  deletedAt        DateTime?
+
+  @@index([walletAddress])
+  @@index([payoutContractId])
+}
+
+enum PartnerRewardPayoutContractProvider {
+  thirdweb
+  sablier
+}
+
+model PartnerRewardPayoutContract {
+  id              String                              @id @default(uuid()) @db.Uuid
+  season          String
+  week            String
+  createdAt       DateTime                            @default(now())
+  contractAddress String
+  chainId         Int
+  tokenAddress    String
+  tokenDecimals   Int
+  tokenSymbol     String
+  partner         String
+  scoutPartnerId  String?
+  scoutPartner    ScoutPartner?                       @relation(fields: [scoutPartnerId], references: [id], onDelete: SetNull)
+  deployTxHash    String
+  ipfsCid         String
+  merkleTreeJson  Json
+  provider        PartnerRewardPayoutContractProvider
+  blockNumber     BigInt                              @default(0)
+  rewardPayouts   PartnerRewardPayout[]
+
+  @@index([scoutPartnerId])
+}
+
+// the raw data, not intended to be used in production processes
+model ScoutProjectContractTransaction {
+  contractId  String               @db.Uuid
+  contract    ScoutProjectContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  createdAt   DateTime
+  from        String
+  to          String
+  status      String
+  txHash      String
+  txData      Json
+  blockNumber BigInt
+  gasUsed     BigInt
+  gasPrice    BigInt
+  gasCost     BigInt
+
+  @@unique([contractId, txHash])
+  @@index([txHash])
+  @@index([blockNumber])
+  @@index([createdAt])
+}
+
+// the raw data, not intended to be used in production processes
+model ScoutProjectWalletTransaction {
+  walletId    String             @db.Uuid
+  wallet      ScoutProjectWallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  chainId     Int
+  createdAt   DateTime
+  from        String
+  to          String
+  status      String
+  txHash      String
+  txData      Json
+  blockNumber BigInt
+  gasUsed     BigInt
+  gasPrice    BigInt
+  gasCost     BigInt
+
+  @@unique([walletId, txHash])
+  @@index([txHash])
+  @@index([blockNumber])
+  @@index([createdAt])
+}
+
+// model ScoutProjectContractLog {
+//   contractId  String               @db.Uuid
+//   contract    ScoutProjectContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+//   txHash      String
+//   logIndex    Int
+//   blockNumber BigInt
+
+//   @@unique([contractId, txHash, logIndex])
+//   @@index([txHash])
+//   @@index([blockNumber])
+// }
+
+model ScoutProjectContractPollEvent {
+  contractId      String               @db.Uuid
+  fromBlockNumber BigInt
+  toBlockNumber   BigInt
+  processedAt     DateTime
+  processTime     Int
+  contract        ScoutProjectContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@unique([contractId, toBlockNumber])
+  @@index([contractId])
+  @@index([toBlockNumber])
+}
+
+model ScoutProjectWalletPollEvent {
+  walletId        String             @db.Uuid
+  fromBlockNumber BigInt
+  toBlockNumber   BigInt
+  processedAt     DateTime
+  processTime     Int
+  wallet          ScoutProjectWallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@unique([walletId, toBlockNumber])
+  @@index([walletId])
+  @@index([toBlockNumber])
+}
+
+model ScoutFarcasterNotification {
+  id                String   @id @default(uuid()) @db.Uuid
+  fid               Int
+  userId            String   @db.Uuid
+  user              Scout    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notificationType  String
+  templateVariables Json     @default("{}")
+  createdAt         DateTime @default(now())
+
+  @@index([userId])
+}
+
+model ScoutEmailNotification {
+  id                String   @id @default(uuid()) @db.Uuid
+  email             String
+  templateVariables Json
+  userId            String   @db.Uuid
+  user              Scout    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notificationType  String
+  createdAt         DateTime @default(now())
+
+  @@index([userId])
+}
+
+model ScoutAppNotification {
+  id                String   @id @default(uuid()) @db.Uuid
+  userId            String   @db.Uuid
+  user              Scout    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notificationType  String
+  read              Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  templateVariables Json
+
+  @@index([userId])
+  @@index([read])
+}
+
+model ScoutMatchup {
+  id                     String                  @id @default(uuid()) @db.Uuid
+  week                   String
+  totalScore             Int                     @default(0)
+  createdAt              DateTime                @default(now())
+  createdBy              String                  @db.Uuid
+  scout                  Scout                   @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  submittedAt            DateTime?
+  selections             ScoutMatchupSelection[]
+  rank                   Int?
+  freeRegistration       Boolean                 @default(false)
+  decentRegistrationTxId String?                 @db.Uuid
+  decentRegistrationTx   BlockchainTransaction?  @relation("decentTransactions", fields: [decentRegistrationTxId], references: [id])
+  registrationTxId       String?                 @db.Uuid
+  registrationTx         BlockchainTransaction?  @relation("registrationTransactions", fields: [registrationTxId], references: [id])
+
+  @@unique([createdBy, week])
+  @@unique([registrationTxId])
+  @@unique([decentRegistrationTxId])
+  @@index([createdBy])
+  @@index([week, submittedAt])
+  @@index([freeRegistration])
+}
+
+// For tracking transactions on multiple chains, with and without Decent.xyz
+model BlockchainTransaction {
+  id                   String         @id @default(uuid()) @db.Uuid
+  hash                 String
+  chainId              Int
+  status               DecentTxStatus
+  error                Json?
+  weeklyMatchups       ScoutMatchup[] @relation("decentTransactions")
+  weeklyMatchupsDecent ScoutMatchup[] @relation("registrationTransactions")
+
+  @@unique([hash, chainId])
+  @@index([hash])
+}
+
+model ScoutMatchupSelection {
+  id             String       @id @default(uuid()) @db.Uuid
+  matchupId      String       @db.Uuid
+  matchup        ScoutMatchup @relation(fields: [matchupId], references: [id], onDelete: Cascade)
+  developerNftId String       @db.Uuid
+  developerNft   BuilderNft   @relation(fields: [developerNftId], references: [id], onDelete: Cascade)
+
+  gemsEarned   Int @default(0)
+  creditsValue Int @default(0)
+
+  @@unique([matchupId, developerNftId])
+  @@index([matchupId])
+  @@index([developerNftId])
+}
+
+model DeveloperNftListing {
+  id            String       @id @default(uuid()) @db.Uuid
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  builderNftId  String       @db.Uuid
+  builderNft    BuilderNft   @relation(fields: [builderNftId], references: [id], onDelete: Cascade)
+  sellerWallet  String
+  seller        ScoutWallet  @relation("sellerWallet", fields: [sellerWallet], references: [address], onDelete: Cascade)
+  buyerWallet   String?
+  buyer         ScoutWallet? @relation("buyerWallet", fields: [buyerWallet], references: [address], onDelete: SetNull)
+  price         BigInt?
+  priceDevToken String?
+  amount        Int
+  signature     String
+  hash          String?
+  completedAt   DateTime?
+  order         Json?
+
+  @@index([builderNftId])
+  @@index([sellerWallet])
+  @@index([completedAt])
+  @@index([buyerWallet])
+}
+
+model AirdropClaim {
+  id              String               @id @default(uuid()) @db.Uuid
+  season          String
+  createdAt       DateTime             @default(now())
+  contractAddress String
+  blockNumber     BigInt
+  chainId         Int
+  deployTxHash    String
+  merkleTreeUrl   String
+  claimPayouts    AirdropClaimPayout[]
+}
+
+model AirdropClaimPayout {
+  id             String       @id @default(uuid()) @db.Uuid
+  airdropClaimId String       @db.Uuid
+  airdropClaim   AirdropClaim @relation(fields: [airdropClaimId], references: [id], onDelete: Cascade)
+  claimAmount    String
+  donationAmount String
+  claimTxHash    String
+  donationTxHash String?
+  walletAddress  String
+  wallet         ScoutWallet  @relation(fields: [walletAddress], references: [address], onDelete: Cascade)
+  claimedAt      DateTime     @default(now())
+
+  @@unique([airdropClaimId, walletAddress])
+  @@index([airdropClaimId])
+  @@index([claimTxHash])
+}
+
+enum DecentTxStatus {
+  initial // waiting for user signature
+  pending
+  success
+  failed
+}
+
+model DraftSeasonOffer {
+  id                 String         @id @default(uuid()) @db.Uuid
+  season             String
+  value              String // Dev Tokens
+  developerId        String         @db.Uuid // link to a builder, not an NFT, in case we havent minted them yet
+  developer          Scout          @relation(fields: [developerId], references: [id], onDelete: Cascade)
+  createdAt          DateTime       @default(now())
+  createdBy          String         @db.Uuid
+  makerWalletAddress String
+  makerWallet        ScoutWallet    @relation(fields: [makerWalletAddress], references: [address], onDelete: Cascade)
+  status             DecentTxStatus
+  decentError        Json?
+  decentTxHash       String?
+  sourceChainId      Int?
+  txHash             String?
+  chainId            Int?
+  completedAt        DateTime?
+  decentPayload      Json
+
+  @@index([season])
+  @@index([developerId])
+  @@index([status])
+  @@index([createdBy])
+}
+
+model BlockchainLogsContract {
+  id               String          @id @default(uuid()) @db.Uuid
+  contractAddress  String
+  chainId          Int
+  firstBlockNumber BigInt
+  lastBlockNumber  BigInt?
+  eventName        String?
+  logs             BlockchainLog[]
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  @@unique([contractAddress, chainId, eventName])
+  @@index([contractAddress])
+  @@index([chainId])
+  @@index([eventName])
+}
+
+model BlockchainLog {
+  logIndex    Int
+  args        Json
+  txHash      String
+  blockNumber BigInt
+  eventName   String
+  contractId  String                 @db.Uuid
+  contract    BlockchainLogsContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@unique([contractId, blockNumber, logIndex])
+  @@index([contractId])
+  @@index([eventName])
+}
+
+model GithubIssue {
+  pullRequestNumber Int
+  githubEventId     String      @db.Uuid
+  githubEvent       GithubEvent @relation(fields: [githubEventId], references: [id], onDelete: Cascade)
+  repoId            Int
+  repo              GithubRepo  @relation(fields: [repoId], references: [id], onDelete: Cascade)
+  issueNumber       Int
+  tags              String[]    @default([])
+  createdAt         DateTime    @default(now())
+
+  @@unique([issueNumber, repoId])
+  @@index([repoId])
+  @@index([githubEventId])
+}
+
+enum ScoutPartnerStatus {
+  active
+  paused
+  completed
+}
+
+model ScoutPartner {
+  id                        String                        @id
+  icon                      String
+  bannerImage               String
+  infoPageImage             String
+  name                      String
+  status                    ScoutPartnerStatus            @default(active)
+  tokenAmountPerPullRequest Int?
+  tokenAddress              String?
+  tokenChain                Int?
+  tokenSymbol               String?
+  tokenDecimals             Int?
+  tokenImage                String?
+  issueTagTokenAmounts      Json?                         @default("{}") // Stores mapping of issue tags to token amounts
+  builderEvents             BuilderEvent[]
+  repos                     GithubRepo[]
+  payoutContracts           PartnerRewardPayoutContract[]
+  rewardEvents              PartnerRewardEvent[]
+}

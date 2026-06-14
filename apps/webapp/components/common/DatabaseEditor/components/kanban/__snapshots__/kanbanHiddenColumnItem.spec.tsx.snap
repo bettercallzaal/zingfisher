@@ -1,0 +1,67 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`src/components/kanban/kanbanHiddenColumnItem > should match snapshot 1`] = `
+<div>
+  <span
+    class="mocked mocked"
+  >
+    <div
+      class="octo-board-hidden-item"
+    >
+      <div
+        aria-label="menuwrapper"
+        class="MenuWrapper"
+        data-testid="menu-wrapper"
+        role="button"
+      >
+        <span
+          class="Label propColorDefault "
+        >
+          propOption
+        </span>
+      </div>
+      <button
+        class="Button size--small"
+        type="button"
+      >
+        <span>
+          1
+        </span>
+      </button>
+    </div>
+  </span>
+</div>
+`;
+
+exports[`src/components/kanban/kanbanHiddenColumnItem > should match snapshot readonly 1`] = `
+<div>
+  <span
+    class="mocked mocked"
+  >
+    <div
+      class="octo-board-hidden-item"
+    >
+      <div
+        aria-label="menuwrapper"
+        class="MenuWrapper disabled"
+        data-testid="menu-wrapper"
+        role="button"
+      >
+        <span
+          class="Label propColorDefault "
+        >
+          propOption
+        </span>
+      </div>
+      <button
+        class="Button size--small"
+        type="button"
+      >
+        <span>
+          1
+        </span>
+      </button>
+    </div>
+  </span>
+</div>
+`;

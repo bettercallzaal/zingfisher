@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`components/calculations/Options > should match snapshot 1`] = `
+<div>
+  <span
+    class="mocked mocked"
+  />
+</div>
+`;
+
+exports[`components/calculations/Options > should match snapshot menu open 1`] = `
+<div
+  aria-hidden="true"
+>
+  <span
+    class="mocked mocked"
+  />
+</div>
+`;

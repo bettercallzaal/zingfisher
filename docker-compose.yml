@@ -1,0 +1,105 @@
+services:
+  defaults:
+    image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/${IMGNAME}:${IMGTAG}'
+    env_file:
+      - '.env'
+    environment:
+      - NODE_ENV=production
+    profiles:
+      # services need at least one profile or else they will be started along with what is in COMPOSE_PROFILES env var
+      - default_config
+
+  prd-cron:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command: ['npm', 'run', 'cron:prod']
+    profiles:
+      - prd-cron
+
+  stg-cron:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command: ['npm', 'run', 'cron:staging']
+    environment:
+      - REACT_APP_APP_ENV=staging
+    profiles:
+      - stg-cron
+
+  prd-webapp:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command:
+      [
+        'sh',
+        '-c',
+        'npx react-env --path .env --dest ./apps/webapp/public -- node --max-old-space-size=8192 node_modules/.bin/next start apps/webapp --keepAliveTimeout 70000'
+      ]
+    profiles:
+      - prd-webapp
+
+  stg-webapp:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command:
+      [
+        'sh',
+        '-c',
+        'npm run prisma:deploy && npx react-env --path .env --dest ./apps/webapp/public -- node --max-old-space-size=750 node_modules/.bin/next start apps/webapp --keepAliveTimeout 70000'
+      ]
+    environment:
+      - REACT_APP_APP_ENV=staging
+    profiles:
+      - stg-webapp
+
+  prd-sockets:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command: ['sh', '-c', 'node ./apps/websockets/dist/initWebsockets.js']
+    profiles:
+      - prd-sockets
+
+  stg-sockets:
+    extends:
+      service: defaults
+    command: ['sh', '-c', 'node ./apps/websockets/dist/initWebsockets.js']
+    ports:
+      - '80:3000'
+    environment:
+      - REACT_APP_APP_ENV=staging
+    profiles:
+      - stg-sockets
+      #- stg-webapp
+
+  devapp:
+    build:
+      context: .
+    ports:
+      - '80:3000'
+    command: ['npm', 'start']
+    volumes:
+      - $PWD:/app
+    env_file:
+      - '.env'
+    depends_on:
+      - localpostgres
+    profiles:
+      - dev
+
+  localpostgres:
+    image: postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - ${LOCAL_DATA_DIR:-/home/postgresql}:/var/lib/postgresql/
+    profiles:
+      - dev

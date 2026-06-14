@@ -1,0 +1,13 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`src/components/kanban/kanbanColumn > should match snapshot 1`] = `
+<div>
+  <span
+    class="mocked mocked"
+  >
+    <div
+      class="octo-board-column"
+    />
+  </span>
+</div>
+`;
