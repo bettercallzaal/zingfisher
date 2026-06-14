@@ -3,7 +3,7 @@ import { Source_Serif_4 } from 'next/font/google';
 import localFont from 'next/font/local';
 
 export const defaultFont =
-  'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
+  '"Inter", ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
 
 export const serifFont = Source_Serif_4({
   subsets: ['latin'],

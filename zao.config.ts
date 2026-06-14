@@ -26,7 +26,7 @@ export const zaoConfig = {
     primaryHover: '#ffd700',
     background: '#0a1628',
     surface: '#0d1b2a',
-    surfaceLight: '#1a2a3a',
+    surfaceLight: '#1a2a3a'
   },
   /** Brand font - wire into apps/webapp/theme/fonts.ts + pages/_document.tsx */
   font: 'Inter', // TODO: confirm ZAO typeface with Zaal
@@ -38,7 +38,7 @@ export const zaoConfig = {
     enabled: true,
     chain: 'base' as const,
     /** ERC-20/721/1155 contracts that grant access. Fill from ZAO membership. */
-    membershipContracts: [] as `0x${string}`[],
+    membershipContracts: [] as `0x${string}`[]
   },
 
   // -- Farcaster (ZAO is a Farcaster-native community) ----------------------
@@ -49,7 +49,7 @@ export const zaoConfig = {
     channels: ['zao', 'zabal', 'cocconcertz', 'wavewarz'],
     defaultChannel: 'zao',
     /** Sign In With Farcaster as an auth method alongside CharmVerse's wallet auth */
-    siwfEnabled: true,
+    siwfEnabled: true
   },
 
   // -- Admin ----------------------------------------------------------------
@@ -59,10 +59,20 @@ export const zaoConfig = {
   // -- Learning tracks (maps to CharmVerse "databases" = course catalog) ----
   /** Top-level learning tracks. Each becomes a CharmVerse database/board view. */
   tracks: [
-    { id: 'zabal-games', name: 'ZABAL Gamez Workshops', emoji: '[GAMES]', description: 'Build-along game-dev workshops' },
+    {
+      id: 'zabal-games',
+      name: 'ZABAL Gamez Workshops',
+      emoji: '[GAMES]',
+      description: 'Build-along game-dev workshops'
+    },
     { id: 'zao-os', name: 'ZAO OS', emoji: '[OS]', description: 'Fork and run a community OS' },
-    { id: 'music', name: 'Music & WaveWarZ', emoji: '[MUSIC]', description: 'Artist tooling, NFTs, prediction markets' },
-    { id: 'governance', name: 'Governance', emoji: '[GOV]', description: 'Respect, ORDAO, Hats, fractals' },
+    {
+      id: 'music',
+      name: 'Music & WaveWarZ',
+      emoji: '[MUSIC]',
+      description: 'Artist tooling, NFTs, prediction markets'
+    },
+    { id: 'governance', name: 'Governance', emoji: '[GOV]', description: 'Respect, ORDAO, Hats, fractals' }
   ],
 
   // -- On-chain credentials (maps to packages/credentials - EAS-style) ------
@@ -72,7 +82,7 @@ export const zaoConfig = {
     enabled: true,
     chain: 'base' as const,
     /** EAS schema UID for "completed ZAO learning track" attestations. TODO. */
-    schemaUid: '' as string,
+    schemaUid: '' as string
   },
 
   // -- ZABAL Gamez workshop booking + streaming -----------------------------
@@ -83,7 +93,7 @@ export const zaoConfig = {
     /** Default streaming surface */
     restreamUrl: 'https://restream.io',
     /** Workshop library + portal platform */
-    portalUrl: 'https://magnetiq.io',
+    portalUrl: 'https://magnetiq.io'
   },
 
   // -- ZAO platform links (the learning center is the hub) ------------------
@@ -91,8 +101,8 @@ export const zaoConfig = {
     zaoos: 'https://zaoos.com',
     discord: 'https://discord.thezao.com',
     luma: 'https://luma.com/zao',
-    ordao: 'https://zao.frapps.xyz/',
-  },
+    ordao: 'https://zao.frapps.xyz/'
+  }
 } as const;
 
 export type ZaoConfig = typeof zaoConfig;

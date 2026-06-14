@@ -1,4 +1,5 @@
 import { useTheme, styled, Box, Menu, MenuItem, Typography } from '@mui/material';
+import { zaoPrimary } from '@packages/config/colors';
 import { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import Image from 'next/image';
@@ -37,8 +38,8 @@ export function Header() {
           </Typography>
         </Box>
       ) : customDomain === null ? (
-        <Typography sx={{ fontWeight: 700, fontSize: '20px', color: '#903235', fontFamily: 'Montserrat, sans-serif' }}>
-          KFMEDIA<sup style={{ fontSize: '9px' }}>℠</sup>
+        <Typography sx={{ fontWeight: 700, fontSize: '20px', color: zaoPrimary, fontFamily: 'Inter, sans-serif' }}>
+          ZAO <span style={{ fontWeight: 400 }}>Learning Center</span>
         </Typography>
       ) : null}
       <UserMenu />
