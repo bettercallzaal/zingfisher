@@ -18,6 +18,12 @@ not used in this fork's branding (trademark clause in LICENSE).
 
 ## Summary of Modifications
 
+### 2026-06-15 - Test coverage for ZaoMemberGate (loop iter 30)
+- `components/zao/__tests__/ZaoMemberGate.spec.tsx` - 4 render tests (member sees
+  content; non-member sees join CTA; no-wallet prompt; custom fallback). Mocks
+  useUser/useZaoMembership/useCurrentSpace via vi.mock. All pass; typecheck back
+  to 35 (0 in spec), eslint clean. First test for the security-relevant gate UI.
+
 ### 2026-06-15 - Music-first section on /learn (loop iter 26)
 - `components/zao/MusicSection.tsx` - leads `/learn` with The ZAO's "music first"
   principle + links (ZAO OS, Farcaster channel, WaveWarZ); data in `@packages/config/zao`
