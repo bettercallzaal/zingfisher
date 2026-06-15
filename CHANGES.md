@@ -18,6 +18,11 @@ not used in this fork's branding (trademark clause in LICENSE).
 
 ## Summary of Modifications
 
+### 2026-06-15 - Smoke tests for /learn content sections (loop iter 31)
+- `components/zao/__tests__/sections.spec.tsx` - render smoke tests for Music,
+  Zao101, ZabalGames (incl the 3 tracks), and Ecosystem sections. Guards the
+  /learn hub against config-shape regressions. 4 pass; typecheck 35, eslint clean.
+
 ### 2026-06-15 - Test coverage for ZaoMemberGate (loop iter 30)
 - `components/zao/__tests__/ZaoMemberGate.spec.tsx` - 4 render tests (member sees
   content; non-member sees join CTA; no-wallet prompt; custom fallback). Mocks
