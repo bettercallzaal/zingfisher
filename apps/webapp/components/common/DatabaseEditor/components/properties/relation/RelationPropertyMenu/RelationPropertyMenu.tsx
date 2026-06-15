@@ -4,7 +4,7 @@ import { bindMenu } from 'material-ui-popup-state';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
-import { LinkCharmverseDatabase } from '../../../viewSidebar/viewSourceOptions/components/LinkCharmverseDatabase';
+import { LinkCharmverseDatabase } from '../../../viewSidebar/viewSourceOptions/components/LinkCharmVerseDatabase';
 
 import { RelationPropertyCreateOptions } from './RelationPropertyOptions';
 

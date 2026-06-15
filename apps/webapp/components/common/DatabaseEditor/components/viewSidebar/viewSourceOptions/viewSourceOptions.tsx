@@ -26,8 +26,8 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { DatabaseSidebarHeader } from '../databaseSidebarHeader';
 
 import { GoogleFormsSource } from './components/GoogleForms/GoogleFormsSource';
-import { LinkCharmverseDatabase } from './components/LinkCharmverseDatabase';
-import { NewCharmverseDatabase } from './components/NewCharmverseDatabase';
+import { LinkCharmverseDatabase } from './components/LinkCharmVerseDatabase';
+import { NewCharmverseDatabase } from './components/NewCharmVerseDatabase';
 import { ProposalSourcePropertiesDialog } from './components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import { SourceType } from './components/viewSourceType';
 import { useSourceOptions } from './useSourceOptions';
