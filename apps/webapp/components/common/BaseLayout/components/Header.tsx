@@ -1,8 +1,7 @@
-import { useTheme, styled, Box, Menu, MenuItem, Typography } from '@mui/material';
+import { styled, Box, Menu, MenuItem, Typography } from '@mui/material';
 import { zaoPrimary } from '@packages/config/colors';
 import { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import Image from 'next/image';
 import { useRouter } from 'next/router';
 
 import { Button } from 'components/common/Button';
@@ -12,7 +11,6 @@ import UserDisplay from 'components/common/UserDisplay';
 import IdentityModal from 'components/settings/profile/components/IdentityModal';
 import { useBaseCurrentDomain } from 'hooks/useBaseCurrentDomain';
 import { useUser } from 'hooks/useUser';
-import logoImage from 'public/images/kfmedia-learning-center-logo.png';
 
 const HeaderBox = styled('div')`
   margin: ${({ theme }) => theme.spacing(3)};
@@ -25,8 +23,6 @@ const HeaderBox = styled('div')`
 `;
 
 export function Header() {
-  const theme = useTheme();
-  const logo = logoImage;
   const { customDomain, spaceFromPath } = useBaseCurrentDomain();
 
   return (
