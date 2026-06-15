@@ -3,5 +3,5 @@
   "framework": "nextjs",
   "installCommand": "npm install --no-audit --no-fund --ignore-scripts --include=dev",
   "buildCommand": "for i in 1 2 3 4 5; do grep -q workspaces package.json 2>/dev/null && break; cd ..; done; pwd; bash scripts/vercel-build.sh",
-  "outputDirectory": "apps/webapp/.next"
+  "outputDirectory": ".next"
 }
