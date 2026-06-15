@@ -18,6 +18,14 @@ not used in this fork's branding (trademark clause in LICENSE).
 
 ## Summary of Modifications
 
+### 2026-06-14 - Wire membership gate into the webapp (loop iter 11)
+- `apps/webapp/pages/api/zao/membership.ts` - GET ?address=0x... returns
+  { member, results } via checkZaoMembership (Respect OP + $ZABAL Base).
+  Validates the address, uses the standard next-connect + withSessionRoute pattern.
+- `apps/webapp/charmClient/hooks/zao.ts` - `useZaoMembership(address)` SWR hook
+  (immutable; skips the request until a wallet is connected).
+- Verified: webapp typecheck unchanged at 134 errors (0 in the new files).
+
 ### 2026-06-14 - Respect membership gate module + on-chain verification (loop iter 10)
 - Added `packages/lib/src/zao/respectGate.ts` - a viem multi-chain ZAO membership
   gate (port of zaoos tokenGate.ts), extended with the ZAO gate set: hold Respect
