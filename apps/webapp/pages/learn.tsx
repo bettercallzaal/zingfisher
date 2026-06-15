@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayout';
 import { Button } from 'components/common/Button';
 import { ZabalGamesSection } from 'components/zao/ZabalGamesSection';
+import { Zao101Section } from 'components/zao/Zao101Section';
 import { ZaoMemberGate } from 'components/zao/ZaoMemberGate';
 
 function Container({ children }: { children: ReactNode }) {
@@ -53,6 +54,9 @@ export default function LearnPage() {
       </Grid>
 
       <Divider sx={{ mb: 4 }} />
+      <Zao101Section />
+
+      <Divider sx={{ my: 4 }} />
       <ZabalGamesSection />
 
       <Divider sx={{ my: 4 }} />

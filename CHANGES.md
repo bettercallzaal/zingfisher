@@ -18,6 +18,13 @@ not used in this fork's branding (trademark clause in LICENSE).
 
 ## Summary of Modifications
 
+### 2026-06-14 - ZAO 101 content section (loop iter 15)
+- `components/zao/Zao101Section.tsx` - the open intro track: definition,
+  principle, the 4 pillars, the umbrella org model, and the 4 join steps.
+  Content from zao-101 (canonical primer), via `zao101` in `@packages/config/zao`.
+- Mounted on `/learn`. eslint clean; webapp typecheck now 132 (down from 134
+  after the iter-14 fixes), 0 errors in new files.
+
 ### 2026-06-14 - Production build verified + 2 dangling-import fixes (loop iter 14)
 - `next build` of apps/webapp SUCCEEDS: 8/8 pages generated. The new `/learn`
   page (static, 3.14 kB) and `/api/zao/membership` route both compile into the
