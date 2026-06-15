@@ -18,6 +18,17 @@ not used in this fork's branding (trademark clause in LICENSE).
 
 ## Summary of Modifications
 
+### 2026-06-14 - Respect membership gate module + on-chain verification (loop iter 10)
+- Added `packages/lib/src/zao/respectGate.ts` - a viem multi-chain ZAO membership
+  gate (port of zaoos tokenGate.ts), extended with the ZAO gate set: hold Respect
+  OG (ERC-20, OP) OR ZOR (ERC-1155, OP) OR $ZABAL (ERC-20, Base) = member. Pure
+  decision logic (`evaluateGate`, `isZaoMember`) split from the on-chain read
+  (`checkTokenGate`, `checkZaoMembership`) for testability.
+- Added 10 unit tests (`__tests__/respectGate.spec.ts`) - all pass.
+- Verified all 5 ecosystem contracts exist on-chain via eth_getCode (Base + OP):
+  ZABAL (25.5KB), ZOR (23KB) full; Respect OG / SANG / ZOUNZ are minimal proxies.
+- NOTE: Base gate uses $ZABAL pending Zaal's confirm of a dedicated Respect-on-Base.
+
 ### 2026-06-14 - Apply ZAO decisions: gating, billing, assets (loop iters 7-8)
 - **Assets**: pulled real ZAO logo + favicon set from zaoos/public into apps/webapp/public.
 - **Gating** (Zaal-confirmed): membership = holding Respect on Optimism (OG ERC-20
