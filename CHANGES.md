@@ -18,6 +18,12 @@ not used in this fork's branding (trademark clause in LICENSE).
 
 ## Summary of Modifications
 
+### 2026-06-14 - Learning-center hub page (loop iter 13)
+- `apps/webapp/pages/learn.tsx` (route `/learn`) - composes the whole stack:
+  tracks grid (Open vs Members chips), the ZABAL Games section, a Respect/$ZABAL
+  -gated Members area (ZaoMemberGate), and cross-ZAO platform links. Uses the
+  public BaseLayout. eslint + typecheck clean (134, 0 new).
+
 ### 2026-06-14 - ZAO UI layer: member gate + ZABAL Games section (loop iter 12)
 - `@packages/config/zao` - import-safe UI config (zabalGames, learningTracks,
   zaoPlatforms), the code-facing source mirroring root zao.config.ts.
