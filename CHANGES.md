@@ -18,6 +18,14 @@ not used in this fork's branding (trademark clause in LICENSE).
 
 ## Summary of Modifications
 
+### 2026-06-15 - Restore missing e2e test mocks - clears 70 errors (loop iter 20)
+- Restored `apps/webapp/__e2e__/utils/mocks.ts` from upstream CharmVerse - the
+  KFMEDIA snapshot never committed it, breaking ~70 e2e spec imports
+  (generateUserAndSpace, loginBrowserUser, createUserAndSpace, etc).
+- Webapp typecheck: 132 -> 62 errors. mocks.ts resolves cleanly (no drift), 0
+  remaining "utils/mocks" cannot-find errors. Remaining 62 are unrelated
+  inherited type issues, tracked for a later cleanup pass.
+
 ### 2026-06-14 - Ecosystem-map section (loop iter 17)
 - `components/zao/EcosystemSection.tsx` - the ZAO product estate (8 products with
   live/R&D/paused chips + links), from research doc 004; data in `@packages/config/zao`
