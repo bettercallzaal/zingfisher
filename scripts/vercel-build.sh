@@ -40,3 +40,9 @@ echo "[vercel-build] generating Prisma client..."
 
 echo "[vercel-build] building webapp..."
 npm run build -w apps/webapp
+
+# Vercel resolves outputDirectory ('.next') at the workspace root, but the build
+# output is apps/webapp/.next. Symlink so Vercel finds it.
+echo "[vercel-build] linking .next -> apps/webapp/.next"
+ln -sfn apps/webapp/.next .next
+ls -la .next >/dev/null 2>&1 && echo "[vercel-build] .next link OK"
