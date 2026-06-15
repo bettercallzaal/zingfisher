@@ -20,25 +20,35 @@ export const zaoConfig = {
   name: 'ZAO Learning Center',
   /** Short line shown on landing + social cards */
   tagline: 'Learn, build, and ship across The ZAO',
-  /** Maps to apps/webapp/theme/colors.ts brandPrimary (currently charmBlue). */
+  /** Canonical ZAO palette (verified against zao-101/style.css). Wired into
+   *  packages/config/src/colors.ts (zaoPrimary). */
   colors: {
-    primary: '#f5a623', // ZAO accent (matches zaoos community.config.ts)
-    primaryHover: '#ffd700',
-    background: '#0a1628',
-    surface: '#0d1b2a',
-    surfaceLight: '#1a2a3a'
+    primary: '#f5a623', // --gold
+    primaryHover: '#ffd700', // --gold-hot
+    background: '#0a1628', // --navy
+    surface: '#0d1b2a', // --navy-2
+    surfaceLight: '#1a2a3a',
+    text: '#e2e8f0', // --ink
+    textMuted: '#94a3b8' // --ink-2
   },
   /** Brand font - wire into apps/webapp/theme/fonts.ts + pages/_document.tsx */
   font: 'Inter', // TODO: confirm ZAO typeface with Zaal
 
-  // -- Membership gating (ZAO is a 188-member community on Base) -------------
+  // -- Membership gating ----------------------------------------------------
+  /** Gate ZAO-member-only content. NOTE: ZABAL Games is OPEN to non-members
+   *  (zao-101/zabal-games.html) - do not gate that track. Only member tracks gate.
+   *  Pattern to port: zaoos/src/lib/spaces/tokenGate.ts (viem, ERC-20/721/1155).
+   *  TODO (needs Zaal): confirm which contract IS the membership gate, or whether
+   *  member access is Farcaster-channel based. Candidates below are real ZAO
+   *  contracts but their gate role is unconfirmed. */
   gating: {
-    /** Gate course content to ZAO membership. CharmVerse has native token gating
-     *  under settings/invites/TokenGates - point it at these. */
     enabled: true,
-    chain: 'base' as const,
-    /** ERC-20/721/1155 contracts that grant access. Fill from ZAO membership. */
-    membershipContracts: [] as `0x${string}`[]
+    memberGateConfirmed: false,
+    candidates: {
+      zabalNounsBase: '0xCB80Ef04DA68667c9a4450013BDD69269842c883' as `0x${string}`, // ERC-721, Base
+      respectOgOptimism: '0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957' as `0x${string}`, // ERC-20, OP
+      zorOptimism: '0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c' as `0x${string}` // ERC-1155, OP
+    }
   },
 
   // -- Farcaster (ZAO is a Farcaster-native community) ----------------------
@@ -56,23 +66,39 @@ export const zaoConfig = {
   adminFids: [19640],
   adminWallets: [] as `0x${string}`[],
 
-  // -- Learning tracks (maps to CharmVerse "databases" = course catalog) ----
-  /** Top-level learning tracks. Each becomes a CharmVerse database/board view. */
+  // -- Learning catalog (maps to CharmVerse "databases" = course catalog) ---
+  /** Top-level areas. Each becomes a CharmVerse database/board view.
+   *  `gated: false` = open to anyone (ZABAL Games, ZAO 101 intro);
+   *  `gated: true`  = ZAO-member-only (uses gating.candidates above). */
   tracks: [
     {
       id: 'zabal-games',
-      name: 'ZABAL Gamez Workshops',
-      emoji: '[GAMES]',
-      description: 'Build-along game-dev workshops'
+      name: 'ZABAL Games',
+      emoji: '[BUILD]',
+      description: 'The front door for builders - open program, hackathon/bootcamp energy',
+      gated: false
     },
-    { id: 'zao-os', name: 'ZAO OS', emoji: '[OS]', description: 'Fork and run a community OS' },
     {
-      id: 'music',
-      name: 'Music & WaveWarZ',
-      emoji: '[MUSIC]',
-      description: 'Artist tooling, NFTs, prediction markets'
+      id: 'zao-101',
+      name: 'ZAO 101',
+      emoji: '[INTRO]',
+      description: 'What The ZAO is - artist org, autonomous org, ecosystem, pillars',
+      gated: false
     },
-    { id: 'governance', name: 'Governance', emoji: '[GOV]', description: 'Respect, ORDAO, Hats, fractals' }
+    {
+      id: 'zao-os',
+      name: 'ZAO OS',
+      emoji: '[OS]',
+      description: 'Fork and run a community OS',
+      gated: true
+    },
+    {
+      id: 'governance',
+      name: 'Governance',
+      emoji: '[GOV]',
+      description: 'Respect, ORDAO, Hats, fractals',
+      gated: true
+    }
   ],
 
   // -- On-chain credentials (maps to packages/credentials - EAS-style) ------
@@ -85,10 +111,20 @@ export const zaoConfig = {
     schemaUid: '' as string
   },
 
-  // -- ZABAL Gamez workshop booking + streaming -----------------------------
-  /** ZABAL Gamez runs workshops; the learning center surfaces booking + replays. */
+  // -- ZABAL Games (open builder program) -----------------------------------
+  /** "The front door for builders" - open to non-members (zao-101/zabal-games.html).
+   *  A public program, NOT the internal "ZABAL toolstack" - keep those separate. */
   zabalGames: {
-    /** Cal.com slot booker (from brand glossary) */
+    open: true, // anyone can join; this track is not gated
+    /** The three entry tracks builders pick from */
+    tracks: ['Artist', 'Builder', 'Creator'] as const,
+    /** Season arc (TODO: confirm exact dates with Zaal) */
+    season: {
+      bootcamp: 'June - workshops + mentors, learn the stack',
+      buildathon: 'July - open build, ship something real',
+      finals: 'August - judging + showcase'
+    },
+    /** Cal.com slot booker */
     bookingUrl: 'https://cal.com/bettercallzaal/zabal-games-workshop-slot',
     /** Default streaming surface */
     restreamUrl: 'https://restream.io',

@@ -6,6 +6,8 @@ export const zaoPrimaryHover = '#ffd700'; // gold hover
 export const zaoBackground = '#0a1628'; // dark page base
 export const zaoSurface = '#0d1b2a'; // card/panel
 export const zaoSurfaceLight = '#1a2a3a'; // modals/dropdowns
+export const zaoInk = '#e2e8f0'; // --ink (primary text on dark)
+export const zaoInkMuted = '#94a3b8'; // --ink-2 (muted text)
 
 // Accent Palette
 export const zaoWhite = '#FEFEFE';
