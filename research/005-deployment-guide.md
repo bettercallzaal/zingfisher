@@ -12,6 +12,42 @@ tier: STANDARD
 
 > **Goal:** Ship the ZAO learning center. The webapp build is verified (doc 003 + iter 14: `next build` succeeds, 8/8 pages). This is how to get it live on the zaoos-matched stack.
 
+## Update 2026-06-15 - Vercel deploy: what actually works (live)
+
+Deployed live at https://zingfisher-webapp.vercel.app/learn. Getting there
+surfaced several CharmVerse/monorepo gaps that don't show locally. The working
+setup and the gotchas (so this is never re-debugged):
+
+**One Vercel project only.** There were briefly TWO projects on this repo
+(`zingfisher` from a stray CLI deploy + `zingfisher-webapp` from the dashboard),
+each auto-deploying every push with different Root Directory settings - they
+fought over the shared `vercel.json`. Deleted `zingfisher`; keep `zingfisher-webapp`.
+If you ever see duplicate/contradictory builds, check for a second project.
+
+**Build config** (`vercel.json` + `scripts/vercel-build.sh`):
+- `installCommand`: `npm install --no-audit --no-fund --ignore-scripts --include=dev`
+  - `npm ci` fails on Vercel (lockfile out of sync re platform optional deps).
+  - `--include=dev` is required - Vercel sets `NODE_ENV=production`, which otherwise
+    prunes devDeps like `@svgr/webpack` (used by the SVG loader).
+- `buildCommand`: walks up to the workspace root, then runs `scripts/vercel-build.sh`.
+- `scripts/vercel-build.sh`: patch-package -> **self-heal `@charmverse/core`** (Vercel's
+  install leaves it missing; force-install it, which runs its own prisma generate) ->
+  generate Prisma client -> `next build` -> symlink `.next` -> `apps/webapp/.next`
+  (so Vercel finds the output regardless of root-dir base).
+
+**Gotchas fixed in code (not config):**
+- `next.config.mjs` hardcoded `assetPrefix: 'https://cdn.charmverse.io'` when `CI=1`.
+  Vercel sets `CI=1`, so every page loaded assets from CharmVerse's CDN -> blank page.
+  Now `assetPrefix: process.env.ZAO_ASSET_CDN || undefined` (serve from deployment).
+- `/learn` 404'd on the `*.vercel.app` subdomain because the middleware rewrites the
+  first path segment to a space lookup unless it's in `DOMAIN_BLACKLIST`. Added `learn`.
+  (Any new top-level public page needs adding to `@packages/spaces/config` DOMAIN_BLACKLIST.)
+- Several case-sensitive import paths (`Charmverse` vs `CharmVerse`) broke on Linux only.
+
+**Env vars** (set on the `zingfisher-webapp` project, all environments): `DATABASE_URL`,
+`AUTH_SECRET`, `NEXT_TELEMETRY_DISABLED`, `DOMAIN`. Currently placeholders -> swap for
+real Supabase + secrets to make login/spaces work.
+
 ## Key Decisions
 
 | # | Decision | Why |

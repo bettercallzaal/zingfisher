@@ -1,6 +1,12 @@
 # zingfisher
 
-ZAO learning center - a fork of CharmVerse (via the KFMEDIA learning center), being rebranded for The ZAO.
+ZAO learning center - a fork of CharmVerse (via the KFMEDIA learning center), rebranded for The ZAO.
+
+**Live (preview):** https://zingfisher-webapp.vercel.app/learn
+
+> Go straight to `/learn` - it's the standalone showcase and needs no database.
+> `/` and the full app (login, spaces, member directory) need Postgres wired
+> (currently a placeholder DB on the preview), so they 404/500 until then.
 
 ## What this is
 
@@ -15,17 +21,24 @@ and decisions live in [research/](research/).
 
 ## Status
 
-Deployable, ZAO-branded learning center. Installs, builds (`next build` green),
-typechecks. Current status + roadmap: [research/006](research/006-project-status.md).
+**Deployed and live** on Vercel (project `zingfisher-webapp`). Installs, builds,
+and serves `/learn`. Current status + roadmap: [research/006](research/006-project-status.md).
 
 - **ZAO branding** - palette, Inter font, logo/favicons, copy, AGPL notice.
-- **`/learn` hub** - ZAO 101, learning tracks, ZABAL Games program, gated members
-  area, ecosystem map, platform links.
+- **`/learn` hub** - music-first hero, learning tracks, ZAO 101, ZABAL Games program,
+  gated members area, ecosystem map, platform links. Rendering live.
 - **Membership gate** - `respectGate.ts` (Respect on Optimism + $ZABAL on Base)
-  -> `/api/zao/membership` -> `useZaoMembership` -> `ZaoMemberGate`. Unit-tested,
-  contracts verified on-chain.
+  -> `/api/zao/membership` -> `useZaoMembership` -> `ZaoMemberGate`. Unit + component
+  tested, contracts verified on-chain.
 - **Billing hidden** (`billingEnabled=false`). **One-file config**: `zao.config.ts`.
-- **Open**: confirm the Base member gate, real deploy secrets, domain. See doc 006.
+- **Deploy pipeline** - one Vercel project, `vercel.json` + `scripts/vercel-build.sh`.
+  See [research/005](research/005-deployment-guide.md) for the working setup + gotchas.
+
+### Open items (to make it a full product)
+- Wire **Supabase** (real Postgres) so login/spaces/`/` work.
+- Confirm the **Base member gate** address ($ZABAL vs a dedicated Respect-on-Base).
+- Point a real **domain** (e.g. `learn.thezao.com`).
+- Optional: dark-navy ZAO theme; seed ZAO 101 as real course content.
 
 ## License
 

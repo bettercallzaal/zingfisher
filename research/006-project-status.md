@@ -14,7 +14,17 @@ tier: STANDARD
 
 ## Where it stands (2026-06-15)
 
-zingfisher is a **deployable, ZAO-branded learning center** forked from CharmVerse (via the KFMEDIA fork). It installs, builds (`next build` succeeds, 8/8 pages), and typechecks at 132 errors - all 132 pre-existing in the inherited base (mostly a missing test-only `utils/mocks`), zero introduced by this work.
+zingfisher is a **deployed, live, ZAO-branded learning center** forked from CharmVerse
+(via the KFMEDIA fork). Live preview: https://zingfisher-webapp.vercel.app/learn -
+the `/learn` hub renders fully (music-first, tracks, ZAO 101, ZABAL Games, gated
+members area, ecosystem, platform links). It installs, builds, and serves on Vercel.
+
+Typecheck: 35 inherited errors remain (down from 134), all pre-existing upstream
+inference issues, zero introduced by this work, none blocking the build.
+
+The full app (`/`, login, spaces) needs a real Postgres (Supabase) wired - the
+preview uses a placeholder DB, so those routes 404/500 until then. `/learn` is the
+standalone showcase and needs no DB.
 
 ## Done + verified
 
