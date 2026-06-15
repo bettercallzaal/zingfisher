@@ -26,7 +26,7 @@ if [ -z "$CORE_DIR" ]; then
   echo "  pwd=$(pwd)"
   ls -la node_modules/@charmverse 2>&1 || true
   echo "[vercel-build] force-installing @charmverse/core (runs its own prisma generate)..."
-  npm install @charmverse/core --no-save --no-audit --no-fund || true
+  npm install @charmverse/core --no-save --no-audit --no-fund --include=dev || true
   CORE_DIR="$(locate_core)"
 fi
 if [ -z "$CORE_DIR" ]; then
