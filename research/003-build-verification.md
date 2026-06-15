@@ -12,6 +12,25 @@ tier: QUICK
 
 > **Goal:** Confirm the ZAO rebrand edits (iters 2-5) compile and the inherited base is sound, before adding ZAO features.
 
+## Update 2026-06-15 - typecheck cleanup outcome (iters 14, 20-22)
+
+The inherited webapp typecheck debt was cut **134 -> 35** by fixing things the
+KFMEDIA rebrand broke (not the build - `next build` was always green):
+
+- iter 14: `blueColor`, `trackedKFMEDIASchemas` dangling exports (-2).
+- iter 20: restored missing `__e2e__/utils/mocks.ts` from upstream (-70).
+- iter 21: restored `proposals`/`forum` to `STATIC_PAGES` + `signup.po.ts` (-17).
+- iter 22: restored 6 `'charmverse'` enum/data values the iter-4 brand sweep had
+  mis-changed to `'ZAO'` (also a runtime-correctness fix) (-10).
+
+**Remaining 35: intentionally left.** They are genuine upstream/inherited TS
+inference issues (SWR mutation hook error generics resolving to `never` so
+`error.message` errors; a few `FeatureMap`/union mismatches in stories + API
+typing). They do NOT block `next build` (test/stories files excluded; the rest
+are type-only). Fixing them risks masking real issues or changing behavior for
+low value. Tracked as a separate upstream-typing cleanup, not part of the ZAO
+build-out. Re-evaluate if the project adopts strict CI typecheck gating.
+
 ## Key Decisions
 
 | # | Decision | Why |
