@@ -12,17 +12,25 @@ set -euo pipefail
 echo "[vercel-build] applying patches..."
 npx patch-package
 
+locate_core() {
+  for d in node_modules/@charmverse/core apps/webapp/node_modules/@charmverse/core; do
+    if [ -d "$d" ]; then echo "$d"; return; fi
+  done
+  find . -maxdepth 6 -type d -path '*node_modules/@charmverse/core' -not -path '*/.git/*' 2>/dev/null | head -1
+}
+
 echo "[vercel-build] locating @charmverse/core..."
-CORE_DIR=""
-for d in node_modules/@charmverse/core apps/webapp/node_modules/@charmverse/core; do
-  if [ -d "$d" ]; then CORE_DIR="$d"; break; fi
-done
+CORE_DIR="$(locate_core)"
 if [ -z "$CORE_DIR" ]; then
-  CORE_DIR="$(find . -maxdepth 5 -type d -path '*node_modules/@charmverse/core' -not -path '*/.git/*' 2>/dev/null | head -1)"
+  echo "[vercel-build] @charmverse/core missing after install; diagnostics:"
+  echo "  pwd=$(pwd)"
+  ls -la node_modules/@charmverse 2>&1 || true
+  echo "[vercel-build] force-installing @charmverse/core (runs its own prisma generate)..."
+  npm install @charmverse/core --no-save --no-audit --no-fund || true
+  CORE_DIR="$(locate_core)"
 fi
 if [ -z "$CORE_DIR" ]; then
-  echo "[vercel-build] ERROR: @charmverse/core not found under node_modules"
-  ls -la node_modules/@charmverse 2>/dev/null || true
+  echo "[vercel-build] ERROR: @charmverse/core still not found under node_modules"
   exit 1
 fi
 echo "[vercel-build] @charmverse/core -> $CORE_DIR"
