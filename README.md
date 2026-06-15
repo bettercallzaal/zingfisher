@@ -13,6 +13,20 @@ it. This repo takes that base and rebrands it for the ZAO.
 The full app source now lives in this repo (`apps/`, `packages/`). Our planning
 and decisions live in [research/](research/).
 
+## Status
+
+Deployable, ZAO-branded learning center. Installs, builds (`next build` green),
+typechecks. Current status + roadmap: [research/006](research/006-project-status.md).
+
+- **ZAO branding** - palette, Inter font, logo/favicons, copy, AGPL notice.
+- **`/learn` hub** - ZAO 101, learning tracks, ZABAL Games program, gated members
+  area, ecosystem map, platform links.
+- **Membership gate** - `respectGate.ts` (Respect on Optimism + $ZABAL on Base)
+  -> `/api/zao/membership` -> `useZaoMembership` -> `ZaoMemberGate`. Unit-tested,
+  contracts verified on-chain.
+- **Billing hidden** (`billingEnabled=false`). **One-file config**: `zao.config.ts`.
+- **Open**: confirm the Base member gate, real deploy secrets, domain. See doc 006.
+
 ## License
 
 CharmVerse is **AGPL-3.0** with a trademark clause (see [LICENSE](LICENSE)). Our
