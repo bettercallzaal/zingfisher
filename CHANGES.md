@@ -18,6 +18,15 @@ not used in this fork's branding (trademark clause in LICENSE).
 
 ## Summary of Modifications
 
+### 2026-06-14 - ZAO UI layer: member gate + ZABAL Games section (loop iter 12)
+- `@packages/config/zao` - import-safe UI config (zabalGames, learningTracks,
+  zaoPlatforms), the code-facing source mirroring root zao.config.ts.
+- `components/zao/ZaoMemberGate.tsx` - gates children on ZAO membership via
+  useZaoMembership + the user's first wallet; shows a join CTA otherwise.
+- `components/zao/ZabalGamesSection.tsx` - renders the open program: 3 tracks,
+  season arc, workshop booking CTA.
+- Verified: webapp typecheck unchanged at 134 (0 errors in new files).
+
 ### 2026-06-14 - Wire membership gate into the webapp (loop iter 11)
 - `apps/webapp/pages/api/zao/membership.ts` - GET ?address=0x... returns
   { member, results } via checkZaoMembership (Respect OP + $ZABAL Base).
