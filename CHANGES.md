@@ -18,6 +18,11 @@ not used in this fork's branding (trademark clause in LICENSE).
 
 ## Summary of Modifications
 
+### 2026-06-15 - Discoverability: header wordmark links to /learn (loop iter 25)
+- The "ZAO Learning Center" header wordmark (public BaseLayout) now links to
+  `/learn`, making the hub reachable from login/join/learn pages. eslint +
+  typecheck clean (35, 0 new).
+
 ### 2026-06-15 - Restore 'charmverse' enum values mis-swept to 'ZAO' (loop iter 22)
 - The iter-4 brand-word sweep over-reached: it turned several `'charmverse'`
   data/enum values into `'ZAO'`, which silently break logic at runtime (some also

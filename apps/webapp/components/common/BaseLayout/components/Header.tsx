@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 
 import { Button } from 'components/common/Button';
+import Link from 'components/common/Link';
 import WorkspaceAvatar from 'components/common/PageLayout/components/Sidebar/components/WorkspaceAvatar';
 import UserDisplay from 'components/common/UserDisplay';
 import IdentityModal from 'components/settings/profile/components/IdentityModal';
@@ -38,9 +39,11 @@ export function Header() {
           </Typography>
         </Box>
       ) : customDomain === null ? (
-        <Typography sx={{ fontWeight: 700, fontSize: '20px', color: zaoPrimary, fontFamily: 'Inter, sans-serif' }}>
-          ZAO <span style={{ fontWeight: 400 }}>Learning Center</span>
-        </Typography>
+        <Link href='/learn' color='inherit'>
+          <Typography sx={{ fontWeight: 700, fontSize: '20px', color: zaoPrimary, fontFamily: 'Inter, sans-serif' }}>
+            ZAO <span style={{ fontWeight: 400 }}>Learning Center</span>
+          </Typography>
+        </Link>
       ) : null}
       <UserMenu />
     </HeaderBox>
