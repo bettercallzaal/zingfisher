@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayout';
 import { Button } from 'components/common/Button';
 import { EcosystemSection } from 'components/zao/EcosystemSection';
+import { MusicSection } from 'components/zao/MusicSection';
 import { ZabalGamesSection } from 'components/zao/ZabalGamesSection';
 import { Zao101Section } from 'components/zao/Zao101Section';
 import { ZaoMemberGate } from 'components/zao/ZaoMemberGate';
@@ -28,6 +29,9 @@ export default function LearnPage() {
         Learn to build, ship, and govern across The ZAO ecosystem.
       </Typography>
 
+      <MusicSection />
+
+      <Divider sx={{ my: 4 }} />
       <Typography variant='h5' sx={{ mb: 2 }}>
         Tracks
       </Typography>

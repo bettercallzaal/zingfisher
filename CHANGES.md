@@ -18,6 +18,11 @@ not used in this fork's branding (trademark clause in LICENSE).
 
 ## Summary of Modifications
 
+### 2026-06-15 - Music-first section on /learn (loop iter 26)
+- `components/zao/MusicSection.tsx` - leads `/learn` with The ZAO's "music first"
+  principle + links (ZAO OS, Farcaster channel, WaveWarZ); data in `@packages/config/zao`
+  (`zaoMusic`). eslint + typecheck clean (35, 0 new).
+
 ### 2026-06-15 - Discoverability: header wordmark links to /learn (loop iter 25)
 - The "ZAO Learning Center" header wordmark (public BaseLayout) now links to
   `/learn`, making the hub reachable from login/join/learn pages. eslint +

@@ -73,6 +73,16 @@ export const zao101 = {
   ]
 } as const;
 
+/** Music-first: The ZAO's core principle. Where to hear + support the music. */
+export const zaoMusic = {
+  principle: 'Music first - that is the whole point. Hear it, then build with the people making it.',
+  links: [
+    { name: 'Listen on ZAO OS', url: 'https://zaoos.com' },
+    { name: 'ZAO on Farcaster', url: 'https://warpcast.com/~/channel/zao' },
+    { name: 'WaveWarZ battles', url: 'https://wavewarz.com' }
+  ]
+} as const;
+
 /** ZAO product estate (from research doc 004). status: live | rnd | paused. */
 export const zaoEcosystem = [
   { name: 'ZAO OS', blurb: 'The lab + gated Farcaster client.', status: 'live', url: 'https://zaoos.com' },
