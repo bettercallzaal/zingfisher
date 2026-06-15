@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 
 import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayout';
 import { Button } from 'components/common/Button';
+import { EcosystemSection } from 'components/zao/EcosystemSection';
 import { ZabalGamesSection } from 'components/zao/ZabalGamesSection';
 import { Zao101Section } from 'components/zao/Zao101Section';
 import { ZaoMemberGate } from 'components/zao/ZaoMemberGate';
@@ -74,6 +75,9 @@ export default function LearnPage() {
           </Typography>
         </Card>
       </ZaoMemberGate>
+
+      <Divider sx={{ my: 4 }} />
+      <EcosystemSection />
 
       <Divider sx={{ my: 4 }} />
       <Typography variant='h5' sx={{ mb: 2 }}>

@@ -18,6 +18,11 @@ not used in this fork's branding (trademark clause in LICENSE).
 
 ## Summary of Modifications
 
+### 2026-06-14 - Ecosystem-map section (loop iter 17)
+- `components/zao/EcosystemSection.tsx` - the ZAO product estate (8 products with
+  live/R&D/paused chips + links), from research doc 004; data in `@packages/config/zao`
+  (`zaoEcosystem`). Mounted on `/learn`. eslint clean; typecheck 132, 0 new errors.
+
 ### 2026-06-14 - ZAO 101 content section (loop iter 15)
 - `components/zao/Zao101Section.tsx` - the open intro track: definition,
   principle, the 4 pillars, the umbrella org model, and the 4 join steps.

@@ -73,6 +73,23 @@ export const zao101 = {
   ]
 } as const;
 
+/** ZAO product estate (from research doc 004). status: live | rnd | paused. */
+export const zaoEcosystem = [
+  { name: 'ZAO OS', blurb: 'The lab + gated Farcaster client.', status: 'live', url: 'https://zaoos.com' },
+  { name: 'WaveWarZ', blurb: 'Agentic music battles, per-battle tokens.', status: 'live', url: 'https://wavewarz.com' },
+  { name: 'COC Concertz', blurb: 'Metaverse concerts in Stilo World.', status: 'live', url: 'https://cocconcertz.com' },
+  {
+    name: 'ZAOstock',
+    blurb: 'Farcaster-native music festival (Oct 3, Ellsworth ME).',
+    status: 'live',
+    url: 'https://zaostock.com'
+  },
+  { name: 'ZAO NEXUS', blurb: 'Ecosystem link hub - 485 links.', status: 'live', url: 'https://nexus.thezao.com' },
+  { name: 'zlank', blurb: 'No-code Farcaster Snap builder.', status: 'live', url: 'https://zlank.online' },
+  { name: 'ZOUNZ', blurb: 'Farcaster music NFT mini app (Base).', status: 'rnd', url: '' },
+  { name: 'FISHBOWLZ', blurb: 'Hot-seat audio rooms (paused - Juke partnership).', status: 'paused', url: '' }
+] as const;
+
 export const zaoPlatforms = {
   zaoos: 'https://zaoos.com',
   nexus: 'https://nexus.thezao.com',
