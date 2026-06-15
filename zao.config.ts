@@ -43,11 +43,21 @@ export const zaoConfig = {
    *  contracts but their gate role is unconfirmed. */
   gating: {
     enabled: true,
-    memberGateConfirmed: false,
-    candidates: {
-      zabalNounsBase: '0xCB80Ef04DA68667c9a4450013BDD69269842c883' as `0x${string}`, // ERC-721, Base
-      respectOgOptimism: '0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957' as `0x${string}`, // ERC-20, OP
-      zorOptimism: '0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c' as `0x${string}` // ERC-1155, OP
+    /** Confirmed by Zaal: membership = holding Respect, on EITHER Optimism or Base.
+     *  Hold Respect on any listed chain -> member access. */
+    method: 'respect' as const,
+    respect: {
+      optimism: {
+        /** Respect OG (ERC-20) */
+        ogContract: '0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957' as `0x${string}`,
+        /** ZOR (ERC-1155), token id 0 */
+        zorContract: '0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c' as `0x${string}`,
+        zorTokenId: 0
+      },
+      base: {
+        /** New Respect on Base. TODO (Zaal): paste the deployed address. */
+        contract: '' as `0x${string}` | ''
+      }
     }
   },
 

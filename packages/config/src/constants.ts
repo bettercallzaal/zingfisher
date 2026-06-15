@@ -11,6 +11,11 @@ export const isNodeEnv = typeof window === 'undefined';
 export const appEnv = isProdEnv ? 'production' : isStagingEnv ? 'staging' : isTestEnv ? 'test' : 'development';
 export const baseUrl = process.env.DOMAIN as string | undefined;
 
+// ZAO: the learning center is free/gated, not a paid SaaS. Hide CharmVerse's
+// subscription / DEV-token billing surfaces (upgrade banners, chips, tiers).
+// Flip to true to restore the upstream paid-tier flow.
+export const billingEnabled = false;
+
 export const cookieDomain = undefined; // TODO: set cookie domain so that we can have cross-subdomain sessions
 export const cookieName = 'charm.sessionId';
 // web sockets

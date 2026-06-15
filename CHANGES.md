@@ -18,6 +18,19 @@ not used in this fork's branding (trademark clause in LICENSE).
 
 ## Summary of Modifications
 
+### 2026-06-14 - Apply ZAO decisions: gating, billing, assets (loop iters 7-8)
+- **Assets**: pulled real ZAO logo + favicon set from zaoos/public into apps/webapp/public.
+- **Gating** (Zaal-confirmed): membership = holding Respect on Optimism (OG ERC-20
+  + ZOR ERC-1155) OR Base (new Respect, address TODO). Set in zao.config.ts.
+  ZABAL Games stays OPEN (ungated). Port target: zaoos/src/lib/spaces/tokenGate.ts.
+- **Billing hidden** (Zaal: "hide it for now"): added `billingEnabled = false` in
+  @packages/config/constants; gated the BlocksExceededBanner and sidebar UpgradeChip.
+  Fixed a pre-existing broken `openSettings('subscription')` path while there.
+- **ZABAL Games config**: corrected to canonical zao-101 truth (open program, tracks
+  Artist/Builder/Creator, June/July/Aug season).
+- **Hosting** (Zaal): match zaoos stack - Supabase (Postgres) + Vercel for webapp.
+  NOTE: the websockets + cron apps need a separate Node host (Vercel can't run them).
+
 ### 2026-06-14 - Fix KFMEDIA partial-rebrand build breaks (loop iter 5)
 KFMEDIA's automated rebrand renamed several import sites to `KFMEDIA*` without
 ever exporting them, leaving dangling imports that break the build. Fixed:

@@ -3,6 +3,7 @@ import { css } from '@emotion/react';
 import { styled } from '@mui/material';
 import type { SxProps } from '@mui/material';
 import Box from '@mui/material/Box';
+import { billingEnabled } from '@packages/config/constants';
 import type { MouseEvent, ReactNode } from 'react';
 
 import Link from 'components/common/Link';
@@ -81,7 +82,7 @@ export function SidebarLink({
           {icon}
           {label}
         </Box>
-        {section && premiumSettingSections.includes(section as any) && (
+        {billingEnabled && section && premiumSettingSections.includes(section as any) && (
           <span style={{ paddingLeft: 10 }}>
             <UpgradeChip
               upgradeContext={(premiumSectionToUpgradeContext as Record<SpaceSettingsSection, UpgradeContext>)[section]}

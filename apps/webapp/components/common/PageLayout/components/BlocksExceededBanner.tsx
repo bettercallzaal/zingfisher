@@ -1,5 +1,6 @@
 import EastIcon from '@mui/icons-material/East';
 import { Box, Stack, Typography } from '@mui/material';
+import { billingEnabled } from '@packages/config/constants';
 import { log } from '@packages/core/log';
 
 import { StyledBanner } from 'components/common/Banners/Banner';
@@ -14,7 +15,7 @@ export function BlocksExceededBanner() {
   const { space } = useCurrentSpace();
   const { spaceBlockQuota, spaceBlockCount, hasPassedBlockQuota, isSpaceReadonly } = useSpaceSubscription();
   const { openSettings } = useSettingsDialog();
-  const showUpgradeBanner = !!user && hasPassedBlockQuota && space?.paidTier !== 'enterprise';
+  const showUpgradeBanner = billingEnabled && !!user && hasPassedBlockQuota && space?.paidTier !== 'enterprise';
 
   if (!showUpgradeBanner) {
     return null;
@@ -36,7 +37,7 @@ export function BlocksExceededBanner() {
             endIcon={<EastIcon />}
             sx={{ ml: 1, pb: 0, pt: 0, fontWeight: 600 }}
             color='white'
-            onClick={() => openSettings('subscription')}
+            onClick={() => openSettings('space')}
             variant='outlined'
           >
             UPGRADE
