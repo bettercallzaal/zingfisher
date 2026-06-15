@@ -100,7 +100,7 @@ type PublicApiEASCredential = {
   schemaId: string;
   createdAt: string;
   chainId: number;
-  source: 'onchain' | 'ZAO';
+  source: 'onchain' | 'charmverse';
   verificationUrl: string | null;
 };
 

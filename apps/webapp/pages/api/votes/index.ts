@@ -149,7 +149,7 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
       pageId,
       spaceId: vote.spaceId,
       resourceId: vote.id,
-      platform: 'ZAO'
+      platform: 'charmverse'
     });
   } else if (pageId) {
     trackUserAction('poll_created', {

@@ -18,6 +18,16 @@ not used in this fork's branding (trademark clause in LICENSE).
 
 ## Summary of Modifications
 
+### 2026-06-15 - Restore 'charmverse' enum values mis-swept to 'ZAO' (loop iter 22)
+- The iter-4 brand-word sweep over-reached: it turned several `'charmverse'`
+  data/enum values into `'ZAO'`, which silently break logic at runtime (some also
+  errored at compile). Restored to the correct enum value in 6 spots:
+  credential-type checks (UserCredentialRow x5, UserCredentialHideAndPublish),
+  profile-widget switch cases (AddMoreMemberProfilesModal, ProfileWidgets), reward
+  `source` type + createProject `source`, and vote analytics `platform`.
+  Genuine display text ('ZAO' OG title, email example space, username fallback) kept.
+- Webapp typecheck: 45 -> 35.
+
 ### 2026-06-15 - Restore trimmed features + signup.po - clears 17 errors (loop iter 21)
 - KFMEDIA trimmed `proposals` + `forum` out of `STATIC_PAGES` in
   `@packages/features/constants` while the code still used them, breaking the

@@ -36,7 +36,7 @@ export function UserCredentialHideAndPublish({
           flexDirection='column'
           gap={1}
         >
-          {credential.type === 'ZAO' && (
+          {credential.type === 'charmverse' && (
             <Typography variant='caption' color='text.secondary'>
               <PublishIcon sx={{ alignSelf: 'center' }} fontSize='small' />
               Publish Credential Onchain

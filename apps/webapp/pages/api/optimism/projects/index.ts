@@ -62,7 +62,7 @@ async function createProjectController(
   }
 
   const newProject = await createProject({
-    source: 'ZAO',
+    source: 'charmverse',
     userId,
     input: req.body
   });

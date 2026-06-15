@@ -57,7 +57,7 @@ export function AddMoreMemberProfilesModal({
 
 export function getProfileWidgetLogo(name: MemberProfileName) {
   switch (name) {
-    case 'ZAO':
+    case 'charmverse':
       return '/images/logos/charmverse_black.png';
     case 'collection':
       return '/images/template_icons/nft_ape_icon.svg';
