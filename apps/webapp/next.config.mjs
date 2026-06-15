@@ -66,9 +66,6 @@ if (process.env.NODE_ENV === 'test') {
   );
 }
 
-// Next.js requires this configured at build and run time
-const useCDN =
-  process.env.CI || process.env.REACT_APP_APP_ENV === 'production' || process.env.REACT_APP_APP_ENV === 'staging';
 
 const config = {
   poweredByHeader: false,
@@ -96,7 +93,9 @@ const config = {
       }
     }
   },
-  assetPrefix: useCDN ? 'https://cdn.charmverse.io' : undefined,
+  // ZAO: serve assets from the deployment itself. Set ZAO_ASSET_CDN to use a CDN.
+  // (Upstream hardcoded cdn.charmverse.io when CI=1, which broke assets on our deploys.)
+  assetPrefix: process.env.ZAO_ASSET_CDN || undefined,
   productionBrowserSourceMaps: true,
   async redirects() {
     return [
