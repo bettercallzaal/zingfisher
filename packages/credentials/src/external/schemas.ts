@@ -121,6 +121,10 @@ export const trackedCharmverseSchemas: Record<EasSchemaChain, TrackedSchemaParam
   [sepolia.id]: [optimismCharmverseProposalSchema, optimismCharmverseRewardSchema]
 };
 
+// Back-compat alias: trackedKFMEDIASchemas is imported by UserCredentialRow but
+// was never exported (KFMEDIA partial-rebrand fallout) - alias fixes the broken import.
+export const trackedKFMEDIASchemas = trackedCharmverseSchemas;
+
 /**
  *
  * @param input string rpgfRound,address referredBy,string referredMethod

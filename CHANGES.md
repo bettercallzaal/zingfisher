@@ -18,6 +18,17 @@ not used in this fork's branding (trademark clause in LICENSE).
 
 ## Summary of Modifications
 
+### 2026-06-14 - Production build verified + 2 dangling-import fixes (loop iter 14)
+- `next build` of apps/webapp SUCCEEDS: 8/8 pages generated. The new `/learn`
+  page (static, 3.14 kB) and `/api/zao/membership` route both compile into the
+  production bundle. The app is deployable.
+- Fixed 2 more dangling imports the build surfaced as warnings:
+  - `trackedKFMEDIASchemas` (another KFMEDIA rebrand artifact) -> aliased to
+    `trackedCharmverseSchemas` in `@packages/credentials/external/schemas`.
+  - `blueColor` (missing export used as `--primary-color`) -> mapped to the ZAO
+    brand primary in `apps/webapp/theme/colors.ts`.
+- Rebuild after fixes: 0 import-error warnings.
+
 ### 2026-06-14 - Learning-center hub page (loop iter 13)
 - `apps/webapp/pages/learn.tsx` (route `/learn`) - composes the whole stack:
   tracks grid (Open vs Members chips), the ZABAL Games section, a Respect/$ZABAL

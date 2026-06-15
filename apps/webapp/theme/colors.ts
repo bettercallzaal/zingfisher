@@ -6,6 +6,9 @@ export const yellowColor = '#EAD637';
 
 export const brandPrimary = charmBlue;
 export const brandPrimaryDark = darken(brandPrimary, 0.1);
+// cssVariables.ts uses colors.blueColor as --primary-color; map to the ZAO brand
+// primary (was a missing export - build warning). Keeps the primary on-brand.
+export const blueColor = brandPrimary;
 export const whiteColor = '#fff';
 export const lightGreyColor = '#edf2f4';
 export const greyColor2 = '#aaa';
