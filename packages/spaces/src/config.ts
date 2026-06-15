@@ -7,6 +7,7 @@ export const DOMAIN_BLACKLIST = [
   // 'login', login is not part of this list, since it is used on custom domains and lives at [domain]/login
   'images',
   'join',
+  'learn',
   'share',
   'signup',
   'loop',
