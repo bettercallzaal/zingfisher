@@ -18,6 +18,15 @@ not used in this fork's branding (trademark clause in LICENSE).
 
 ## Summary of Modifications
 
+### 2026-06-15 - Restore trimmed features + signup.po - clears 17 errors (loop iter 21)
+- KFMEDIA trimmed `proposals` + `forum` out of `STATIC_PAGES` in
+  `@packages/features/constants` while the code still used them, breaking the
+  `Feature`/`FeatureMap` type (getFeatureTitle, PageTitleWithBreadcrumbs). Restored
+  both entries (matches upstream; the app has both feature dirs).
+- Restored `__e2e__/po/signup.po.ts` from upstream (missing, broke testWithFixtures).
+- Webapp typecheck: 62 -> 45. FeatureMap cluster + signup.po errors fully cleared,
+  no new errors.
+
 ### 2026-06-15 - Restore missing e2e test mocks - clears 70 errors (loop iter 20)
 - Restored `apps/webapp/__e2e__/utils/mocks.ts` from upstream CharmVerse - the
   KFMEDIA snapshot never committed it, breaking ~70 e2e spec imports
