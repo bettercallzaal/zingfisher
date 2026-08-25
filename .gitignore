@@ -63,3 +63,8 @@ apps/webapp/.cache
 
 token-diffs/
 .claude/
+.vercel
+.env*.local
+
+# per-machine agent tooling
+.serena/
