@@ -1,11 +1,14 @@
-import type { GateResult } from "@packages/lib/zao/respectGate";
-import type { ZidProfile } from "@packages/lib/zao/zid";
-import { useGETImmutable } from "./helpers";
+import type { GateResult } from '@packages/lib/zao/respectGate';
+import type { ZidProfile } from '@packages/lib/zao/zid';
+
+import { useGETImmutable } from './helpers';
 
 export type ZaoMembership = {
-  member: boolean;
+  member: boolean | null; // null if unknown due to error
   results: GateResult[];
-  governanceWeight: string;
+  governanceWeight: string | null; // null if read error; NEVER "0" on failure
+  status: 'ok' | 'error' | 'partial';
+  error?: string;
 };
 
 /**
@@ -13,7 +16,11 @@ export type ZaoMembership = {
  * Pass null/undefined to skip the request (e.g. before a wallet is connected).
  */
 export function useZaoMembership(address?: string | null) {
-  return useGETImmutable<ZaoMembership>(address ? "/api/zao/membership" : null, { address });
+  const result = useGETImmutable<ZaoMembership>(address ? '/api/zao/membership' : null, { address });
+  return {
+    ...result,
+    isError: Boolean(result.error || result.data?.status === 'error')
+  };
 }
 
 /**
@@ -21,7 +28,7 @@ export function useZaoMembership(address?: string | null) {
  */
 export function useZidProfile(identifier?: string | number | null) {
   const queryParam = identifier ? identifier.toString() : null;
-  return useGETImmutable<ZidProfile>(queryParam ? "/api/zao/zid" : null, { identifier: queryParam });
+  return useGETImmutable<ZidProfile>(queryParam ? '/api/zao/zid' : null, { identifier: queryParam });
 }
 
 /**
@@ -38,9 +45,9 @@ export async function registerZidProfile(data: {
   voucherAddress?: string;
   voucherName?: string;
 }): Promise<ZidProfile> {
-  const res = await fetch("/api/zao/zid", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+  const res = await fetch('/api/zao/zid', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   });
   if (!res.ok) {
