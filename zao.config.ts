@@ -1,153 +1,156 @@
 /**
- * ZAO Learning Center Configuration (zingfisher)
+ * ZAO Community & Governance Configuration (zingfisher)
  *
- * The one file to change when forking this learning center for a ZAO brand.
- * Mirrors the `community.config.ts` pattern from bettercallzaal/zaoos so the
- * whole ZAO estate shares one mental model: branding, gating, admin, and the
- * learning-specific surfaces (tracks, credentials, workshop booking) all live
- * here.
+ * The canonical configuration file for The ZAO portal fork (CharmVerse fork).
+ * Multi-tenant federation architecture decided 2026-09-22 (Zaal Grill decisions,
+ * commits 6cbeb028, d3381bff, 7be9b59f in ~/zao-vault):
  *
- * The underlying app is a CharmVerse fork (AGPL-3.0). Do NOT rebrand the
- * `@charmverse/core` package name - it is a real npm dependency. Only the
- * user-facing values below change per brand.
+ * 1. The Mission (item 23): "the movement for the new creator economy of bringing
+ *    the profit margin data and ip rights back to independed artists".
+ * 2. Multi-Tenant Federation (items 24-28):
+ *    - The ZAO parent: front door, commons, and social onboarding.
+ *    - Parent ZAO governance Respect: earned exclusively through parent ZAO fractals.
+ *    - ZAO Festivals: dedicated brand with isolated fractal and Respect ledger.
+ *    - Sub-DAOs: incubated communities run fractals using ZAO tooling.
+ * 3. Protocol & Identity (items 29-31):
+ *    - Knowable community: pseudonyms permitted with a peer voucher (item 29).
+ *    - Declared goals and vision: mandatory protocol requirement on entry (item 30).
+ *    - ZID identity layer rooted in ZAO Fractal (item 31).
+ *    - Allocation standard (2026-09-01): ZID 0 Zaal, 1-500 OGs/existing, 501+ new joiners.
  *
- * See research/001 (fork plan) and research/002 (ZAO features + platform prep).
+ * Open questions left for Zaal (do not design around an assumed answer):
+ * - Question 6: 47 pre-73 attendance-only members (grandfathered vs reconstructed).
+ * - Question 7: 9 solo-circle first rankings (handling open).
+ * - Merged home portal definitive brand name.
  */
 
 export const zaoConfig = {
-  // -- Branding -------------------------------------------------------------
-  /** Brand name - nav, page titles, meta tags, landing page */
-  name: 'ZAO Learning Center',
-  /** Short line shown on landing + social cards */
-  tagline: 'Learn, build, and ship across The ZAO',
-  /** Canonical ZAO palette (verified against zao-101/style.css). Wired into
-   *  packages/config/src/colors.ts (zaoPrimary). */
+  // -- Mission & Branding ---------------------------------------------------
+  /** Brand name (definitive merged home name pending Zaal confirmation) */
+  name: "The ZAO",
+  /** Constitutional mission statement (Zaal verbatim, item 23) */
+  mission: "The movement for the new creator economy of bringing the profit margin data and IP rights back to independent artists",
+  tagline: "Music first, community second, tech third",
   colors: {
-    primary: '#f5a623', // --gold
-    primaryHover: '#ffd700', // --gold-hot
-    background: '#0a1628', // --navy
-    surface: '#0d1b2a', // --navy-2
-    surfaceLight: '#1a2a3a',
-    text: '#e2e8f0', // --ink
-    textMuted: '#94a3b8' // --ink-2
+    primary: "#f5a623", // --gold
+    primaryHover: "#ffd700", // --gold-hot
+    background: "#0a1628", // --navy
+    surface: "#0d1b2a", // --navy-2
+    surfaceLight: "#1a2a3a",
+    text: "#e2e8f0", // --ink
+    textMuted: "#94a3b8" // --ink-2
   },
-  /** Brand font - wire into apps/webapp/theme/fonts.ts + pages/_document.tsx */
-  font: 'Inter', // TODO: confirm ZAO typeface with Zaal
+  font: "Inter",
 
-  // -- Membership gating ----------------------------------------------------
-  /** Gate ZAO-member-only content. NOTE: ZABAL Games is OPEN to non-members
-   *  (zao-101/zabal-games.html) - do not gate that track. Only member tracks gate.
-   *  Pattern to port: zaoos/src/lib/spaces/tokenGate.ts (viem, ERC-20/721/1155).
-   *  TODO (needs Zaal): confirm which contract IS the membership gate, or whether
-   *  member access is Farcaster-channel based. Candidates below are real ZAO
-   *  contracts but their gate role is unconfirmed. */
-  gating: {
-    enabled: true,
-    /** Confirmed by Zaal: membership = holding Respect, on EITHER Optimism or Base.
-     *  Hold Respect on any listed chain -> member access. */
-    method: 'respect' as const,
-    respect: {
-      optimism: {
-        /** Respect OG (ERC-20) */
-        ogContract: '0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957' as `0x${string}`,
-        /** ZOR (ERC-1155), token id 0 */
-        zorContract: '0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c' as `0x${string}`,
-        zorTokenId: 0
-      },
-      base: {
-        /** New Respect on Base. TODO (Zaal): paste the deployed address. */
-        contract: '' as `0x${string}` | ''
+  // -- Multi-Tenant Federation ----------------------------------------------
+  tenants: {
+    parent: {
+      id: "parent",
+      name: "The ZAO",
+      role: "Front door, commons, and social onboarding (item 25)",
+      governanceScope: "Parent ZAO governance Respect earned exclusively via parent fractals (item 26)",
+      contracts: {
+        optimism: {
+          /** Respect OG (ERC-20) */
+          ogContract: "0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957" as `0x${string}`,
+          /** ZOR Respect (ERC-1155, token id 0) */
+          zorContract: "0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c" as `0x${string}`,
+          zorTokenId: 0,
+          /** OREC Proposal Contract */
+          orecContract: "0xcB05F9254765CA521F7698e61E0A6CA6456Be532" as `0x${string}`
+        }
       }
+    },
+    festivals: {
+      id: "festivals",
+      name: "ZAO Festivals",
+      role: "Dedicated brand with isolated fractal and Respect ledger (item 24, 28)",
+      governanceScope: "Festival Respect ledger isolated from parent OREC voting power",
+      events: ["ZAOstock", "ZAO-CHELLA", "ZAO-PALOOZA"],
+      currentFocus: "ZAOstock (October 3, 2026 in Ellsworth, ME)"
+    },
+    subDaos: {
+      id: "sub-daos",
+      name: "Incubated Sub-DAOs",
+      role: "Independent communities running fractals via ZAO tooling (item 27)"
     }
   },
 
-  // -- Farcaster (ZAO is a Farcaster-native community) ----------------------
+  // -- Governance & Voting Model --------------------------------------------
+  governance: {
+    /** 1:1 unweighted sum of OG + ZOR Respect (Zaal ruling Q1 & Q2) */
+    votingWeightModel: "og_plus_zor_1_to_1" as const,
+    /** Author threshold: any Respect holder (> 0) can draft (Zaal ruling Q4) */
+    draftThreshold: "any_respect" as const,
+    /** Publish threshold: 1,000 peer Respect endorsements (Zaal ruling Q4) */
+    publishEndorsementThreshold: 1000,
+    /** Zero-Respect members have read and comment capabilities (item 14) */
+    zeroRespectPermissions: {
+      canRead: true,
+      canComment: true,
+      canVote: false,
+      canDraft: false
+    },
+    /** $ZABAL status: personal group token, future incubated project, no voting rights (Zaal ruling Q3) */
+    zabalToken: {
+      role: "future_incubated",
+      address: "0xbB48f19B0494Ff7C1fE5Dc2032aeEE14312f0b07" as `0x${string}`,
+      chainId: 8453,
+      hasVotingPower: false
+    }
+  },
+
+  // -- ZID Identity Protocol (items 29-31) -----------------------------------
+  identity: {
+    protocol: "ZID",
+    sequenceStartNewMembers: 501,
+    reservedOgRange: [0, 500],
+    requirePeerVoucher: true, // item 29: pseudonyms allowed only with peer voucher
+    requireDeclaredGoals: true, // item 30: mandatory stated creative goals & vision
+    hatsProtocolTreeId: 226, // Tree 226 for organizational roles
+    openQuestions: {
+      pre73AttendanceCohort: "Question 6: 47 pre-73 attendance-only members (status: pre_73_attendance, open for Zaal)",
+      soloCircleCohort: "Question 7: 9 solo-circle first rankings (status: solo_circle, open for Zaal)",
+      mergedHomeName: "Merged home definitive brand name (open for Zaal)"
+    }
+  },
+
+  // -- Farcaster ------------------------------------------------------------
   farcaster: {
-    /** App FID from Neynar dashboard. zaoos uses 19640. */
     appFid: 19640,
-    /** Channels surfaced as discussion rooms in the forum/community surface */
-    channels: ['zao', 'zabal', 'cocconcertz', 'wavewarz'],
-    defaultChannel: 'zao',
-    /** Sign In With Farcaster as an auth method alongside CharmVerse's wallet auth */
+    channels: ["zao", "zabal", "cocconcertz", "wavewarz"],
+    defaultChannel: "zao",
     siwfEnabled: true
   },
 
   // -- Admin ----------------------------------------------------------------
   adminFids: [19640],
-  adminWallets: [] as `0x${string}`[],
-
-  // -- Learning catalog (maps to CharmVerse "databases" = course catalog) ---
-  /** Top-level areas. Each becomes a CharmVerse database/board view.
-   *  `gated: false` = open to anyone (ZABAL Games, ZAO 101 intro);
-   *  `gated: true`  = ZAO-member-only (uses gating.candidates above). */
-  tracks: [
-    {
-      id: 'zabal-games',
-      name: 'ZABAL Games',
-      emoji: '[BUILD]',
-      description: 'The front door for builders - open program, hackathon/bootcamp energy',
-      gated: false
-    },
-    {
-      id: 'zao-101',
-      name: 'ZAO 101',
-      emoji: '[INTRO]',
-      description: 'What The ZAO is - artist org, autonomous org, ecosystem, pillars',
-      gated: false
-    },
-    {
-      id: 'zao-os',
-      name: 'ZAO OS',
-      emoji: '[OS]',
-      description: 'Fork and run a community OS',
-      gated: true
-    },
-    {
-      id: 'governance',
-      name: 'Governance',
-      emoji: '[GOV]',
-      description: 'Respect, ORDAO, Hats, fractals',
-      gated: true
-    }
-  ],
-
-  // -- On-chain credentials (maps to packages/credentials - EAS-style) ------
-  /** Issue completion certificates / attestations when a member finishes a track.
-   *  CharmVerse already ships a credentials package; wire it to ZAO attestations. */
-  credentials: {
-    enabled: true,
-    chain: 'base' as const,
-    /** EAS schema UID for "completed ZAO learning track" attestations. TODO. */
-    schemaUid: '' as string
-  },
+  adminWallets: ["0x7234c36a71ec237c2ae7698e8916e0735001e9af"] as `0x${string}`[], // Zaal
 
   // -- ZABAL Games (open builder program) -----------------------------------
-  /** "The front door for builders" - open to non-members (zao-101/zabal-games.html).
-   *  A public program, NOT the internal "ZABAL toolstack" - keep those separate. */
   zabalGames: {
-    open: true, // anyone can join; this track is not gated
-    /** The three entry tracks builders pick from */
-    tracks: ['Artist', 'Builder', 'Creator'] as const,
-    /** Season arc (TODO: confirm exact dates with Zaal) */
+    open: true,
+    tracks: ["Artist", "Builder", "Creator"] as const,
     season: {
-      bootcamp: 'June - workshops + mentors, learn the stack',
-      buildathon: 'July - open build, ship something real',
-      finals: 'August - judging + showcase'
+      bootcamp: "June: workshops + mentors, learn the stack",
+      buildathon: "July: open build, ship something real",
+      finals: "August: judging + showcase"
     },
-    /** Cal.com slot booker */
-    bookingUrl: 'https://cal.com/bettercallzaal/zabal-games-workshop-slot',
-    /** Default streaming surface */
-    restreamUrl: 'https://restream.io',
-    /** Workshop library + portal platform */
-    portalUrl: 'https://magnetiq.io'
+    bookingUrl: "https://cal.com/bettercallzaal/zabal-games-workshop-slot",
+    restreamUrl: "https://restream.io",
+    portalUrl: "https://magnetiq.io"
   },
 
-  // -- ZAO platform links (the learning center is the hub) ------------------
+  // -- Platforms ------------------------------------------------------------
   platforms: {
-    zaoos: 'https://zaoos.com',
-    discord: 'https://discord.thezao.com',
-    luma: 'https://luma.com/zao',
-    ordao: 'https://zao.frapps.xyz/'
+    zaoos: "https://zaoos.com",
+    nexus: "https://nexus.thezao.com",
+    discord: "https://discord.thezao.com",
+    luma: "https://luma.com/zao",
+    ordao: "https://zao.frapps.xyz/",
+    farcaster: "https://warpcast.com/~/channel/zao",
+    wavewarz: "https://wavewarz.com",
+    zaostock: "https://zaostock.com"
   }
 } as const;
 

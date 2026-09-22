@@ -1,22 +1,23 @@
-import { createPublicClient, http, type Address, type Chain } from 'viem';
-import { base, mainnet, optimism } from 'viem/chains';
+import { createPublicClient, http, type Address, type Chain } from "viem";
+import { base, mainnet, optimism } from "viem/chains";
 
 /**
- * ZAO membership gate.
+ * ZAO Governance & Membership Gates.
  *
- * The ZAO gates member-only content on Respect: hold Respect on Optimism
- * (OG ERC-20 OR ZOR ERC-1155) OR the community token on Base ($ZABAL ERC-20).
- * Holding ANY of these = member.
+ * Decisions 2026-09-22 (Zaal Grill decisions, commits 6cbeb028, d3381bff, 7be9b59f):
+ * - Voting weight: 1:1 unweighted sum of OG (ERC-20) + ZOR (ERC-1155, id 0) on Optimism.
+ * - Parent ZAO governance Respect is earned exclusively through parent ZAO fractals.
+ * - ZAO Festivals Respect is isolated from parent governance (item 24, 26).
+ * - $ZABAL: Zaal personal group token, future incubated project, no voting rights (item 3).
+ * - Zero-Respect members have read and comment capabilities (item 14).
  *
- * Ported from zaoos/src/lib/spaces/tokenGate.ts (the estate-standard viem gate)
- * and extended with the ZAO membership set. Addresses verified on-chain
- * 2026-06-14 (eth_getCode). Mirrors gating.* in zao.config.ts.
- *
- * NOTE: the Base "new Respect" gate currently uses $ZABAL pending Zaal's
- * confirmation - swap ZABAL_BASE if a dedicated Respect-on-Base ships.
+ * Contracts verified on Optimism Mainnet:
+ * - Respect OG (ERC-20): 0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957
+ * - ZOR Respect (ERC-1155): 0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c, tokenId 0
+ * - OREC: 0xcB05F9254765CA521F7698e61E0A6CA6456Be532
  */
 
-export type GateType = 'erc20' | 'erc721' | 'erc1155';
+export type GateType = "erc20" | "erc721" | "erc1155";
 
 export interface TokenGateConfig {
   type: GateType;
@@ -28,12 +29,14 @@ export interface TokenGateConfig {
   tokenId?: string;
   /** Human label for logging / UI. */
   label?: string;
+  tenant?: "parent" | "festivals" | "incubated";
 }
 
 export interface GateResult {
   allowed: boolean;
   balance: string;
   label?: string;
+  tenant?: "parent" | "festivals" | "incubated";
 }
 
 const CHAINS: Record<number, Chain> = {
@@ -46,65 +49,83 @@ export const CHAIN_IDS = { mainnet: 1, base: 8453, optimism: 10 } as const;
 
 const ERC20_ABI = [
   {
-    name: 'balanceOf',
-    type: 'function',
-    stateMutability: 'view',
-    inputs: [{ name: 'account', type: 'address' }],
-    outputs: [{ name: '', type: 'uint256' }]
+    name: "balanceOf",
+    type: "function",
+    stateMutability: "view",
+    inputs: [{ name: "account", type: "address" }],
+    outputs: [{ name: "", type: "uint256" }]
   }
 ] as const;
 
-const ERC721_ABI = ERC20_ABI; // balanceOf(owner) -> uint256, same shape
+const ERC721_ABI = ERC20_ABI;
 
 const ERC1155_ABI = [
   {
-    name: 'balanceOf',
-    type: 'function',
-    stateMutability: 'view',
+    name: "balanceOf",
+    type: "function",
+    stateMutability: "view",
     inputs: [
-      { name: 'account', type: 'address' },
-      { name: 'id', type: 'uint256' }
+      { name: "account", type: "address" },
+      { name: "id", type: "uint256" }
     ],
-    outputs: [{ name: '', type: 'uint256' }]
+    outputs: [{ name: "", type: "uint256" }]
   }
 ] as const;
 
-/** The ZAO membership gate set. Hold any one = member. */
-export const ZAO_MEMBERSHIP_GATES: TokenGateConfig[] = [
+/** Canonical Parent ZAO Governance Gates on Optimism. */
+export const PARENT_ZAO_GATES: TokenGateConfig[] = [
   {
-    label: 'Respect OG (Optimism)',
-    type: 'erc20',
-    contractAddress: '0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957',
-    chainId: CHAIN_IDS.optimism
-  },
-  {
-    label: 'ZOR (Optimism)',
-    type: 'erc1155',
-    contractAddress: '0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c',
+    label: "Respect OG (Optimism)",
+    type: "erc20",
+    contractAddress: "0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957",
     chainId: CHAIN_IDS.optimism,
-    tokenId: '0'
+    tenant: "parent"
   },
   {
-    label: '$ZABAL (Base)',
-    type: 'erc20',
-    contractAddress: '0xbB48f19B0494Ff7C1fE5Dc2032aeEE14312f0b07',
-    chainId: CHAIN_IDS.base
+    label: "ZOR Respect (Optimism)",
+    type: "erc1155",
+    contractAddress: "0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c",
+    chainId: CHAIN_IDS.optimism,
+    tokenId: "0",
+    tenant: "parent"
   }
 ];
 
-/** Pure: decide allowed/balance from a raw balance. No network. Unit-tested. */
+export const ZAO_MEMBERSHIP_GATES = PARENT_ZAO_GATES;
+
+/** Pure: decide allowed/balance from a raw balance. Unit-tested. */
 export function evaluateGate(balance: bigint, gate: TokenGateConfig): GateResult {
-  if (gate.type === 'erc20') {
-    const min = BigInt(gate.minBalance || '1');
-    return { allowed: balance >= min, balance: balance.toString(), label: gate.label };
+  if (gate.type === "erc20") {
+    const min = BigInt(gate.minBalance || "1");
+    return {
+      allowed: balance >= min,
+      balance: balance.toString(),
+      label: gate.label,
+      tenant: gate.tenant
+    };
   }
-  // erc721 / erc1155: holding any (> 0) grants access
-  return { allowed: balance > BigInt(0), balance: balance.toString(), label: gate.label };
+  return {
+    allowed: balance > BigInt(0),
+    balance: balance.toString(),
+    label: gate.label,
+    tenant: gate.tenant
+  };
 }
 
-/** Pure: a wallet is a member if it passes ANY gate. No network. Unit-tested. */
+/** Pure: checks whether any gate is satisfied. */
 export function isZaoMember(results: GateResult[]): boolean {
   return results.some((r) => r.allowed);
+}
+
+/** Computes combined 1:1 voting weight from gate evaluation results. */
+export function computeGovernanceWeightFromResults(results: GateResult[]): string {
+  let total = BigInt(0);
+  for (const r of results) {
+    if (r.tenant === "parent" && r.allowed) {
+      total += BigInt(r.balance || "0");
+    }
+  }
+  return total.toString();
 }
 
 function getClient(chainId: number) {
@@ -121,14 +142,14 @@ export async function checkTokenGate(walletAddress: string, gate: TokenGateConfi
   const address = walletAddress as Address;
   const contract = gate.contractAddress;
 
-  if (gate.type === 'erc1155') {
+  if (gate.type === "erc1155") {
     if (!gate.tokenId) {
-      throw new Error('tokenId required for ERC-1155 gate');
+      throw new Error("tokenId required for ERC-1155 gate");
     }
     const balance = await client.readContract({
       address: contract,
       abi: ERC1155_ABI,
-      functionName: 'balanceOf',
+      functionName: "balanceOf",
       args: [address, BigInt(gate.tokenId)]
     });
     return evaluateGate(balance as bigint, gate);
@@ -136,30 +157,30 @@ export async function checkTokenGate(walletAddress: string, gate: TokenGateConfi
 
   const balance = await client.readContract({
     address: contract,
-    abi: gate.type === 'erc721' ? ERC721_ABI : ERC20_ABI,
-    functionName: 'balanceOf',
+    abi: gate.type === "erc721" ? ERC721_ABI : ERC20_ABI,
+    functionName: "balanceOf",
     args: [address]
   });
   return evaluateGate(balance as bigint, gate);
 }
 
 /**
- * Check ZAO membership across all gates (Respect OP + ZABAL Base) for a wallet.
- * Returns per-gate results and an overall `member` boolean. Errors on a single
- * chain do not fail the whole check - that gate just reports not-allowed.
+ * Checks Parent ZAO Respect balances across OG and ZOR on Optimism.
+ * Computes 1:1 unweighted governance weight.
  */
 export async function checkZaoMembership(
   walletAddress: string,
-  gates: TokenGateConfig[] = ZAO_MEMBERSHIP_GATES
-): Promise<{ member: boolean; results: GateResult[] }> {
+  gates: TokenGateConfig[] = PARENT_ZAO_GATES
+): Promise<{ member: boolean; results: GateResult[]; governanceWeight: string }> {
   const results = await Promise.all(
     gates.map(async (gate) => {
       try {
         return await checkTokenGate(walletAddress, gate);
       } catch {
-        return { allowed: false, balance: '0', label: gate.label };
+        return { allowed: false, balance: "0", label: gate.label, tenant: gate.tenant };
       }
     })
   );
-  return { member: isZaoMember(results), results };
+  const governanceWeight = computeGovernanceWeightFromResults(results);
+  return { member: isZaoMember(results), results, governanceWeight };
 }
