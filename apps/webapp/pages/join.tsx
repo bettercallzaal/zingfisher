@@ -165,7 +165,7 @@ export default function JoinPage() {
       </Box>
 
       {/* Existing Member Alert */}
-      {existingProfile && existingProfile.zid >= 0 && (
+      {existingProfile && existingProfile.zid !== null && existingProfile.zid >= 0 && (
         <Alert severity='info' sx={{ mb: 3 }} icon={<VerifiedUserIcon />}>
           Wallet <strong>{existingProfile.address}</strong> is already registered as{' '}
           <strong>{existingProfile.formattedZid}</strong> ({existingProfile.displayName}).{' '}
@@ -187,8 +187,8 @@ export default function JoinPage() {
           <Box sx={{ display: 'flex', gap: 1.5 }}>
             <Chip size='small' label='Item 31' color='primary' variant='outlined' />
             <Typography variant='body2'>
-              <strong>Instant Permanent ZID:</strong> Claim your unique identifier starting at ZID-
-              {zidConfig.newMemberStart}+ (allocations 0-500 reserved for founding and early members).
+              <strong>Instant Permanent ZID:</strong> Claim your unique identifier starting at{' '}
+              {`ZID-${zidConfig.newMemberStart}+`} (allocations 0-500 reserved for founding and early members).
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: 1.5 }}>

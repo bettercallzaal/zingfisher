@@ -417,7 +417,7 @@ export function MemberProfileView({ profile }: { profile: ZidProfile }) {
               )}
 
               {profile.voucher.status === 'pre_73_attendance' && (
-                <Alert severity='secondary' sx={{ mt: 1 }}>
+                <Alert severity='info' sx={{ mt: 1 }}>
                   <strong>Open Question 6:</strong> This member participated in recorded sessions during periods 1-72
                   (attendance only). Awaiting Zaal ruling on grandfathering versus circle peer reconstruction.
                 </Alert>
