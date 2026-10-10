@@ -50,8 +50,11 @@ npx vitest run --config <cfg>       # tests; the packages project's globalSetup 
 ## ZAO conventions
 
 - Branding from `@packages/config/colors` + `@packages/config/zao`; don't hardcode hex/strings.
-- Member gating uses `packages/lib/src/zao/respectGate.ts` (Respect on Optimism + $ZABAL on
-  Base). Gate UI with `components/zao/ZaoMemberGate`.
+- Member gating uses CharmVerse's own token gates, defined in `@packages/config/zao` (`zaoTokenGates`:
+  Respect OG or ZOR on Optimism, plus Hats tree 226 role labels) and evaluated in
+  `packages/lib/src/zao/zaoTokenGates.ts`; `respectGate.ts` reads raw balances for display and vote
+  weight only. $ZABAL confers nothing (grill 2026-09-22 morning item 6). Gate UI with
+  `components/zao/ZaoMemberGate`; `scripts/seedZaoTokenGates.ts` seeds the DB rows once Postgres exists.
 - "Say The ZAO first; ZABAL is the internal builder identity, never the umbrella" (see research/004).
 - No emojis in code/docs/commits.
 
