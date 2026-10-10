@@ -8,10 +8,11 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { useUser } from 'hooks/useUser';
 
 /**
- * Gates member-only content behind ZAO membership (Respect on Optimism OR
- * $ZABAL on Base). Resolves the user's first connected wallet, asks
- * /api/zao/membership, and renders children only for members. Non-members and
- * logged-out visitors get a join CTA.
+ * Gates member-only content behind ZAO membership: CharmVerse's own token gates
+ * (Respect OG or ZOR on Optimism, defined in @packages/config/zao) evaluated by
+ * /api/zao/membership. Renders children only for members. Non-members and
+ * logged-out visitors get a join CTA. $ZABAL confers nothing (grill 2026-09-22
+ * morning item 6).
  */
 export function ZaoMemberGate({ children, fallback }: { children: ReactNode; fallback?: ReactNode }) {
   const { user } = useUser();
@@ -37,13 +38,11 @@ export function ZaoMemberGate({ children, fallback }: { children: ReactNode; fal
       </Typography>
       <Typography variant='body2' sx={{ mb: 2 }}>
         {address
-          ? 'This track is open to ZAO members. Hold Respect (Optimism) or $ZABAL (Base) to unlock it.'
-          : 'Connect a wallet that holds Respect (Optimism) or $ZABAL (Base) to unlock this track.'}
+          ? 'This track is open to ZAO members. Hold Respect (OG or ZOR, on Optimism) to unlock it.'
+          : 'Connect a wallet that holds Respect (OG or ZOR, on Optimism) to unlock this track.'}
       </Typography>
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} justifyContent='center'>
-        <Button external href={zaoPlatforms.zaoos} target='_blank'>
-          Join The ZAO
-        </Button>
+        <Button href='/member/join'>Join The ZAO</Button>
         <Button external color='secondary' variant='outlined' href={zaoPlatforms.discord} target='_blank'>
           Ask in Discord
         </Button>
