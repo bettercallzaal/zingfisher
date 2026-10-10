@@ -1,7 +1,8 @@
-import { Box, CircularProgress, Typography, Alert } from '@mui/material';
+import { Alert, Box, CircularProgress } from '@mui/material';
 
 import { useZidProfile } from 'charmClient/hooks/zao';
 import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayout';
+import { Button } from 'components/common/Button';
 import { MemberProfileView } from 'components/zao/MemberProfileView';
 import { useUser } from 'hooks/useUser';
 
@@ -24,9 +25,10 @@ export default function MemberIndexPage() {
   if (error || !profile) {
     return (
       <Box sx={{ maxWidth: 800, mx: 'auto', px: 2, py: 6 }}>
-        <Alert severity='warning'>
+        <Alert severity='warning' sx={{ mb: 2 }}>
           Could not load member profile. Please verify your connection or search for a valid ZID.
         </Alert>
+        <Button href='/member/join'>Claim your ZID</Button>
       </Box>
     );
   }

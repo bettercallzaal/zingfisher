@@ -238,6 +238,19 @@ export const ZAAL_ADDRESS = '0x7234c36a71ec237c2ae7698e8916e0735001e9af';
 
 let nextMemberZidSequence = 501; // Decision 2026-09-01: new members start at 501
 
+/**
+ * Pure: does the signed-in user own `address`? Case-insensitive match against the
+ * wallets the session user has linked. The ZID API refuses any other address, so a
+ * logged-in visitor cannot register a profile for a wallet that is not theirs.
+ */
+export function isOwnedAddress(walletAddresses: readonly string[], address: string): boolean {
+  const target = address.trim().toLowerCase();
+  if (!/^0x[a-f0-9]{40}$/.test(target)) {
+    return false;
+  }
+  return walletAddresses.some((w) => w.trim().toLowerCase() === target);
+}
+
 /** Looks up profile by wallet address or ZID identifier. */
 export function getZidProfile(identifier: string | number): ZidProfile | null {
   if (typeof identifier === 'number') {

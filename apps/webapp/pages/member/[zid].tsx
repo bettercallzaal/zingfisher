@@ -1,8 +1,9 @@
-import { Box, CircularProgress, Typography, Alert, Button } from "@mui/material";
-import { getLayout as getBaseLayout } from "components/common/BaseLayout/getLayout";
-import { MemberProfileView } from "components/zao/MemberProfileView";
-import { useZidProfile } from "charmClient/hooks/zao";
-import { useRouter } from "next/router";
+import { Box, CircularProgress, Typography, Alert, Button } from '@mui/material';
+import { useRouter } from 'next/router';
+
+import { useZidProfile } from 'charmClient/hooks/zao';
+import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayout';
+import { MemberProfileView } from 'components/zao/MemberProfileView';
 
 export default function MemberProfileDynamicPage() {
   const router = useRouter();
@@ -12,7 +13,7 @@ export default function MemberProfileDynamicPage() {
 
   if (isLoading || !router.isReady) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", py: 10 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
         <CircularProgress />
       </Box>
     );
@@ -20,11 +21,11 @@ export default function MemberProfileDynamicPage() {
 
   if (error || !profile) {
     return (
-      <Box sx={{ maxWidth: 700, mx: "auto", px: 2, py: 8, textAlign: "center" }}>
-        <Alert severity="warning" sx={{ mb: 3 }}>
+      <Box sx={{ maxWidth: 700, mx: 'auto', px: 2, py: 8, textAlign: 'center' }}>
+        <Alert severity='warning' sx={{ mb: 3 }}>
           Member profile not found for identifier: <strong>{zid}</strong>
         </Alert>
-        <Button variant="outlined" onClick={() => router.push("/member")}>
+        <Button variant='outlined' onClick={() => router.push('/member')}>
           Return to Member Index
         </Button>
       </Box>

@@ -1,4 +1,5 @@
 import {
+  isOwnedAddress,
   formatZid,
   parseZid,
   calculateGovernanceWeight,
@@ -118,6 +119,21 @@ describe('Zero-Respect and Unknown Balance Permissions (Item 14)', () => {
     expect(perms.canComment).toBe(true);
     expect(perms.canVote).toBe(true);
     expect(perms.canDraftProposal).toBe(true);
+  });
+});
+
+describe('isOwnedAddress (the ZID API binds a profile to the signed-in wallet)', () => {
+  const wallets = ['0x7234c36A71ec237c2Ae7698e8916e0735001E9Af', '0x1111111111111111111111111111111111111111'];
+
+  it('accepts a wallet the session user has linked, case-insensitively', () => {
+    expect(isOwnedAddress(wallets, '0x7234c36a71ec237c2ae7698e8916e0735001e9af')).toBe(true);
+    expect(isOwnedAddress(wallets, ' 0x1111111111111111111111111111111111111111 ')).toBe(true);
+  });
+
+  it('RED CONTROL: refuses a wallet the user does not own, and malformed input', () => {
+    expect(isOwnedAddress(wallets, '0x2222222222222222222222222222222222222222')).toBe(false);
+    expect(isOwnedAddress(wallets, 'not-an-address')).toBe(false);
+    expect(isOwnedAddress([], '0x7234c36a71ec237c2ae7698e8916e0735001e9af')).toBe(false);
   });
 });
 
