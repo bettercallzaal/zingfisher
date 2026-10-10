@@ -1,6 +1,7 @@
 import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
 import { Alert, Box, Card, Divider } from '@mui/material';
 import DialogTitle from '@mui/material/DialogTitle';
+import { getAppUrl, getSpaceUrl } from '@packages/lib/utils/browser';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 
@@ -13,7 +14,6 @@ import { SpaceAccessGateWithSearch } from 'components/common/SpaceAccessGate/Spa
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useSpaces } from 'hooks/useSpaces';
 import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
-import { getAppUrl, getSpaceUrl } from '@packages/lib/utils/browser';
 
 export function AlternateRouteButton({ href, children }: { href: string; children: ReactNode }) {
   const { spaces } = useSpaces();
