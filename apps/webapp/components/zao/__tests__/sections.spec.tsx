@@ -27,7 +27,7 @@ describe('ZAO content sections render', () => {
 
   it('ZabalGamesSection shows the program + the three tracks', () => {
     const { getByText } = render(<ZabalGamesSection />);
-    expect(getByText('ZABAL Games')).toBeDefined();
+    expect(getByText('ZABAL Gamez')).toBeDefined();
     expect(getByText('Artist')).toBeDefined();
     expect(getByText('Builder')).toBeDefined();
     expect(getByText('Creator')).toBeDefined();

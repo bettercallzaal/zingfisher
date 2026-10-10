@@ -74,8 +74,8 @@ async function getProfile(
       if (!profile) {
         const hasRespect = governanceWeight !== null && BigInt(governanceWeight) > BigInt(0);
         profile = {
-          zid: isZaal ? 0 : null, // 0 for Zaal; 1-500 reserved pending Zaal ruling
-          formattedZid: isZaal ? 'ZID-000' : 'UNASSIGNED',
+          zid: isZaal ? 1 : null, // ZID 1 for Zaal (grill 2026-09-22 afternoon item 19); 2-500 reserved pending ruling
+          formattedZid: isZaal ? 'ZID-001' : 'UNASSIGNED',
           address: normAddress,
           displayName: isZaal ? 'Zaal' : `${normAddress.slice(0, 6)}...${normAddress.slice(-4)}`,
           handle: isZaal ? 'zaal' : normAddress.slice(0, 8),
@@ -88,9 +88,9 @@ async function getProfile(
               unrecordedTokenHolder: hasRespect && !isZaal
             }),
             note: isZaal
-              ? 'Founder (ZID 0 decided 2026-08-25)'
+              ? 'Founder (ZID 1, ruled 2026-09-22)'
               : hasRespect
-                ? 'On-chain Respect holder (ZIDs 1-500 reserved pending Zaal ruling)'
+                ? 'On-chain Respect holder (ZIDs 2-500 reserved pending Zaal ruling)'
                 : 'Unassigned profile: complete onboarding to claim permanent ZID'
           },
           joinedAt: new Date().toISOString(),

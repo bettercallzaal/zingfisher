@@ -6,6 +6,10 @@ import { base, mainnet, optimism } from 'viem/chains';
  *
  * Decisions 2026-09-22 (Zaal Grill decisions, commits 6cbeb028, d3381bff, 7be9b59f):
  * - Voting weight: 1:1 unweighted sum of OG (ERC-20) + ZOR (ERC-1155, id 0) on Optimism.
+ *   Ruling 2026-10-10 (vault decisions/grill-2026-10-09-seat-morning.md item 78): the sum is
+ *   OG + ZOR in WHOLE Respect. OG has 18 decimals (decimals() measured on Optimism 2026-10-10),
+ *   ZOR is an integer ERC-1155 balance, so OG is divided by 10^18 before the two are added.
+ *   Before this fix the raw wei was summed and Zaal's wallet read 3094e18 + 858.
  * - Parent ZAO governance Respect is earned exclusively through parent ZAO fractals.
  * - ZAO Festivals Respect is isolated from parent governance (item 24, 26).
  * - $ZABAL: Zaal personal group token, future incubated project, no voting rights (item 3).
@@ -27,8 +31,10 @@ export interface TokenGateConfig {
   type: GateType;
   contractAddress: Address;
   chainId: number;
-  /** Min balance for erc20 (raw units). Defaults to 1. */
+  /** Min balance for erc20 in WHOLE tokens (after `decimals`). Defaults to 1. */
   minBalance?: string;
+  /** ERC-20 decimals. The balance is divided by 10^decimals before gating and summing. Defaults to 0. */
+  decimals?: number;
   /** Required for erc1155. */
   tokenId?: string;
   /** Human label for logging / UI. */
@@ -38,7 +44,10 @@ export interface TokenGateConfig {
 
 export interface GateResult {
   allowed: boolean;
-  balance: string | null; // null if read failed; NEVER "0" on failure
+  /** Whole-token balance (raw / 10^decimals, truncated); null if read failed; NEVER "0" on failure */
+  balance: string | null;
+  /** The untouched on-chain integer, for audit; null if read failed */
+  rawBalance?: string | null;
   label?: string;
   tenant?: 'parent' | 'festivals' | 'incubated';
   status: 'ok' | 'error';
@@ -93,6 +102,7 @@ export const PARENT_ZAO_GATES: TokenGateConfig[] = [
     type: 'erc20',
     contractAddress: '0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957',
     chainId: CHAIN_IDS.optimism,
+    decimals: 18, // measured: decimals() on 0x34cE...6957 returns 18 (2026-10-10)
     tenant: 'parent'
   },
   {
@@ -101,27 +111,39 @@ export const PARENT_ZAO_GATES: TokenGateConfig[] = [
     contractAddress: '0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c',
     chainId: CHAIN_IDS.optimism,
     tokenId: '0',
+    decimals: 0, // ERC-1155 integer balance
     tenant: 'parent'
   }
 ];
+
+/** Pure: raw on-chain integer to whole tokens, truncated toward zero. No floats. */
+export function toWholeUnits(raw: bigint, decimals = 0): bigint {
+  if (decimals <= 0) {
+    return raw;
+  }
+  return raw / BigInt(10) ** BigInt(decimals);
+}
 
 export const ZAO_MEMBERSHIP_GATES = PARENT_ZAO_GATES;
 
 /** Pure: decide allowed/balance from a raw balance. Unit-tested. */
 export function evaluateGate(balance: bigint, gate: TokenGateConfig): GateResult {
+  const whole = toWholeUnits(balance, gate.decimals ?? 0);
   if (gate.type === 'erc20') {
     const min = BigInt(gate.minBalance || '1');
     return {
-      allowed: balance >= min,
-      balance: balance.toString(),
+      allowed: whole >= min,
+      balance: whole.toString(),
+      rawBalance: balance.toString(),
       label: gate.label,
       tenant: gate.tenant,
       status: 'ok'
     };
   }
   return {
-    allowed: balance > BigInt(0),
-    balance: balance.toString(),
+    allowed: whole > BigInt(0),
+    balance: whole.toString(),
+    rawBalance: balance.toString(),
     label: gate.label,
     tenant: gate.tenant,
     status: 'ok'
@@ -144,7 +166,8 @@ export function isZaoMember(results: GateResult[]): boolean | null {
 }
 
 /**
- * Computes combined 1:1 voting weight from gate evaluation results.
+ * Computes combined 1:1 voting weight from gate evaluation results, in whole Respect
+ * (each result's `balance` is already divided by its gate's decimals).
  * If ANY parent tenant result has status "error" or balance null,
  * the governance weight is UNKNOWN (null). NEVER returns "0" on failure.
  */
@@ -216,6 +239,7 @@ export async function checkZaoMembership(
         return {
           allowed: false,
           balance: null, // UNKNOWN, not "0"
+          rawBalance: null,
           label: gate.label,
           tenant: gate.tenant,
           status: 'error' as const,

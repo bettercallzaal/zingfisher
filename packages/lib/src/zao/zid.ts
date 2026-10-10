@@ -11,7 +11,8 @@
  *   - Item 29: Knowable community: pseudonyms permitted with peer voucher.
  *   - Item 30: Stated creative goals and vision protocol requirement.
  *   - Item 31: ZID identity layer rooted in ZAO Fractal.
- *   - Decision 2026-09-01: Allocation standard (ZID 0 Zaal, 1-500 reserved for OGs/existing, 501+ new members).
+ *   - Allocation standard: Zaal is ZID 1 (grill 2026-09-22 afternoon item 19: humans count from one;
+ *     supersedes the 2026-08-25 ZID 0 note), 2-500 reserved for OGs/existing, 501+ new members.
  *
  * Open questions left for Zaal (do not design around an assumed answer):
  * - Question 6: 47 pre-73 attendance-only members (status: pre_73_attendance, open for Zaal).
@@ -71,7 +72,7 @@ export interface MemberPermissions {
 
 export interface ZidProfile {
   zid: number | null; // null if unassigned (reserved 1-500 range pending Zaal ruling)
-  formattedZid: string; // e.g. "ZID-000" (Zaal), "ZID-501", or "UNASSIGNED"
+  formattedZid: string; // e.g. "ZID-001" (Zaal), "ZID-501", or "UNASSIGNED"
   address: string; // Lowercase 0x wallet address
   displayName: string;
   handle: string;
@@ -102,7 +103,7 @@ export interface ZidProfile {
   permissions: MemberPermissions;
 }
 
-/** Formats integer ZID into canonical display string (e.g. 0 -> ZID-000, 501 -> ZID-501). */
+/** Formats integer ZID into canonical display string (e.g. 1 -> ZID-001, 501 -> ZID-501). */
 export function formatZid(zid: number | null): string {
   if (zid === null) {
     return 'UNASSIGNED';
@@ -232,7 +233,7 @@ export function classifyVoucherStatus(options: {
 
 const runtimeProfiles = new Map<string, ZidProfile>();
 
-// Zaal address is canonical; ZID 0 was explicitly decided for him (2026-08-25)
+// Zaal address is canonical; ZID 1 ruled 2026-09-22 (grill afternoon item 19), superseding the 2026-08-25 ZID 0 note
 export const ZAAL_ADDRESS = '0x7234c36a71ec237c2ae7698e8916e0735001e9af';
 
 let nextMemberZidSequence = 501; // Decision 2026-09-01: new members start at 501
@@ -297,10 +298,10 @@ export function assignNextZid(input: {
     throw new Error(handleValidation.reason);
   }
 
-  // Zaal is ZID 0 per 2026-08-25 decision; new joiners start at 501+
+  // Zaal is ZID 1 per grill 2026-09-22 afternoon item 19; new joiners start at 501+
   let zid: number | null = null;
   if (normAddress === ZAAL_ADDRESS.toLowerCase()) {
-    zid = 0;
+    zid = 1;
   } else {
     zid = nextMemberZidSequence;
     nextMemberZidSequence += 1;

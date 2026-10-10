@@ -16,7 +16,7 @@ function Container({ children }: { children: ReactNode }) {
 }
 
 /**
- * ZAO Learning Center hub. Open tracks (ZABAL Games, ZAO 101) are visible to
+ * ZAO Learning Center hub. Open tracks (ZABAL Gamez, ZAO 101) are visible to
  * anyone; member tracks (ZAO OS, Governance) sit behind the Respect/$ZABAL gate.
  */
 export default function LearnPage() {

@@ -24,7 +24,7 @@ function Container({ children }: { children: ReactNode }) {
  *
  * Protocol requirements decided 2026-09-22:
  * - Creator economy mission (Item 23).
- * - Instant ZID assignment upon onboarding (Item 12, 31; Decision 2026-09-01: 501+).
+ * - Instant ZID assignment upon onboarding (Item 12, 31; new members from 501; Zaal is ZID 1 per 2026-09-22 item 19).
  * - Knowable community: pseudonyms allowed with peer voucher (Item 29).
  * - Mandatory declared creative goals and vision statement (Item 30).
  * - Zero-Respect members granted read and comment capabilities (Item 14).
@@ -188,7 +188,7 @@ export default function JoinPage() {
             <Chip size='small' label='Item 31' color='primary' variant='outlined' />
             <Typography variant='body2'>
               <strong>Instant Permanent ZID:</strong> Claim your unique identifier starting at{' '}
-              {`ZID-${zidConfig.newMemberStart}+`} (allocations 0-500 reserved for founding and early members).
+              {`ZID-${zidConfig.newMemberStart}+`} (allocations 1-500 reserved for founding and early members).
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: 1.5 }}>

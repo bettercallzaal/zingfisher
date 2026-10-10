@@ -106,6 +106,35 @@ describe('computeGovernanceWeightFromResults (1:1 unweighted sum)', () => {
   });
 });
 
+describe('OG decimals (ruling 2026-10-10 item 78: OG + ZOR summed in whole Respect, not wei)', () => {
+  const ogGate = PARENT_ZAO_GATES.find((g) => g.type === 'erc20')!;
+  const zorGate = PARENT_ZAO_GATES.find((g) => g.type === 'erc1155')!;
+
+  it('OG gate declares 18 decimals; ZOR declares 0 (measured on Optimism 2026-10-10)', () => {
+    expect(ogGate.decimals).toBe(18);
+    expect(zorGate.decimals ?? 0).toBe(0);
+  });
+
+  it('evaluateGate reports OG in whole Respect and keeps the raw wei beside it', () => {
+    const res = evaluateGate(BigInt('3094000000000000000000'), ogGate);
+    expect(res.balance).toBe('3094');
+    expect(res.rawBalance).toBe('3094000000000000000000');
+    expect(res.allowed).toBe(true);
+  });
+
+  it('evaluateGate truncates a fractional OG balance, never rounds up', () => {
+    const res = evaluateGate(BigInt('1999999999999999999'), ogGate);
+    expect(res.balance).toBe('1');
+  });
+
+  it('PINNED: Zaal wallet 0x7234...9af read 2026-10-10 as OG 3094e18 wei + ZOR 858 weighs 3952', () => {
+    const og = evaluateGate(BigInt('3094000000000000000000'), ogGate);
+    const zor = evaluateGate(BigInt(858), zorGate);
+    expect(computeGovernanceWeightFromResults([og, zor])).toBe('3952');
+    expect(computeGovernanceWeightFromResults([og, zor])).not.toBe('3094000000000000000858');
+  });
+});
+
 describe('PARENT_ZAO_GATES', () => {
   it('covers Respect OG and ZOR on Optimism', () => {
     const chains = PARENT_ZAO_GATES.map((g) => g.chainId);

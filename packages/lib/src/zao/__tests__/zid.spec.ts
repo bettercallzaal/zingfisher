@@ -13,7 +13,7 @@ import {
 
 describe('ZID formatting and parsing', () => {
   it('formats ZID into 3-digit padded strings', () => {
-    expect(formatZid(0)).toBe('ZID-000');
+    expect(formatZid(1)).toBe('ZID-001');
     expect(formatZid(1)).toBe('ZID-001');
     expect(formatZid(42)).toBe('ZID-042');
     expect(formatZid(501)).toBe('ZID-501');
@@ -26,7 +26,7 @@ describe('ZID formatting and parsing', () => {
   });
 
   it('parses both prefixed and bare ZID values', () => {
-    expect(parseZid('ZID-000')).toBe(0);
+    expect(parseZid('ZID-001')).toBe(1);
     expect(parseZid('ZID-042')).toBe(42);
     expect(parseZid('zid-501')).toBe(501);
     expect(parseZid('501')).toBe(501);
@@ -144,7 +144,7 @@ describe('ZID Onboarding Allocation (Decision 2026-09-01)', () => {
     expect(profile.fractalHistory).toHaveLength(0);
   });
 
-  it('assigns ZID 0 to Zaal per 2026-08-25 decision', () => {
+  it('assigns ZID 1 to Zaal per grill 2026-09-22 afternoon item 19 (humans count from one)', () => {
     const zaal = assignNextZid({
       address: ZAAL_ADDRESS,
       displayName: 'Zaal',
@@ -153,7 +153,7 @@ describe('ZID Onboarding Allocation (Decision 2026-09-01)', () => {
         'The movement for the new creator economy of bringing profit margin data and IP rights back to independent artists.'
     });
 
-    expect(zaal.zid).toBe(0);
-    expect(zaal.formattedZid).toBe('ZID-000');
+    expect(zaal.zid).toBe(1);
+    expect(zaal.formattedZid).toBe('ZID-001');
   });
 });
