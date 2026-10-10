@@ -1,10 +1,12 @@
 import type { GateResult } from '@packages/lib/zao/respectGate';
+import type { ZaoAccess } from '@packages/lib/zao/zaoTokenGates';
 import type { ZidProfile } from '@packages/lib/zao/zid';
 
 import { useGETImmutable } from './helpers';
 
 export type ZaoMembership = {
-  member: boolean | null; // null if unknown due to error
+  member: boolean | null; // null if unknown due to error; decided by CharmVerse token gates (access)
+  access?: ZaoAccess; // CharmVerse TokenGate evaluation: roles granted and per-gate outcome
   results: GateResult[];
   governanceWeight: string | null; // null if read error; NEVER "0" on failure
   status: 'ok' | 'error' | 'partial';
@@ -12,7 +14,7 @@ export type ZaoMembership = {
 };
 
 /**
- * Check ZAO membership for a wallet (Respect OG + ZOR on Optimism).
+ * Check ZAO membership for a wallet: CharmVerse token gates for access and roles, raw OG + ZOR balances for weight.
  * Pass null/undefined to skip the request (e.g. before a wallet is connected).
  */
 export function useZaoMembership(address?: string | null) {

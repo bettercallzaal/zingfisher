@@ -95,7 +95,11 @@ const ERC1155_ABI = [
   }
 ] as const;
 
-/** Canonical Parent ZAO Governance Gates on Optimism. */
+/**
+ * Parent ZAO Respect contracts on Optimism, read here for BALANCES and vote weight only.
+ * Access and roles are decided by CharmVerse's own token gates (@packages/config/zao
+ * `zaoTokenGates`, evaluated in @packages/lib/zao/zaoTokenGates); see ZAOOS doc 2657 KD2.
+ */
 export const PARENT_ZAO_GATES: TokenGateConfig[] = [
   {
     label: 'Respect OG (Optimism)',

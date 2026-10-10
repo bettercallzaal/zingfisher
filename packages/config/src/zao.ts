@@ -34,6 +34,114 @@ export const zaoTenants = {
   }
 } as const;
 
+/**
+ * Access gates in CharmVerse's own TokenGate shape (packages/lib/src/tokenGates/interfaces.ts).
+ * Decided in ZAOOS research governance/2657 (Key Decision 2): CharmVerse already evaluates
+ * ERC20 with on-chain decimals, ERC1155 by token id, and Hats by wearer, and maps a passing
+ * gate to a Role, so The ZAO's access rules are expressed as CharmVerse gates rather than a
+ * parallel gate. These definitions are evaluated live by the membership API today and become
+ * the TokenGate and Role rows of the ZAO space when Postgres is wired (scripts/seedZaoTokenGates.ts).
+ *
+ * Quantities follow CharmVerse's convention: ERC20 quantities are in wei after the contract's
+ * decimals are read (OG has 18 decimals, measured 2026-10-10), so "1000000000000000000" is one
+ * whole Respect; ERC1155 quantities are token counts.
+ *
+ * Hats (grill 2026-09-22 afternoon item 18): roles only, no platform powers. Hat ids are
+ * tree 226's, computed as in ZAO OS src/lib/hats/constants.ts (16-bit levels from bit 224)
+ * and matching ZAOOS research governance/059 (Configurator 0x000000e2 0001 0000..., Governance
+ * Council Members 0x000000e2 0001 0002 ...).
+ */
+export const zaoChainIds = { optimism: 10 } as const;
+
+export const zaoContracts = {
+  respectOg: '0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957',
+  respectZor: '0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c',
+  orec: '0xcB05F9254765CA521F7698e61E0A6CA6456Be532',
+  hats: '0x3bc1A0Ad72417f2d411118085256fC53CBdDd137'
+} as const;
+
+export const zaoHatIds = {
+  topHat: '0x000000e200000000000000000000000000000000000000000000000000000000',
+  configurator: '0x000000e200010000000000000000000000000000000000000000000000000000',
+  governanceCouncilMembers: '0x000000e200010002000000000000000000000000000000000000000000000000'
+} as const;
+
+export const zaoTokenGates = [
+  {
+    id: 'zao-respect-holder',
+    roleName: 'Respect holder',
+    description: 'Holds any Respect: at least one whole OG (ERC-20) or at least one ZOR (ERC-1155 id 0) on Optimism.',
+    grants: 'Draft and endorse proposals; vote weight is the whole OG + ZOR sum read separately (item 78).',
+    conditions: {
+      operator: 'OR',
+      accessControlConditions: [
+        {
+          chain: 10,
+          condition: 'evm',
+          type: 'ERC20',
+          contractAddress: '0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957',
+          method: 'balanceOf',
+          tokenIds: [],
+          quantity: '1000000000000000000',
+          name: 'Respect OG'
+        },
+        {
+          chain: 10,
+          condition: 'evm',
+          type: 'ERC1155',
+          contractAddress: '0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c',
+          method: 'balanceOf',
+          tokenIds: ['0'],
+          quantity: '1',
+          name: 'ZOR Respect'
+        }
+      ]
+    }
+  },
+  {
+    id: 'zao-hat-configurator',
+    roleName: 'ZAO Configurator',
+    description: 'Wears the Configurator hat on Hats tree 226 (Optimism).',
+    grants: 'Role label only; no platform powers (grill 2026-09-22 afternoon item 18).',
+    conditions: {
+      operator: 'OR',
+      accessControlConditions: [
+        {
+          chain: 10,
+          condition: 'evm',
+          type: 'Hats',
+          contractAddress: '0x3bc1A0Ad72417f2d411118085256fC53CBdDd137',
+          method: 'balanceOf',
+          tokenIds: ['6092948358152183923896255948408732171579620885178135789124381753475072'],
+          quantity: '1',
+          name: 'Configurator hat'
+        }
+      ]
+    }
+  },
+  {
+    id: 'zao-hat-governance-council-member',
+    roleName: 'ZAO Governance Council Member',
+    description: 'Wears the Governance Council Members hat on Hats tree 226 (Optimism).',
+    grants: 'Role label only; no platform powers (grill 2026-09-22 afternoon item 18).',
+    conditions: {
+      operator: 'OR',
+      accessControlConditions: [
+        {
+          chain: 10,
+          condition: 'evm',
+          type: 'Hats',
+          contractAddress: '0x3bc1A0Ad72417f2d411118085256fC53CBdDd137',
+          method: 'balanceOf',
+          tokenIds: ['6092948358164738127367029309936403750426036218010340500013309822500864'],
+          quantity: '1',
+          name: 'Governance Council Members hat'
+        }
+      ]
+    }
+  }
+] as const;
+
 export const zaoGovernance = {
   weightModel: '1:1 unweighted sum of OG + ZOR Respect (item 1 & 2)',
   authorThreshold: 'Any Respect holder (> 0) can draft (item 4)',
