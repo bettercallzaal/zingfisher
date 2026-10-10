@@ -16,7 +16,11 @@ export function onError(err: any, req: NextApiRequest, res: NextApiResponse) {
   // We need to change strategy to validate the error since Prototypes are not always correct
   const isValidSystemError = isSystemError(err);
 
-  const errorAsSystemError = isValidSystemError ? err : new UnknownError(err.stack ?? err.error ?? err);
+  // An unknown error becomes a generic 500. Its message and stack are logged below and
+  // never placed on the response: UnknownError's `error` field is spread into the JSON
+  // body, and `new UnknownError(err.stack ?? ...)` used to send the full stack (file paths,
+  // connection strings, provider URLs) to every API client.
+  const errorAsSystemError = isValidSystemError ? err : new UnknownError();
 
   if (errorAsSystemError.code === 500) {
     // err.error?.message is for errors from @packages/core/http
