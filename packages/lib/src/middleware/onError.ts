@@ -3,6 +3,7 @@ import { UnknownError } from '@packages/nextjs/errors';
 import { DataNotFoundError, SystemError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import { describeRequestBody } from './describeRequestBody';
 import { isSystemError } from './isSystemError';
 import { removeApiKeyFromQuery } from './removeApiKeyFromQuery';
 
@@ -27,12 +28,17 @@ export function onError(err: any, req: NextApiRequest, res: NextApiResponse) {
       pageId: req.query?.pageId || req.body?.pageId,
       spaceId: req.query?.spaceId || req.body?.spaceId,
       url: removeApiKeyFromQuery(req.url ?? ''),
-      body: req.body
+      method: req.method,
+      status: errorAsSystemError.code,
+      // never the body itself: it carries login payloads, OTP codes and signatures
+      body: describeRequestBody(req.body)
     });
   } else {
     log.warn(`Client Error: ${errorAsSystemError.message}`, {
       url: removeApiKeyFromQuery(req.url ?? ''),
-      body: req.body,
+      method: req.method,
+      status: errorAsSystemError.code,
+      body: describeRequestBody(req.body),
       userId: req.session?.user?.id,
       pageId: req.query?.pageId || req.body?.pageId,
       spaceId: req.query?.spaceId || req.body?.spaceId
