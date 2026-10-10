@@ -25,18 +25,21 @@ and decisions live in [research/](research/).
 and serves `/learn`. Current status + roadmap: [research/006](research/006-project-status.md).
 
 - **ZAO branding** - palette, Inter font, logo/favicons, copy, AGPL notice.
-- **`/learn` hub** - music-first hero, learning tracks, ZAO 101, ZABAL Games program,
+- **`/learn` hub** - music-first hero, learning tracks, ZAO 101, ZABAL Gamez program,
   gated members area, ecosystem map, platform links. Rendering live.
-- **Membership gate** - `respectGate.ts` (Respect on Optimism + $ZABAL on Base)
-  -> `/api/zao/membership` -> `useZaoMembership` -> `ZaoMemberGate`. Unit + component
-  tested, contracts verified on-chain.
+- **Membership gate** - CharmVerse's own token gates, defined in `@packages/config/zao`
+  (`zaoTokenGates`: Respect OG or ZOR on Optimism, plus Hats tree 226 role labels) and evaluated
+  in `packages/lib/src/zao/zaoTokenGates.ts`; `respectGate.ts` reads raw balances for display and
+  vote weight -> `/api/zao/membership` -> `useZaoMembership` -> `ZaoMemberGate`. $ZABAL confers
+  nothing (grill 2026-09-22 morning item 6). Unit + component tested, contracts verified on-chain.
 - **Billing hidden** (`billingEnabled=false`). **One-file config**: `zao.config.ts`.
 - **Deploy pipeline** - one Vercel project, `vercel.json` + `scripts/vercel-build.sh`.
   See [research/005](research/005-deployment-guide.md) for the working setup + gotchas.
 
 ### Open items (to make it a full product)
 - Wire **Supabase** (real Postgres) so login/spaces/`/` work.
-- Confirm the **Base member gate** address ($ZABAL vs a dedicated Respect-on-Base).
+- Decide how sub-ledgers (ZAO Festivals Respect, incubated projects) are stored: contract or
+  table (onboarding spec Q1). There is no Base member gate; $ZABAL confers nothing (item 6).
 - Point a real **domain** (e.g. `learn.thezao.com`).
 - Optional: dark-navy ZAO theme; seed ZAO 101 as real course content.
 
