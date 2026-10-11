@@ -17,6 +17,10 @@ describe('zaoTokenGates definitions', () => {
     expect(og.type).toBe('ERC20');
     expect(og.chain).toBe(10);
     expect(og.quantity).toBe('1000000000000000000');
+    // numeric pin: exactly one whole 18-decimal token, and half a token does not clear it
+    expect(BigInt(og.quantity)).toBe(BigInt(10) ** BigInt(18));
+    expect(BigInt('500000000000000000') >= BigInt(og.quantity)).toBe(false);
+    expect(BigInt('1000000000000000000') >= BigInt(og.quantity)).toBe(true);
     expect(zor.type).toBe('ERC1155');
     expect(zor.tokenIds).toEqual(['0']);
   });

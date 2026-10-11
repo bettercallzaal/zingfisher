@@ -17,7 +17,8 @@ function Container({ children }: { children: ReactNode }) {
 
 /**
  * ZAO Learning Center hub. Open tracks (ZABAL Gamez, ZAO 101) are visible to
- * anyone; member tracks (ZAO OS, Governance) sit behind the Respect/$ZABAL gate.
+ * anyone; member tracks (ZAO OS, Governance) sit behind the Respect gate (CharmVerse
+ * token gates defined in @packages/config/zao; $ZABAL confers nothing, grill 2026-09-22 item 6).
  */
 export default function LearnPage() {
   return (
