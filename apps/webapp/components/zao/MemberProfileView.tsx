@@ -125,7 +125,7 @@ export function MemberProfileView({ profile }: { profile: ZidProfile }) {
         );
       case 'pending_vouch':
       default:
-        return <Chip label='Pending Peer Voucher (Item 29)' color='default' variant='outlined' size='small' />;
+        return <Chip label='Pending Peer Voucher' color='default' variant='outlined' size='small' />;
     }
   };
 
@@ -237,8 +237,7 @@ export function MemberProfileView({ profile }: { profile: ZidProfile }) {
             Panel 1: Multi-Ledger Respect Separation
           </Typography>
           <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 2.5 }}>
-            Parent ZAO governance weight is read live from chain at request time (Item 26). Festival standing is
-            isolated (Item 24).
+            Parent ZAO governance weight is read live from chain at request time. Festival standing is isolated.
           </Typography>
 
           <Grid container spacing={2.5}>
@@ -318,7 +317,7 @@ export function MemberProfileView({ profile }: { profile: ZidProfile }) {
 
                 <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 1 }}>
                   Drives voting power on CharmVerse proposals and OREC settlement. Equal 1:1 weighting decided
-                  2026-09-22 (Zaal ruling Q1 & Q2). Read directly from Optimism at request time.
+                  2026-09-22. Read directly from Optimism at request time.
                 </Typography>
               </Box>
             </Grid>
@@ -356,13 +355,13 @@ export function MemberProfileView({ profile }: { profile: ZidProfile }) {
                     Ledger Not Yet Established
                   </Typography>
                   <Typography variant='caption' color='text.secondary'>
-                    Decided 2026-09-22 (Zaal Grill Item 24 & 28). Dedicated festival fractal and ledger deployment
-                    planned for ZAOstock (Oct 3, 2026 in Ellsworth, ME).
+                    Decided 2026-09-22. Dedicated festival fractal and ledger deployment planned for ZAOstock (Oct 3,
+                    2026 in Ellsworth, ME).
                   </Typography>
                 </Box>
 
                 <Typography variant='caption' color='text.secondary'>
-                  Separate brand and isolated ledger (Item 24). Festival Respect will not dilute parent ZAO governance.
+                  Separate brand and isolated ledger. Festival Respect will not dilute parent ZAO governance.
                 </Typography>
               </Box>
             </Grid>
@@ -384,7 +383,7 @@ export function MemberProfileView({ profile }: { profile: ZidProfile }) {
               sx={{ p: 2, bgcolor: 'background.default', borderRadius: 1, border: '1px solid', borderColor: 'divider' }}
             >
               <Typography variant='subtitle2' sx={{ fontWeight: 600, color: zaoPrimary, mb: 0.5 }}>
-                Declared Creative Goals & Vision (Item 30)
+                Declared Creative Goals & Vision
               </Typography>
               <Typography variant='body1' sx={{ fontStyle: 'italic', mb: 1 }}>
                 "
@@ -403,7 +402,7 @@ export function MemberProfileView({ profile }: { profile: ZidProfile }) {
               sx={{ p: 2, bgcolor: 'background.default', borderRadius: 1, border: '1px solid', borderColor: 'divider' }}
             >
               <Typography variant='subtitle2' sx={{ fontWeight: 600, mb: 1 }}>
-                Vouched Identity Standing (Item 29)
+                Vouched Identity Standing
               </Typography>
               <Typography variant='body2' sx={{ mb: 1 }}>
                 <strong>Status:</strong> {profile.voucher.status} • {profile.voucher.note || 'Standard peer voucher'}
@@ -425,8 +424,8 @@ export function MemberProfileView({ profile }: { profile: ZidProfile }) {
 
               {profile.voucher.status === 'pending_vouch' && (
                 <Alert severity='warning' sx={{ mt: 1 }}>
-                  <strong>Pending Peer Voucher:</strong> Per item 29, anon/pseudonymous members require a peer voucher
-                  or attendance in a weekly fractal circle.
+                  <strong>Pending Peer Voucher:</strong> Anon/pseudonymous members require a peer voucher or attendance
+                  in a weekly fractal circle.
                 </Alert>
               )}
 
@@ -570,10 +569,9 @@ export function MemberProfileView({ profile }: { profile: ZidProfile }) {
 
           <Box sx={{ mt: 2.5, p: 1.5, bgcolor: 'background.default', borderRadius: 1 }}>
             <Typography variant='caption' color='text.secondary'>
-              <strong>Zero-Respect Capabilities (Item 14):</strong> Members with zero Respect can read and comment on
-              all proposals. Drafting proposals is unlocked for any verified member with Respect &gt; 0 (Zaal ruling
-              Q4). Publishing a draft to active community vote requires 1,000 peer Respect endorsements (Zaal ruling
-              Q4).
+              <strong>Zero-Respect Capabilities:</strong> Members with zero Respect can read and comment on all
+              proposals. Drafting proposals is unlocked for any verified member with Respect &gt; 0. Publishing a draft
+              to active community vote requires 1,000 peer Respect endorsements.
             </Typography>
           </Box>
         </Card>

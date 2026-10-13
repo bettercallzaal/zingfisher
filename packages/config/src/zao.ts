@@ -9,7 +9,7 @@
 export const zaoMission = {
   statement:
     'The movement for the new creator economy of bringing the profit margin data and IP rights back to independent artists',
-  quoteBy: 'Zaal (Grill 2026-09-22, item 23)',
+  quoteBy: 'Zaal',
   principle: 'Music first, community second, tech third'
 } as const;
 
@@ -17,20 +17,20 @@ export const zaoTenants = {
   parent: {
     id: 'parent',
     name: 'The ZAO',
-    role: 'Front door, commons, and social onboarding (item 25)',
-    governanceScope: 'Parent governance Respect earned exclusively via parent fractals (item 26)'
+    role: 'Front door, commons, and social onboarding',
+    governanceScope: 'Parent governance Respect earned exclusively via parent fractals'
   },
   festivals: {
     id: 'festivals',
     name: 'ZAO Festivals',
-    role: 'Dedicated festival brand with isolated fractal and Respect ledger (item 24, 28)',
+    role: 'Dedicated festival brand with isolated fractal and Respect ledger',
     events: ['ZAOstock', 'ZAO-CHELLA', 'ZAO-PALOOZA'],
     currentFocus: 'ZAOstock (October 3, 2026 in Ellsworth, ME)'
   },
   subDaos: {
     id: 'sub-daos',
     name: 'Incubated Sub-DAOs',
-    role: 'Independent communities running fractals via ZAO tooling (item 27)'
+    role: 'Independent communities running fractals via ZAO tooling'
   }
 } as const;
 
@@ -71,7 +71,7 @@ export const zaoTokenGates = [
     id: 'zao-respect-holder',
     roleName: 'Respect holder',
     description: 'Holds any Respect: at least one whole OG (ERC-20) or at least one ZOR (ERC-1155 id 0) on Optimism.',
-    grants: 'Draft and endorse proposals; vote weight is the whole OG + ZOR sum read separately (item 78).',
+    grants: 'Draft and endorse proposals; vote weight is the whole OG + ZOR sum read separately.',
     conditions: {
       operator: 'OR',
       accessControlConditions: [
@@ -102,7 +102,7 @@ export const zaoTokenGates = [
     id: 'zao-hat-configurator',
     roleName: 'ZAO Configurator',
     description: 'Wears the Configurator hat on Hats tree 226 (Optimism).',
-    grants: 'Role label only; no platform powers (grill 2026-09-22 afternoon item 18).',
+    grants: 'Role label only; no platform powers.',
     conditions: {
       operator: 'OR',
       accessControlConditions: [
@@ -123,7 +123,7 @@ export const zaoTokenGates = [
     id: 'zao-hat-governance-council-member',
     roleName: 'ZAO Governance Council Member',
     description: 'Wears the Governance Council Members hat on Hats tree 226 (Optimism).',
-    grants: 'Role label only; no platform powers (grill 2026-09-22 afternoon item 18).',
+    grants: 'Role label only; no platform powers.',
     conditions: {
       operator: 'OR',
       accessControlConditions: [
@@ -143,8 +143,8 @@ export const zaoTokenGates = [
 ] as const;
 
 export const zaoGovernance = {
-  weightModel: '1:1 unweighted sum of OG + ZOR Respect (item 1 & 2)',
-  authorThreshold: 'Any Respect holder (> 0) can draft (item 4)',
+  weightModel: '1:1 unweighted sum of OG + ZOR Respect',
+  authorThreshold: 'Any Respect holder (> 0) can draft',
   publishEndorsementThreshold: 1000, // 1000 peer Respect endorsements (item 4)
   zeroRespectPermissions: {
     canRead: true,
@@ -152,7 +152,7 @@ export const zaoGovernance = {
     canVote: false,
     canDraft: false
   },
-  zabalRole: 'Personal group token, future incubated project, no voting power (item 3)'
+  zabalRole: 'Personal group token, future incubated project, no voting power'
 } as const;
 
 export const zidConfig = {

@@ -118,7 +118,7 @@ export default function JoinPage() {
             </Typography>
             <Divider sx={{ my: 1.5 }} />
             <Typography variant='subtitle2' color='text.secondary'>
-              Declared Goals & Vision (Protocol Item 30)
+              Declared Goals & Vision
             </Typography>
             <Typography variant='body2' sx={{ fontStyle: 'italic', mt: 0.5 }}>
               "{createdProfile.goalsAndVision}"
@@ -153,7 +153,7 @@ export default function JoinPage() {
           {zaoMission.statement}
         </Typography>
         <Typography variant='caption' sx={{ color: 'text.secondary' }}>
-          Constitutional Mission Statement: {zaoMission.quoteBy}
+          Mission statement: {zaoMission.quoteBy}
         </Typography>
       </Box>
 
@@ -178,28 +178,28 @@ export default function JoinPage() {
         </Typography>
         <Stack spacing={1.5}>
           <Box sx={{ display: 'flex', gap: 1.5 }}>
-            <Chip size='small' label='Item 31' color='primary' variant='outlined' />
+            <Chip size='small' label='1' color='primary' variant='outlined' />
             <Typography variant='body2'>
               <strong>Instant Permanent ZID:</strong> Claim your unique identifier starting at{' '}
               {`ZID-${zidConfig.newMemberStart}+`} (allocations 1-500 reserved for founding and early members).
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: 1.5 }}>
-            <Chip size='small' label='Item 30' color='primary' variant='outlined' />
+            <Chip size='small' label='2' color='primary' variant='outlined' />
             <Typography variant='body2'>
               <strong>Stated Goals & Vision:</strong> Declare what you are building and where you want to go so peers
               can align with your creative work.
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: 1.5 }}>
-            <Chip size='small' label='Item 29' color='primary' variant='outlined' />
+            <Chip size='small' label='3' color='primary' variant='outlined' />
             <Typography variant='body2'>
               <strong>Knowable Community:</strong> Pseudonyms and handles are welcomed, anchored by peer vouchers or
               consensus fractals.
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: 1.5 }}>
-            <Chip size='small' label='Item 14' color='primary' variant='outlined' />
+            <Chip size='small' label='4' color='primary' variant='outlined' />
             <Typography variant='body2'>
               <strong>Zero-Respect Access:</strong> New members immediately receive full read and comment capabilities
               across all community spaces.
@@ -260,7 +260,7 @@ export default function JoinPage() {
             </Grid>
 
             <TextField
-              label='Stated Creative Goals & Vision (Protocol Item 30)'
+              label='Stated Creative Goals & Vision'
               required
               fullWidth
               multiline
@@ -268,7 +268,7 @@ export default function JoinPage() {
               value={goalsAndVision}
               onChange={(e) => setGoalsAndVision(e.target.value)}
               placeholder='Describe what you create, your creative vision, and what you aim to build or contribute to The ZAO movement...'
-              helperText='Mandatory per constitutional protocol item 30 so peers can understand and collaborate'
+              helperText='Required, so peers can understand and collaborate'
             />
 
             <Grid container spacing={2}>
@@ -289,7 +289,7 @@ export default function JoinPage() {
                   value={voucherName}
                   onChange={(e) => setVoucherName(e.target.value)}
                   placeholder='e.g. Zaal or member ZID'
-                  helperText='Peer who invited or vouches for you (Item 29)'
+                  helperText='Peer who invited or vouches for you'
                 />
               </Grid>
             </Grid>
