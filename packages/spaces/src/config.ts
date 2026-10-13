@@ -8,6 +8,7 @@ export const DOMAIN_BLACKLIST = [
   'images',
   'join',
   'learn',
+  'member', // ZAO member pages (/member, /member/join, /member/[zid]) are app routes, not a space
   'share',
   'signup',
   'loop',

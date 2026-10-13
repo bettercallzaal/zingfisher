@@ -11,21 +11,9 @@ import { useSharedPage } from 'hooks/useSharedPage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
-// Pages shared to the public that don't require user login
-// When adding a page here or any new top-level pages, please also add this page to DOMAIN_BLACKLIST in @packages/spaces/config.ts
-const publicPages = [
-  '/',
-  'share',
-  'api-docs',
-  'u',
-  'join',
-  'login',
-  'invite',
-  'authenticate',
-  'test',
-  'permalink',
-  '/[domain]/proposals/new'
-];
+
+import { isPublicPagePath } from './routeGuardPublicPages';
+
 // pages that should be always available to logged in users
 const publicLoggedInPages = ['createSpace', 'admin'];
 
@@ -75,7 +63,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
         // Only get segments that evaluate to some value
         return pathElem;
       })[0] ?? '/';
-    const isPublicPath = publicPages.some((basePath) => firstPathSegment === basePath || pathName === basePath);
+    const isPublicPath = isPublicPagePath({ firstPathSegment, pathName });
     // special case, when visiting main app url on space subdomain
     const isSpaceSubdomainPath = firstPathSegment === '/' && !!_spaceDomain;
 
