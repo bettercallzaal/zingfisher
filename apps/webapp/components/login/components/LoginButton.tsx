@@ -7,6 +7,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import { log } from '@packages/core/log';
+import type { SignatureVerificationPayload } from '@packages/lib/blockchain/signAndVerify';
 import type { LoggedInUser } from '@packages/profile/getUser';
 import type { SystemError } from '@packages/utils/errors';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -14,15 +15,19 @@ import { useRouter } from 'next/router';
 import type { SyntheticEvent } from 'react';
 import { useRef, useState } from 'react';
 
+import { WalletSelector } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal';
 import { ConnectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/components/ConnectorButton';
 import { Button } from 'components/common/Button';
 import { useCustomDomain } from 'hooks/useCustomDomain';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useWeb3Account } from 'hooks/useWeb3Account';
+import { zaoRealSignInEnabled } from 'lib/zao/realSignIn';
 
 import { EmailAddressForm } from './EmailAddressForm';
 import { LoginErrorModal } from './LoginErrorModal';
+import { WalletSign } from './WalletSign';
 
 export type AnyIdLogin<I extends IdentityType = IdentityType> = {
   identityType: I;
@@ -56,7 +61,7 @@ type Props = {
   emailOnly?: boolean;
 };
 
-// ZAO Learning Center — simplified login (no wallet/crypto)
+// ZAO Learning Center: email and Google, plus wallet sign-in when NEXT_PUBLIC_ZAO_REAL_SIGNIN=true
 
 export function LoginButton({ redirectUrl, signInLabel = 'Sign in', showSignup, emailOnly }: Props) {
   const loginDialog = usePopupState({ variant: 'popover', popupId: 'login-dialog' });
@@ -66,9 +71,10 @@ export function LoginButton({ redirectUrl, signInLabel = 'Sign in', showSignup, 
     loginDialog.open(eventOrAnchorEl);
   };
 
-   const handleClose = () => {
- loginDialog.close();
- };
+  const handleClose = () => {
+    loginDialog.close();
+    resetSigning();
+  };
 
   return (
     <Box
@@ -105,8 +111,10 @@ export function LoginButton({ redirectUrl, signInLabel = 'Sign in', showSignup, 
 }
 
 function LoginHandler(props: DialogProps) {
- const { redirectUrl, onClose, isOpen } = props;
- // ZAO Learning Center — email and Google only
+  const { redirectUrl, onClose, isOpen } = props;
+  const { loginFromWeb3Account, verifiableWalletDetected } = useWeb3Account();
+  // Governs whether we should auto-request a signature. Should only happen on first login.
+  const [enableAutosign, setEnableAutoSign] = useState(true);
   const router = useRouter();
   const returnUrl = typeof router.query.returnUrl === 'string' ? router.query.returnUrl : undefined;
   const [loginMethod, setLoginMethod] = useState<'email' | null>(null);
@@ -147,7 +155,16 @@ function LoginHandler(props: DialogProps) {
     }
   }
 
-   // Web3 login removed for ZAO Learning Center
+  async function handleWeb3Login(payload: SignatureVerificationPayload) {
+    try {
+      const resp = await loginFromWeb3Account(payload);
+      if (resp?.id) {
+        handleLogin({ identityType: 'Wallet' });
+      }
+    } catch (err) {
+      handleLoginError(err);
+    }
+  }
 
   function handleLoginError(err: any) {
     if ((err as SystemError)?.errorType === 'Disabled account') {
@@ -176,11 +193,26 @@ function LoginHandler(props: DialogProps) {
     <>
       <Dialog open={isOpen} onClose={close}>
         <List sx={{ pt: 0, maxWidth: '400px' }}>
-           {!loginMethod && (
-          <DialogTitle textAlign='left'>
-          Sign in to ZAO
-         </DialogTitle>
-        )}
+          {!loginMethod && <DialogTitle textAlign='left'>Sign in to ZAO</DialogTitle>}
+
+          {/* Wallet sign-in: CharmVerse's own flow, restored behind the switch */}
+          {zaoRealSignInEnabled && !loginMethod && !props.emailOnly && (
+            <>
+              <ListItem>
+                <WalletSelector />
+              </ListItem>
+              {verifiableWalletDetected && (
+                <ListItem>
+                  <WalletSign
+                    buttonStyle={{ width: '100%' }}
+                    signSuccess={handleWeb3Login}
+                    enableAutosign={enableAutosign}
+                    onError={() => setEnableAutoSign(false)}
+                  />
+                </ListItem>
+              )}
+            </>
+          )}
 
           {/* Google login method */}
           {!loginMethod && (

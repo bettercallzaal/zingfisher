@@ -6,6 +6,7 @@ import { useZaoMembership } from 'charmClient/hooks/zao';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useUser } from 'hooks/useUser';
+import { zaoRealSignInEnabled } from 'lib/zao/realSignIn';
 
 /**
  * Gates member-only content behind ZAO membership: CharmVerse's own token gates
@@ -42,11 +43,20 @@ export function ZaoMemberGate({ children, fallback }: { children: ReactNode; fal
           : 'Connect a wallet that holds Respect (OG or ZOR, on Optimism) to unlock this track.'}
       </Typography>
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} justifyContent='center'>
-        <Button href='/member/join'>Join The ZAO</Button>
+        {zaoRealSignInEnabled && !address && (
+          <Button href={`/?returnUrl=${encodeURIComponent(currentPath())}`}>Sign in with your wallet</Button>
+        )}
+        <Button href='/member/join' variant={zaoRealSignInEnabled && !address ? 'outlined' : undefined}>
+          Join The ZAO
+        </Button>
         <Button external color='secondary' variant='outlined' href={zaoPlatforms.discord} target='_blank'>
           Ask in Discord
         </Button>
       </Stack>
     </Box>
   );
+}
+
+function currentPath() {
+  return typeof window === 'undefined' ? '/learn' : `${window.location.pathname}${window.location.search}`;
 }
