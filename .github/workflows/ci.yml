@@ -54,10 +54,18 @@ jobs:
       - name: Typecheck at or below baseline
         run: |
           set +e
-          npm run typecheck -w apps/webapp > typecheck.log 2>&1
+          npm run ${TYPECHECK_SCRIPT:-typecheck} -w apps/webapp > typecheck.log 2>&1
+          status=$?
           set -e
           count=$(grep -c "error TS" typecheck.log || true)
-          echo "typecheck errors: $count (baseline $TYPECHECK_BASELINE)"
+          echo "typecheck exit $status, errors: $count (baseline $TYPECHECK_BASELINE)"
+          if [ "$status" -ne 0 ] && [ "$count" -eq 0 ]; then
+            # tsc exits non-zero whenever it reports errors, so a failure with no "error TS" line means
+            # typecheck did not run at all (missing script, crash, out of memory).
+            tail -20 typecheck.log
+            echo "Typecheck did not run: exit $status with no type errors reported."
+            exit 1
+          fi
           if [ "$count" -gt "$TYPECHECK_BASELINE" ]; then
             grep "error TS" typecheck.log
             echo "New typecheck errors: $count is above the baseline of $TYPECHECK_BASELINE."
