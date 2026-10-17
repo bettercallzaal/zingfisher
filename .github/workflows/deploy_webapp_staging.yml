@@ -1,8 +1,9 @@
 name: 'Deploy Webapp to staging'
 
+# Manual-only in this fork: CharmVerse's AWS deploy pipeline, which zingfisher does not use (Vercel
+# deploys the webapp). Its original triggers are in git history.
 on:
-  pull_request:
-    types: [labeled, opened, synchronize]
+  workflow_dispatch:
 
 env:
   SELECTED_PERMISSION_API_TAG: latest

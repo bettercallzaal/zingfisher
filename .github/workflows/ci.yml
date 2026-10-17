@@ -1,0 +1,65 @@
+name: ZAO CI
+
+# The checks this fork can actually pass: install, lint the ZAO code, run the specs that need no
+# database, and hold typecheck at its baseline. The inherited CharmVerse workflows deploy to AWS,
+# which this fork does not use; they are manual-only (workflow_dispatch) and kept for reference.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: zao-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Inherited typecheck errors on main (upstream inference, test files). Lower it as they are fixed;
+  # never raise it.
+  TYPECHECK_BASELINE: 17
+
+jobs:
+  check:
+    name: Lint, specs, typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.15
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint ZAO code
+        run: >
+          npx eslint
+          packages/lib/src/zao
+          packages/config/src/zao.ts
+          apps/webapp/components/zao
+          apps/webapp/lib/zao
+          apps/webapp/pages/api/zao
+          apps/webapp/pages/learn.tsx
+          apps/webapp/pages/member
+
+      - name: Specs that need no database
+        run: npx vitest run --config vitest.ci.config.mts
+
+      - name: Typecheck at or below baseline
+        run: |
+          set +e
+          npm run typecheck -w apps/webapp > typecheck.log 2>&1
+          set -e
+          count=$(grep -c "error TS" typecheck.log || true)
+          echo "typecheck errors: $count (baseline $TYPECHECK_BASELINE)"
+          if [ "$count" -gt "$TYPECHECK_BASELINE" ]; then
+            grep "error TS" typecheck.log
+            echo "New typecheck errors: $count is above the baseline of $TYPECHECK_BASELINE."
+            exit 1
+          fi
