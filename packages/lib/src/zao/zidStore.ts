@@ -113,10 +113,21 @@ export interface RawQueryClient {
 const COLUMNS = Prisma.sql`address, zid, handle, display_name, intro, goals_and_vision, farcaster, discord,
   voucher_address, voucher_name, voucher_status, created_at`;
 
-/** True when a database error is the unique index on lower(handle). */
+/**
+ * True when a database error from the claim insert is the unique index on lower(handle).
+ * Prisma raw queries report a unique violation as P2010 with meta.code "23505" and, in practice,
+ * no index name. In that insert the address conflict is absorbed by "on conflict do nothing" and
+ * new ZIDs come from the sequence, so a 23505 that names no other constraint is the handle index.
+ */
 export function isHandleConflict(err: unknown): boolean {
-  const text = `${(err as Error)?.message ?? ''} ${JSON.stringify((err as { meta?: unknown })?.meta ?? '')}`;
-  return text.includes('zao_member_handle_lower');
+  const e = err as { message?: string; code?: string; meta?: { code?: string } } | null;
+  const text = `${e?.message ?? ''} ${JSON.stringify(e?.meta ?? '')}`;
+  if (text.includes('zao_member_handle_lower')) {
+    return true;
+  }
+  const uniqueViolation = e?.meta?.code === '23505' || e?.code === '23505';
+  const namesOtherConstraint = text.includes('zao_member_pkey') || text.includes('zao_member_zid_key');
+  return uniqueViolation && !namesOtherConstraint;
 }
 
 export function createDbZidStore(client: RawQueryClient): ZidStore {

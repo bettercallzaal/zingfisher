@@ -185,6 +185,28 @@ describe('createDbZidStore', () => {
     expect(queries).toHaveLength(1);
   });
 
+  it('maps the real Prisma raw-query shape (P2010, meta.code 23505, no index name) to HandleTakenError', async () => {
+    // Shape reported by the evaluator for three concurrent claims of Racer/racer/RACER.
+    const p2010 = Object.assign(new Error('Raw query failed. Code: `23505`. Message: `db error`'), {
+      code: 'P2010',
+      meta: { code: '23505', message: 'db error' }
+    });
+    expect(isHandleConflict(p2010)).toBe(true);
+    const { client } = fakeClient([[], [], p2010]);
+    await expect(
+      createDbZidStore(client).create({ address: addr('c'), displayName: 'C', handle: 'RACER', goalsAndVision: GOALS })
+    ).rejects.toBeInstanceOf(HandleTakenError);
+  });
+
+  it('RED CONTROL: a 23505 naming another constraint, or another error code, is not a handle conflict', () => {
+    const zidClash = Object.assign(new Error('duplicate key value violates unique constraint "zao_member_zid_key"'), {
+      code: 'P2010',
+      meta: { code: '23505' }
+    });
+    expect(isHandleConflict(zidClash)).toBe(false);
+    expect(isHandleConflict(Object.assign(new Error('x'), { code: 'P2010', meta: { code: '23503' } }))).toBe(false);
+  });
+
   it('isHandleConflict ignores other errors', () => {
     expect(isHandleConflict(new Error('connection refused'))).toBe(false);
   });
