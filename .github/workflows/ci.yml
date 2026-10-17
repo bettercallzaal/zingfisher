@@ -37,9 +37,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Linting a directory also picks up files matched by .eslintrc overrides,
+      # such as lib/zao/sql/*.sql, so name the code extensions explicitly.
       - name: Lint ZAO code
         run: >
-          npx eslint
+          npx eslint --ext .js,.jsx,.ts,.tsx
           packages/lib/src/zao
           packages/config/src/zao.ts
           apps/webapp/components/zao
