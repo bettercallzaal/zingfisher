@@ -1,8 +1,9 @@
 name: 'Clean up staging'
 
+# Manual-only in this fork: CharmVerse's AWS deploy pipeline, which zingfisher does not use (Vercel
+# deploys the webapp). Its original triggers are in git history.
 on:
-  pull_request:
-    types: [unlabeled, closed]
+  workflow_dispatch:
 
 concurrency:
   group: staging-${{ github.ref }}

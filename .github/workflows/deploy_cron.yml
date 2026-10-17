@@ -1,41 +1,9 @@
 name: Cron CI
 
+# Manual-only in this fork: CharmVerse's AWS deploy pipeline, which zingfisher does not use (Vercel
+# deploys the webapp). Its original triggers are in git history.
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.cdk/**'
-      - 'docker-compose.yml'
-      - '.ebextensions/cron/**'
-      - '.ebstalk.apps.env/cron.env'
-      - '.github/actions/**'
-      - '.github/workflows/deploy_cron.yml'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'apps/cron/**'
-      - 'abis/**'
-      - 'adapters/**'
-      - 'config/**'
-      - 'packages/**'
-      - 'lib/**'
-  pull_request:
-    types: [labeled, opened, synchronize]
-    branches: ['**']
-    paths:
-      - '.cdk/**'
-      - 'docker-compose.yml'
-      - '.ebextensions/cron/**'
-      - '.ebstalk.apps.env/cron.env'
-      - '.github/actions/**'
-      - '.github/workflows/deploy_cron.yml'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'apps/cron/**'
-      - 'abis/**'
-      - 'adapters/**'
-      - 'config/**'
-      - 'packages/**'
-      - 'lib/**'
+  workflow_dispatch:
 
 concurrency:
   group: ci-cron-${{ github.event_name }}-${{ github.ref }}

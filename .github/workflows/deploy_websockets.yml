@@ -1,41 +1,9 @@
 name: Websockets CI
 
+# Manual-only in this fork: CharmVerse's AWS deploy pipeline, which zingfisher does not use (Vercel
+# deploys the webapp). Its original triggers are in git history.
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.cdk/**'
-      - 'docker-compose.yml'
-      - '.ebextensions/websockets/**'
-      - '.ebstalk.apps.env/websockets.env'
-      - '.github/actions/**'
-      - '.github/workflows/deploy_websockets.yml'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'apps/webapp/**'
-      - 'apps/websockets/**'
-      - 'adapters/**'
-      - 'config/**'
-      - 'lib/**'
-      - 'packages/**'
-  pull_request:
-    types: [labeled, opened, synchronize]
-    branches: ['**']
-    paths:
-      - '.cdk/**'
-      - 'docker-compose.yml'
-      - '.ebextensions/websockets/**'
-      - '.ebstalk.apps.env/websockets.env'
-      - '.github/actions/**'
-      - '.github/workflows/deploy_websockets.yml'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'apps/webapp/**'
-      - 'apps/websockets/**'
-      - 'adapters/**'
-      - 'config/**'
-      - 'lib/**'
-      - 'packages/**'
+  workflow_dispatch:
 
 concurrency:
   group: ci-websockets-${{ github.event_name }}-${{ github.ref }}
