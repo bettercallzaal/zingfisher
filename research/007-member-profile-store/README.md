@@ -97,7 +97,11 @@ Notes on the columns:
   publicly. It has no foreign key to `"User"` on purpose: `"User"` belongs to
   `zingfisher_app`, and the editor's `postgres` login is not a superuser, so declaring the
   key fails with "permission denied for table User" (measured, see Tested below). The app
-  writes it from the session, so it cannot name a user that does not exist.
+  writes it from the session, so it cannot name a user that does not exist when written.
+  Without the key there is also no `on delete set null`: if a CharmVerse user row is later
+  removed, `user_id` keeps the old id. The app treats that as harmless by design. It finds
+  members by `address` only, never authorises from `user_id` (every write re-checks the
+  session's wallets with `isOwnedAddress`), and never shows it.
 - `intro` is the existing `bio` field renamed in storage; the API keeps the name `bio` so the
   page code does not change.
 - The checks repeat the API's own limits (`createProfileSchema` in the route), so a bug in

@@ -5,17 +5,16 @@ import { withSessionRoute } from '@packages/lib/session/withSession';
 import { checkZaoMembership } from '@packages/lib/zao/respectGate';
 import type { MembershipCheckResult } from '@packages/lib/zao/respectGate';
 import {
-  assignNextZid,
   classifyVoucherStatus,
   getMemberPermissions,
-  getZidProfile,
   isOwnedAddress,
-  listZidProfiles,
+  parseZid,
   validateDeclaredGoals,
   validateHandle,
   ZAAL_ADDRESS,
   type ZidProfile
 } from '@packages/lib/zao/zid';
+import { getZidStore, HandleTakenError } from '@packages/lib/zao/zidStore';
 import { InvalidInputError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -29,7 +28,7 @@ handler.post(requireUser, createProfile);
 const ADDRESS_RE = /^0x[a-fA-F0-9]{40}$/;
 
 // Input shape for POST. Lengths are generous but bounded so a request cannot carry
-// arbitrary payloads into the in-memory registry. Field semantics: zid.ts (items 29, 30).
+// arbitrary payloads into the profile store. Field semantics: zid.ts (items 29, 30).
 const createProfileSchema = yup.object({
   address: yup.string().trim().matches(ADDRESS_RE, 'A valid 0x wallet address is required').required(),
   displayName: yup.string().trim().max(80).default(''),
@@ -44,6 +43,16 @@ const createProfileSchema = yup.object({
 
 // The RPC error text never reaches the client: it can carry provider URLs and keys.
 const RPC_ERROR_MESSAGE = 'Optimism RPC read failed. Balance is UNKNOWN, not zero.';
+
+// A wallet address or a ZID ("501", "ZID-501"), as the member pages link them.
+async function findProfile(identifier: string): Promise<ZidProfile | null> {
+  const clean = identifier.trim().toLowerCase();
+  if (clean.startsWith('0x')) {
+    return getZidStore().getByAddress(clean);
+  }
+  const zid = parseZid(clean);
+  return zid === null ? null : getZidStore().getByZid(zid);
+}
 
 async function getSessionWallets(userId: string): Promise<string[]> {
   const user = await prisma.user.findUnique({
@@ -88,7 +97,7 @@ async function getProfile(
       return res.status(401).json({ error: 'Sign in to list your ZID profiles' });
     }
     const wallets = await getSessionWallets(req.session.user.id);
-    const mine = listZidProfiles().filter((p) => isOwnedAddress(wallets, p.address));
+    const mine = (await getZidStore().listByAddresses(wallets)).filter((p) => isOwnedAddress(wallets, p.address));
     return res.status(200).json(mine);
   }
 
@@ -97,7 +106,7 @@ async function getProfile(
   }
 
   // Check if identifier is an existing registered profile
-  let profile = getZidProfile(identifier);
+  let profile = await findProfile(identifier);
 
   let targetAddress: string | null = profile?.address || null;
   if (!targetAddress && ADDRESS_RE.test(identifier)) {
@@ -211,7 +220,8 @@ async function createProfile(req: NextApiRequest, res: NextApiResponse<ZidProfil
 
   let profile: ZidProfile;
   try {
-    profile = assignNextZid({
+    profile = await getZidStore().create({
+      userId: req.session.user.id,
       address: input.address.toLowerCase(),
       displayName: input.displayName || input.handle,
       handle: input.handle,
@@ -223,7 +233,10 @@ async function createProfile(req: NextApiRequest, res: NextApiResponse<ZidProfil
       voucherName: input.voucherName
     });
   } catch (err) {
-    log.error('[zao/zid] assignNextZid failed', { error: (err as Error)?.message });
+    if (err instanceof HandleTakenError) {
+      return res.status(409).json({ error: err.message });
+    }
+    log.error('[zao/zid] ZID claim failed', { error: (err as Error)?.message });
     return res.status(400).json({ error: 'Failed to create ZID profile' });
   }
 

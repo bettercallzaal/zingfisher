@@ -276,12 +276,8 @@ export function listZidProfiles(): ZidProfile[] {
   return Array.from(unique.values());
 }
 
-/**
- * Assigns the next permanent ZID and creates a profile upon onboarding.
- * Validates declared goals and vision (item 30).
- * Allocates from 501+ for new joiners; does NOT assign any ZID in the reserved 1-500 range.
- */
-export function assignNextZid(input: {
+/** What a member submits when claiming a ZID (the join form, after the route's checks). */
+export interface NewZidInput {
   address: string;
   displayName: string;
   handle: string;
@@ -291,61 +287,80 @@ export function assignNextZid(input: {
   discordHandle?: string;
   voucherAddress?: string;
   voucherName?: string;
-}): ZidProfile {
-  const normAddress = input.address.toLowerCase();
+}
 
-  // Return existing profile if already registered
-  const existing = runtimeProfiles.get(normAddress);
-  if (existing) {
-    return existing;
-  }
+/** The fields a store keeps for one member. Everything else in a profile is derived or read live. */
+export interface StoredZidFields {
+  zid: number | null;
+  address: string;
+  displayName: string;
+  handle: string;
+  bio: string;
+  goalsAndVision: string;
+  voucherStatus: VoucherStatus;
+  voucherAddress?: string;
+  voucherName?: string;
+  farcaster?: string;
+  discord?: string;
+  joinedAt: string;
+}
 
-  // Validate declared goals per protocol item 30
+/** Throws with a user-facing reason when the declared goals (item 30) or the handle are invalid. */
+export function assertValidNewZidInput(input: Pick<NewZidInput, 'goalsAndVision' | 'handle'>): void {
   const goalsValidation = validateDeclaredGoals(input.goalsAndVision);
   if (!goalsValidation.valid) {
     throw new Error(goalsValidation.reason);
   }
-
   const handleValidation = validateHandle(input.handle);
   if (!handleValidation.valid) {
     throw new Error(handleValidation.reason);
   }
+}
 
-  // Zaal is ZID 1 per grill 2026-09-22 afternoon item 19; new joiners start at 501+
-  let zid: number | null = null;
-  if (normAddress === ZAAL_ADDRESS.toLowerCase()) {
-    zid = 1;
-  } else {
-    zid = nextMemberZidSequence;
-    nextMemberZidSequence += 1;
-  }
-  const formattedZid = formatZid(zid);
-
-  const voucherStatus = classifyVoucherStatus({
-    hasExplicitPeerVoucher: Boolean(input.voucherAddress || input.voucherName)
-  });
-
-  const profile: ZidProfile = {
+/** Normalises claim input into the stored fields, minus the ZID and join time the store assigns. */
+export function toStoredZidFields(input: NewZidInput, zid: number | null, joinedAt: string): StoredZidFields {
+  const handle = input.handle.trim().replace(/^@/, '');
+  return {
     zid,
-    formattedZid,
-    address: normAddress,
+    address: input.address.toLowerCase(),
     displayName: input.displayName.trim() || input.handle.trim(),
-    handle: input.handle.trim().replace(/^@/, ''),
+    handle,
     bio: input.bio?.trim() || '',
     goalsAndVision: input.goalsAndVision.trim(),
+    voucherStatus: classifyVoucherStatus({
+      hasExplicitPeerVoucher: Boolean(input.voucherAddress || input.voucherName)
+    }),
+    voucherAddress: input.voucherAddress?.toLowerCase(),
+    voucherName: input.voucherName,
+    farcaster: input.farcasterHandle?.trim().replace(/^@/, '') || undefined,
+    discord: input.discordHandle?.trim() || undefined,
+    joinedAt
+  };
+}
+
+/** Pure: builds the full profile from stored fields. Balances start null (pending a live chain read). */
+export function buildZidProfile(fields: StoredZidFields): ZidProfile {
+  return {
+    zid: fields.zid,
+    formattedZid: formatZid(fields.zid),
+    address: fields.address,
+    displayName: fields.displayName,
+    handle: fields.handle,
+    bio: fields.bio,
+    goalsAndVision: fields.goalsAndVision,
     voucher: {
-      status: voucherStatus,
-      voucherAddress: input.voucherAddress?.toLowerCase(),
-      voucherName: input.voucherName,
+      status: fields.voucherStatus,
+      voucherAddress: fields.voucherAddress,
+      voucherName: fields.voucherName,
       note:
-        voucherStatus === 'pending_vouch'
+        fields.voucherStatus === 'pending_vouch'
           ? 'Pseudonymous handle pending peer voucher (item 29)'
           : 'Vouched on onboarding'
     },
-    joinedAt: new Date().toISOString(),
+    joinedAt: fields.joinedAt,
     socials: {
-      farcaster: input.farcasterHandle?.trim().replace(/^@/, ''),
-      discord: input.discordHandle?.trim()
+      farcaster: fields.farcaster,
+      discord: fields.discord
     },
     hats: [],
     ledgers: {
@@ -362,6 +377,42 @@ export function assignNextZid(input: {
     fractalHistory: [], // Mirrored from chain in Phase 3; no fabricated records
     permissions: getMemberPermissions({ governanceWeight: null })
   };
+}
+
+/** True when `handle` is already held by a different wallet in the in-memory registry (case-insensitive). */
+export function isHandleTakenInMemory(handle: string, address: string): boolean {
+  const target = handle.trim().replace(/^@/, '').toLowerCase();
+  const self = address.toLowerCase();
+  return listZidProfiles().some((p) => p.handle.toLowerCase() === target && p.address !== self);
+}
+
+/**
+ * In-memory store: assigns the next permanent ZID and creates a profile upon onboarding.
+ * Validates declared goals and vision (item 30).
+ * Allocates from 501+ for new joiners; does NOT assign any ZID in the reserved 1-500 range.
+ * Used by tests and when ZAO_ZID_STORE is not "db"; see zidStore.ts for the database store.
+ */
+export function assignNextZid(input: NewZidInput): ZidProfile {
+  const normAddress = input.address.toLowerCase();
+
+  // Return existing profile if already registered
+  const existing = runtimeProfiles.get(normAddress);
+  if (existing) {
+    return existing;
+  }
+
+  assertValidNewZidInput(input);
+
+  // Zaal is ZID 1 per grill 2026-09-22 afternoon item 19; new joiners start at 501+
+  let zid: number | null = null;
+  if (normAddress === ZAAL_ADDRESS.toLowerCase()) {
+    zid = 1;
+  } else {
+    zid = nextMemberZidSequence;
+    nextMemberZidSequence += 1;
+  }
+
+  const profile = buildZidProfile(toStoredZidFields(input, zid, new Date().toISOString()));
 
   runtimeProfiles.set(normAddress, profile);
   if (zid !== null) {
