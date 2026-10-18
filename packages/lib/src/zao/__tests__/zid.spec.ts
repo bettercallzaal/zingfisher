@@ -9,8 +9,12 @@ import {
   classifyVoucherStatus,
   assignNextZid,
   getZidProfile,
+  applyZidEdit,
+  profileToStoredFields,
+  buildZidProfile,
   ZAAL_ADDRESS
 } from '../zid';
+import type { StoredZidFields } from '../zid';
 
 describe('ZID formatting and parsing', () => {
   it('formats ZID into 3-digit padded strings', () => {
@@ -171,5 +175,43 @@ describe('ZID Onboarding Allocation (Decision 2026-09-01)', () => {
 
     expect(zaal.zid).toBe(1);
     expect(zaal.formattedZid).toBe('ZID-001');
+  });
+});
+
+describe('applyZidEdit (editing after the claim)', () => {
+  const GOALS = 'I make ambient records and want to release them with The ZAO.';
+  const base: StoredZidFields = {
+    zid: 501,
+    address: `0x${'a'.repeat(40)}`,
+    displayName: 'Ay',
+    handle: 'ay',
+    bio: 'old intro',
+    goalsAndVision: GOALS,
+    voucherStatus: 'verified',
+    voucherName: 'Vee',
+    farcaster: 'ayfc',
+    discord: 'ay#1',
+    joinedAt: '2026-10-18T12:00:00Z'
+  };
+
+  it('changes only the fields sent, strips @ from farcaster, and clears a social sent empty', () => {
+    const next = applyZidEdit(base, { displayName: '  New Ay ', farcasterHandle: '@newfc', discordHandle: '' });
+    expect(next).toEqual({ ...base, displayName: 'New Ay', farcaster: 'newfc', discord: undefined });
+  });
+
+  it('RED CONTROL: ZID, wallet, handle, voucher and join date never change', () => {
+    const sneaky = { handle: 'taken', zid: 2, address: `0x${'b'.repeat(40)}`, voucherStatus: 'verified' } as never;
+    const next = applyZidEdit(base, sneaky);
+    expect(next).toEqual(base);
+  });
+
+  it('RED CONTROL: refuses short goals and an empty or long display name', () => {
+    expect(() => applyZidEdit(base, { goalsAndVision: 'too short' })).toThrow(/15 characters/);
+    expect(() => applyZidEdit(base, { displayName: '   ' })).toThrow(/1-80/);
+    expect(() => applyZidEdit(base, { displayName: 'x'.repeat(81) })).toThrow(/1-80/);
+  });
+
+  it('profileToStoredFields inverts buildZidProfile', () => {
+    expect(profileToStoredFields(buildZidProfile(base))).toEqual(base);
   });
 });

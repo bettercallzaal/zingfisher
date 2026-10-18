@@ -24,6 +24,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(getProfile);
 handler.post(requireUser, createProfile);
+handler.patch(requireUser, updateProfile);
 
 const ADDRESS_RE = /^0x[a-fA-F0-9]{40}$/;
 
@@ -39,6 +40,17 @@ const createProfileSchema = yup.object({
   discordHandle: yup.string().trim().max(64).optional(),
   voucherAddress: yup.string().trim().matches(ADDRESS_RE, 'Voucher must be a 0x wallet address').optional(),
   voucherName: yup.string().trim().max(80).optional()
+});
+
+// Input shape for PATCH. ZID, wallet and handle are not editable, so they are not in it;
+// stripUnknown drops them if sent. Same limits as the claim.
+const updateProfileSchema = yup.object({
+  address: yup.string().trim().matches(ADDRESS_RE, 'A valid 0x wallet address is required').required(),
+  displayName: yup.string().trim().max(80).optional(),
+  goalsAndVision: yup.string().trim().max(2000).optional(),
+  bio: yup.string().trim().max(1000).optional(),
+  farcasterHandle: yup.string().trim().max(64).optional(),
+  discordHandle: yup.string().trim().max(64).optional()
 });
 
 // The RPC error text never reaches the client: it can carry provider URLs and keys.
@@ -240,27 +252,82 @@ async function createProfile(req: NextApiRequest, res: NextApiResponse<ZidProfil
     return res.status(400).json({ error: 'Failed to create ZID profile' });
   }
 
-  // Attempt live chain read from Optimism; a failed read is UNKNOWN, never zero
+  await attachLiveBalances(profile);
+  return res.status(201).json(profile);
+}
+
+// PATCH /api/zao/zid
+// Edits the SIGNED-IN wallet's own profile: display name, intro, goals and socials. ZID, wallet
+// and handle stay fixed. Any address not linked to the caller's session is refused.
+async function updateProfile(req: NextApiRequest, res: NextApiResponse<ZidProfile | { error: string }>) {
+  let input: yup.InferType<typeof updateProfileSchema>;
+  try {
+    input = await updateProfileSchema.validate(req.body ?? {}, { abortEarly: true, stripUnknown: true });
+  } catch (err) {
+    const message = err instanceof yup.ValidationError ? err.message : 'Invalid input';
+    throw new InvalidInputError(message);
+  }
+
+  const wallets = await getSessionWallets(req.session.user.id);
+  if (!isOwnedAddress(wallets, input.address)) {
+    return res.status(403).json({ error: 'You can only edit the profile of a wallet linked to your account' });
+  }
+
+  if (input.goalsAndVision !== undefined) {
+    const goalsCheck = validateDeclaredGoals(input.goalsAndVision);
+    if (!goalsCheck.valid) {
+      throw new InvalidInputError(goalsCheck.reason || 'Declared creative goals and vision are required');
+    }
+  }
+  if (input.displayName !== undefined && input.displayName.length === 0) {
+    throw new InvalidInputError('Display name must be 1-80 characters');
+  }
+
+  let profile: ZidProfile | null;
+  try {
+    profile = await getZidStore().update(
+      input.address.toLowerCase(),
+      {
+        displayName: input.displayName,
+        bio: input.bio,
+        goalsAndVision: input.goalsAndVision,
+        farcasterHandle: input.farcasterHandle,
+        discordHandle: input.discordHandle
+      },
+      req.session.user.id
+    );
+  } catch (err) {
+    log.error('[zao/zid] Profile edit failed', { error: (err as Error)?.message });
+    return res.status(400).json({ error: 'Failed to update ZID profile' });
+  }
+  if (!profile) {
+    return res.status(404).json({ error: 'This wallet has no ZID yet' });
+  }
+
+  await attachLiveBalances(profile);
+  return res.status(200).json(profile);
+}
+
+// Live chain read from Optimism after a write; a failed read is UNKNOWN, never zero.
+async function attachLiveBalances(profile: ZidProfile) {
   try {
     const membership = await checkZaoMembership(profile.address);
     if (membership.status === 'ok') {
       applyLiveBalances(profile, membership);
     } else {
-      log.warn('[zao/zid] Optimism read failed after onboarding', {
+      log.warn('[zao/zid] Optimism read failed after a write', {
         address: profile.address,
         error: membership.error
       });
       markReadFailed(profile);
     }
   } catch (err) {
-    log.warn('[zao/zid] Optimism read threw after onboarding', {
+    log.warn('[zao/zid] Optimism read threw after a write', {
       address: profile.address,
       error: (err as Error)?.message
     });
     markReadFailed(profile);
   }
-
-  return res.status(201).json(profile);
 }
 
 export default withSessionRoute(handler);

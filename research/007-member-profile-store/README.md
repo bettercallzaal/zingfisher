@@ -101,7 +101,8 @@ Notes on the columns:
   Without the key there is also no `on delete set null`: if a CharmVerse user row is later
   removed, `user_id` keeps the old id. The app treats that as harmless by design. It finds
   members by `address` only, never authorises from `user_id` (every write re-checks the
-  session's wallets with `isOwnedAddress`), and never shows it.
+  session's wallets with `isOwnedAddress`), and never shows it. An edit (`PATCH /api/zao/zid`) also
+  rewrites `user_id` from the session, so a stale id is replaced on the member's next edit.
 - `intro` is the existing `bio` field renamed in storage; the API keeps the name `bio` so the
   page code does not change.
 - The checks repeat the API's own limits (`createProfileSchema` in the route), so a bug in
@@ -189,6 +190,10 @@ already public, like the member page. A list of every member is open question 1.
 2. Editing after the claim. A (recommended): a member can edit their own display name,
    intro, goals and socials; ZID, wallet and handle stay fixed. B: handle editable too.
    C: nothing editable until a later spec.
+   **Built as A on 2026-10-18**, the recommended default, while the question waited:
+   `PATCH /api/zao/zid` for a wallet linked to the caller's session. Display name, intro,
+   goals and socials can change; ZID, wallet, handle and voucher cannot. Zaal can still pick
+   B or C.
 3. ZIDs 2 to 500 stay reserved and unassigned until Zaal rules on who gets them. No change
    proposed here.
 

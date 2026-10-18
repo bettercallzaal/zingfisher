@@ -59,6 +59,22 @@ describe('memoryZidStore', () => {
   });
 });
 
+describe('memoryZidStore.update', () => {
+  it('edits the intro and keeps the handle and ZID; a wallet with no profile gets null', async () => {
+    const claimed = await memoryZidStore.create({
+      address: addr('5'),
+      displayName: 'V',
+      handle: 'vee5',
+      goalsAndVision: GOALS
+    });
+    const edited = await memoryZidStore.update(addr('5'), { bio: 'new intro', handle: 'other' } as never);
+
+    expect(edited).toMatchObject({ zid: claimed.zid, handle: 'vee5', bio: 'new intro' });
+    expect((await memoryZidStore.getByZid(claimed.zid as number))?.bio).toBe('new intro');
+    expect(await memoryZidStore.update(addr('6'), { bio: 'x' })).toBeNull();
+  });
+});
+
 describe('memoryZidStore.listPage', () => {
   it('returns profiles above the cursor, lowest ZID first, up to the limit', async () => {
     const a = await memoryZidStore.create({
@@ -230,6 +246,37 @@ describe('createDbZidStore', () => {
     });
     expect(isHandleConflict(zidClash)).toBe(false);
     expect(isHandleConflict(Object.assign(new Error('x'), { code: 'P2010', meta: { code: '23503' } }))).toBe(false);
+  });
+
+  it('edits with bound values, refreshes user_id from the session, and never writes handle or ZID', async () => {
+    const hostile = "x'); drop table zingfisher.zao_member; --";
+    const before = savedRow(addr('7'), 507, 'sev');
+    const after = { ...before, intro: hostile };
+    const { client, queries } = fakeClient([[before], [after]]);
+    const edited = await createDbZidStore(client).update(
+      addr('7'),
+      { bio: hostile },
+      '00000000-0000-0000-0000-000000000002'
+    );
+
+    expect(edited?.bio).toBe(hostile);
+    const update = queries[1];
+    expect(update.sql).toContain('update zingfisher.zao_member');
+    expect(update.sql).not.toContain('drop table');
+    expect(update.sql).not.toMatch(/\bhandle\s*=|\bzid\s*=/);
+    expect(update.sql).toContain('::uuid');
+    expect(update.values).toContain(hostile);
+    expect(update.values).toContain('00000000-0000-0000-0000-000000000002');
+  });
+
+  it('RED CONTROL: no row means null and no update; bad goals throw before any update', async () => {
+    const none = fakeClient([[]]);
+    expect(await createDbZidStore(none.client).update(addr('8'), { bio: 'x' })).toBeNull();
+    expect(none.queries).toHaveLength(1);
+
+    const bad = fakeClient([[savedRow(addr('9'), 509, 'nine')]]);
+    await expect(createDbZidStore(bad.client).update(addr('9'), { goalsAndVision: 'short' })).rejects.toThrow();
+    expect(bad.queries).toHaveLength(1);
   });
 
   it('lists a page by ZID with the cursor and limit as bound values', async () => {
