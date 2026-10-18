@@ -420,3 +420,76 @@ export function assignNextZid(input: NewZidInput): ZidProfile {
   }
   return profile;
 }
+
+/** What a member may change after the claim. ZID, wallet and handle stay fixed (spec 007, open question 2). */
+export interface ZidProfileEdit {
+  displayName?: string;
+  bio?: string;
+  goalsAndVision?: string;
+  farcasterHandle?: string;
+  discordHandle?: string;
+}
+
+/** Pure: the stored fields of a profile, the inverse of buildZidProfile for what a store keeps. */
+export function profileToStoredFields(profile: ZidProfile): StoredZidFields {
+  return {
+    zid: profile.zid,
+    address: profile.address,
+    displayName: profile.displayName,
+    handle: profile.handle,
+    bio: profile.bio ?? '',
+    goalsAndVision: profile.goalsAndVision,
+    voucherStatus: profile.voucher.status,
+    voucherAddress: profile.voucher.voucherAddress,
+    voucherName: profile.voucher.voucherName,
+    farcaster: profile.socials.farcaster,
+    discord: profile.socials.discord,
+    joinedAt: profile.joinedAt
+  };
+}
+
+/**
+ * Pure: applies an edit to stored fields. A field left out keeps its value; an empty social clears it.
+ * Throws with a user-facing reason when the goals (item 30) or the display name are invalid.
+ */
+export function applyZidEdit(fields: StoredZidFields, edit: ZidProfileEdit): StoredZidFields {
+  const next = { ...fields };
+  if (edit.displayName !== undefined) {
+    const displayName = edit.displayName.trim();
+    if (displayName.length < 1 || displayName.length > 80) {
+      throw new Error('Display name must be 1-80 characters');
+    }
+    next.displayName = displayName;
+  }
+  if (edit.goalsAndVision !== undefined) {
+    const goalsValidation = validateDeclaredGoals(edit.goalsAndVision);
+    if (!goalsValidation.valid) {
+      throw new Error(goalsValidation.reason);
+    }
+    next.goalsAndVision = edit.goalsAndVision.trim();
+  }
+  if (edit.bio !== undefined) {
+    next.bio = edit.bio.trim();
+  }
+  if (edit.farcasterHandle !== undefined) {
+    next.farcaster = edit.farcasterHandle.trim().replace(/^@/, '') || undefined;
+  }
+  if (edit.discordHandle !== undefined) {
+    next.discord = edit.discordHandle.trim() || undefined;
+  }
+  return next;
+}
+
+/** In-memory store: applies an edit to a registered profile. Null when the wallet has no profile. */
+export function updateZidProfileInMemory(address: string, edit: ZidProfileEdit): ZidProfile | null {
+  const existing = runtimeProfiles.get(address.trim().toLowerCase());
+  if (!existing) {
+    return null;
+  }
+  const profile = buildZidProfile(applyZidEdit(profileToStoredFields(existing), edit));
+  runtimeProfiles.set(profile.address, profile);
+  if (profile.zid !== null) {
+    runtimeProfiles.set(profile.zid.toString(), profile);
+  }
+  return profile;
+}

@@ -12,8 +12,9 @@
  */
 import { prisma, Prisma } from '@charmverse/core/prisma-client';
 
-import type { NewZidInput, StoredZidFields, VoucherStatus, ZidProfile } from './zid';
+import type { NewZidInput, StoredZidFields, VoucherStatus, ZidProfile, ZidProfileEdit } from './zid';
 import {
+  applyZidEdit,
   assertValidNewZidInput,
   assignNextZid,
   buildZidProfile,
@@ -21,6 +22,7 @@ import {
   isHandleTakenInMemory,
   listZidProfiles,
   toStoredZidFields,
+  updateZidProfileInMemory,
   ZAAL_ADDRESS
 } from './zid';
 
@@ -37,6 +39,8 @@ export interface ZidStore {
   listByAddresses(addresses: readonly string[]): Promise<ZidProfile[]>;
   /** Claims a ZID for the wallet, or returns the wallet's existing profile. Throws HandleTakenError. */
   create(input: NewZidInput & { userId?: string }): Promise<ZidProfile>;
+  /** Edits the wallet's profile; null when it has none. Throws on invalid goals or display name. */
+  update(address: string, edit: ZidProfileEdit, userId?: string): Promise<ZidProfile | null>;
 }
 
 export const memoryZidStore: ZidStore = {
@@ -59,6 +63,9 @@ export const memoryZidStore: ZidStore = {
       throw new HandleTakenError();
     }
     return assignNextZid(input);
+  },
+  async update(address, edit) {
+    return updateZidProfileInMemory(address, edit);
   }
 };
 
@@ -200,6 +207,26 @@ export function createDbZidStore(client: RawQueryClient): ZidStore {
         throw new Error('ZID claim was not saved');
       }
       return saved;
+    },
+    async update(rawAddress, edit, userId) {
+      const address = rawAddress.trim().toLowerCase();
+      const rows = await client.$queryRaw<ZaoMemberRow[]>(
+        Prisma.sql`select ${COLUMNS} from zingfisher.zao_member where address = ${address} limit 1`
+      );
+      if (!rows[0]) {
+        return null;
+      }
+      const f = applyZidEdit(rowToStoredFields(rows[0]), edit);
+      // An edit also refreshes user_id from the session, so a stale id is replaced on the next write.
+      const user = userId ? Prisma.sql`${userId}::uuid` : Prisma.sql`user_id`;
+      const updated = await client.$queryRaw<ZaoMemberRow[]>(
+        Prisma.sql`update zingfisher.zao_member
+          set display_name = ${f.displayName}, intro = ${f.bio}, goals_and_vision = ${f.goalsAndVision},
+            farcaster = ${f.farcaster ?? null}, discord = ${f.discord ?? null}, user_id = ${user}, updated_at = now()
+          where address = ${address}
+          returning ${COLUMNS}`
+      );
+      return updated[0] ? buildZidProfile(rowToStoredFields(updated[0])) : null;
     }
   };
 }
