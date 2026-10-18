@@ -182,6 +182,10 @@ already public, like the member page. A list of every member is open question 1.
    tooling. A (recommended): yes, at `GET /api/zao/members`, since every field in it is
    already public on each member page. B: no list; tools look members up one at a time.
    C: a separate read-only database login for the fractal tooling only.
+   **Built as A on 2026-10-18**, the recommended default, while the question waited: public
+   `GET /api/zao/members?after=<zid>`, lowest ZID first, `nextAfter` for the next page. It
+   returns ZID, handle, display name and intro, and no wallet, goals, voucher or socials.
+   Zaal can still pick B or C; B means deleting one route file.
 2. Editing after the claim. A (recommended): a member can edit their own display name,
    intro, goals and socials; ZID, wallet and handle stay fixed. B: handle editable too.
    C: nothing editable until a later spec.
@@ -196,4 +200,4 @@ already public, like the member page. A list of every member is open question 1.
 | Build PR: `zidStore.ts`, SQL file, route switched to the store, tests | zao-core lane | this spec merged |
 | Run `001_zao_member.sql` in the SQL editor | Zaal | the Postgres walk-through |
 | Set `ZAO_ZID_STORE=db` on a Preview and claim a ZID | Zaal | the two rows above |
-| Members list endpoint | zao-core lane | open question 1 |
+| Members list endpoint (built as option A, 2026-10-18) | zao-core lane | open question 1 |
