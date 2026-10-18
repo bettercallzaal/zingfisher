@@ -59,6 +59,31 @@ describe('memoryZidStore', () => {
   });
 });
 
+describe('memoryZidStore.listPage', () => {
+  it('returns profiles above the cursor, lowest ZID first, up to the limit', async () => {
+    const a = await memoryZidStore.create({
+      address: addr('3'),
+      displayName: 'T',
+      handle: 'tee3',
+      goalsAndVision: GOALS
+    });
+    const b = await memoryZidStore.create({
+      address: addr('4'),
+      displayName: 'U',
+      handle: 'you4',
+      goalsAndVision: GOALS
+    });
+
+    const all = await memoryZidStore.listPage(0, 1000);
+    const zids = all.map((p) => p.zid as number);
+    expect(zids).toEqual([...zids].sort((x, y) => x - y));
+    expect(zids).toContain(a.zid);
+
+    const afterA = await memoryZidStore.listPage(a.zid as number, 1);
+    expect(afterA.map((p) => p.zid)).toEqual([b.zid]);
+  });
+});
+
 describe('rowToStoredFields', () => {
   const row: ZaoMemberRow = {
     address: addr('a'),
@@ -205,6 +230,16 @@ describe('createDbZidStore', () => {
     });
     expect(isHandleConflict(zidClash)).toBe(false);
     expect(isHandleConflict(Object.assign(new Error('x'), { code: 'P2010', meta: { code: '23503' } }))).toBe(false);
+  });
+
+  it('lists a page by ZID with the cursor and limit as bound values', async () => {
+    const { client, queries } = fakeClient([[savedRow(addr('1'), 502, 'one'), savedRow(addr('2'), 503, 'two')]]);
+    const page = await createDbZidStore(client).listPage(501, 51);
+
+    expect(page.map((p) => p.zid)).toEqual([502, 503]);
+    expect(queries[0].sql).toContain('order by zid');
+    expect(queries[0].sql).not.toContain('501');
+    expect(queries[0].values).toEqual([501, 51]);
   });
 
   it('isHandleConflict ignores other errors', () => {

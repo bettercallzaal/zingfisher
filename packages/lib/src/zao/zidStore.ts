@@ -35,6 +35,8 @@ export interface ZidStore {
   getByAddress(address: string): Promise<ZidProfile | null>;
   getByZid(zid: number): Promise<ZidProfile | null>;
   listByAddresses(addresses: readonly string[]): Promise<ZidProfile[]>;
+  /** Up to `limit` profiles with a ZID above `afterZid`, lowest ZID first. */
+  listPage(afterZid: number, limit: number): Promise<ZidProfile[]>;
   /** Claims a ZID for the wallet, or returns the wallet's existing profile. Throws HandleTakenError. */
   create(input: NewZidInput & { userId?: string }): Promise<ZidProfile>;
 }
@@ -49,6 +51,12 @@ export const memoryZidStore: ZidStore = {
   async listByAddresses(addresses) {
     const wanted = new Set(addresses.map((a) => a.trim().toLowerCase()));
     return listZidProfiles().filter((p) => wanted.has(p.address));
+  },
+  async listPage(afterZid, limit) {
+    return listZidProfiles()
+      .filter((p) => p.zid !== null && p.zid > afterZid)
+      .sort((a, b) => (a.zid as number) - (b.zid as number))
+      .slice(0, limit);
   },
   async create(input) {
     const existing = getZidProfile(input.address.trim().toLowerCase());
@@ -152,6 +160,12 @@ export function createDbZidStore(client: RawQueryClient): ZidStore {
       }
       const rows = await client.$queryRaw<ZaoMemberRow[]>(
         Prisma.sql`select ${COLUMNS} from zingfisher.zao_member where address in (${Prisma.join(wanted)}) order by zid`
+      );
+      return rows.map((r) => buildZidProfile(rowToStoredFields(r)));
+    },
+    async listPage(afterZid, limit) {
+      const rows = await client.$queryRaw<ZaoMemberRow[]>(
+        Prisma.sql`select ${COLUMNS} from zingfisher.zao_member where zid > ${afterZid} order by zid limit ${limit}`
       );
       return rows.map((r) => buildZidProfile(rowToStoredFields(r)));
     },
